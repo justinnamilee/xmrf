@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+use strict;
+
+
+# imports
+
+use Getopt::Long qw[];
+use File::Copy qw[];
+use File::Basename qw[];
+
+
+# sub defs
+
+sub boolify(_);
+sub configure(\%\%);
+sub scan(_);
+
+
+# globals
+
+my %input =
+(
+
+);
+
+my %config =
+( #? hardcoded defaults -> env -> getopts (wins)
+  automatic => boolify($ENV{XMRF_AUTOMATIC} // 1),
+  copy      => boolify($ENV{XMRF_COPY}      // 0),
+  execute   => boolify($ENV{XMRF_EXCUTE}    // 0),
+  input     =>         $ENV{XMRF_INPUT}     // q[.],
+  output    =>         $ENV{XMRF_OUTPUT}    // q[.],
+  recursive => boolify($ENV{XMRF_RECURSIVE} // 0),
+  simple    => boolify($ENV{XMRF_SIMPLE}    // 1),
+  verbose   => boolify($ENV{XMRF_VERBOSE}   // 0),
+  #? positional arguments (required)
+  format    => undef,
+  match     => undef,
+  #? special config items
+  map       => {},
+  name      => File::Basename::basename($0),
+);
+
+
+# int main(void)
+
+configure(%option, %config)
+
+
+# subroutines
+
+sub boolify(_)
+{
+  !!shift
+}
+
+sub configure(\%\%)
+{
+
+}
