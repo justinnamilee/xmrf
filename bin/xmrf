@@ -3,8 +3,9 @@
 use strict;
 
 use File::Basename qw[];
-use File::Copy qw[];
-use Getopt::Long qw[];
+use File::Copy     qw[];
+use Getopt::Long   qw[];
+use Pod::Usage     qw[];
 
 
 # subroutine definitions
@@ -39,7 +40,7 @@ my %option =
   q[automatic|a!] => \$config{automatic},
   q[copy|c!]      => \$config{copy},
   q[execute|e!]   => \$config{execute},
-  q[help|h!]      => \$config{help}, 
+  q[help|h+]      => \$config{help}, 
   q[input|i=s]    => \$config{input},
   q[output|o=s]   => \$config{output},
   q[recursive|r!] => \$config{recursive},
@@ -63,6 +64,17 @@ sub boolify(_)
 sub configure(\%\%)
 {
   my ($option, $config) = @_;
+
+  Getopt::Long::Configure (q[bundling], q[ignorecase_always]);
+
+  Getopt::Long::GetOptions(%{$option})
+    or Pod::Usage::pod2usage(2);
+
+  Pod::Usage::pod2usage(1)
+    if $config->{help} == 1;
+
+  Pod::Usage::pod2usage(-exitval => 0, -verbose => 2)
+    if $config->{help} > 1;
 }
 
 
@@ -92,7 +104,7 @@ xmrf [options] regex sprintf
 
 =over 4
 
-=item B<-automatic>
+=item B<--automatic>
 
 In automatic mode only the filename without any file extension (as determined
 by B<File::Basename::fileparse>) will be passed to the regex.  When the job is
@@ -102,7 +114,7 @@ the extension will be re-attached.
 If disabled with B<--no-automatic>, then the entire path for the file and its
 extension will be passed to your regex (sometimes quite useful).
 
-=item B<-copy>
+=item B<--copy>
 
 Use B<File::Copy::copy> instead of B<File::Copy::move> as the operation on the
 input file and output file.
