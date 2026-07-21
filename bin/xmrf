@@ -73,7 +73,7 @@ sub configure(\%\%)
   Pod::Usage::pod2usage(1)
     if $config->{help} == 1;
 
-  Pod::Usage::pod2usage(-exitval => 0, -verbose => 2)
+  Pod::Usage::pod2usage(-exitval => 0, -verbose => 2, -noperldoc => 1)
     if $config->{help} > 1;
 }
 
