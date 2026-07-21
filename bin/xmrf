@@ -6,7 +6,6 @@ use File::Basename qw[];
 use File::Copy     qw[];
 use Getopt::Long   qw[];
 use Pod::Usage     qw[];
-use Data::Dump     qw[dd]; #!DEBUG
 
 
 # subroutine definitions
@@ -20,33 +19,34 @@ sub error($;@);
 
 my %config =
 ( #? hardcoded defaults -> env -> getopts (wins)
-  automatic => boolify($ENV{XMRF_AUTOMATIC} // 1),
-  copy      => boolify($ENV{XMRF_COPY}      // 0),
-  execute   => boolify($ENV{XMRF_EXCUTE}    // 0),
-  input     =>         $ENV{XMRF_INPUT}     // q[.],
-  output    =>         $ENV{XMRF_OUTPUT}    // q[],
-  recursive => boolify($ENV{XMRF_RECURSIVE} // 0),
-  simple    => boolify($ENV{XMRF_SIMPLE}    // 1),
-  verbose   => boolify($ENV{XMRF_VERBOSE}   // 0),
+  build     => $ENV{XMRF_BUILD}     // 0,
+  copy      => $ENV{XMRF_COPY}      // 0,
+  execute   => $ENV{XMRF_EXCUTE}    // 0,
+  full      => $ENV{XMRF_FULL}      // 0,
+  input     => $ENV{XMRF_INPUT}     // q[.],
+  named     => $ENV{XMRF_NAMED}     // 0,
+  output    => $ENV{XMRF_OUTPUT}    // q[],
+  recursive => $ENV{XMRF_RECURSIVE} // 0,
+  verbose   => $ENV{XMRF_VERBOSE}   // 0,
   #? positional arguments (required)
   format    => undef,
   match     => undef,
   #? special config items
   help      => 0,
-  map       => {},
-  name      => File::Basename::basename($0),
+  map       => {}
 );
 
 my %option =
 ( #? note, map is special, very special
-  q[automatic|a!] => \$config{automatic},
+  q[build|b!]     => \$config{build},
   q[copy|c!]      => \$config{copy},
   q[execute|e!]   => \$config{execute},
+  q[full|f!]      => \$config{full},
   q[help|h+]      => \$config{help}, 
   q[input|i=s]    => \$config{input},
+  q[named|n!]     => \$config{named},
   q[output|o=s]   => \$config{output},
   q[recursive|r!] => \$config{recursive},
-  q[simple|s!]    => \$config{simple},
   q[verbose|v!]   => \$config{verbose}
 );
 
@@ -65,11 +65,11 @@ sub boolify(_)
 
 sub configure(\%\%)
 {
-  my ($option, $config) = @_;
+  my ($option, $config, %map) = @_;
 
-  Getopt::Long::Configure (q[bundling], q[ignorecase_always]);
+  Getopt::Long::Configure(qw[bundling ignorecase_always]);
 
-  Getopt::Long::GetOptions(%{$option})
+  Getopt::Long::GetOptions(%{$option}, q[map|m=s] => \%map)
     or Pod::Usage::pod2usage(2);
 
   Pod::Usage::pod2usage(-exitval => 0, -verbose => 2, -noperldoc => 1)
@@ -78,18 +78,49 @@ sub configure(\%\%)
   Pod::Usage::pod2usage(1)
     if $config->{help} == 1;
 
+  error(q[Input folder must exist], qq['$config->{input}'])
+    unless (-d $config->{input});
+
   error(q[Incorrect number of positional arguments], int(@ARGV))
     unless (@ARGV == 2);
 
-  ($config->{match}, $config->{format}) = @ARGV;
-  print q[config: ]; dd($config); #!DEBUG
+  my ($regex, $sprintf) = @ARGV;
+
+  $config->{match} = eval "qr/$regex/";
+
+  error(q[Invalid regex given], $regex, $@)
+    if ($@);
+
+  error(q[Sprintf should be non-zero length])
+    unless (length($sprintf));
+
+  $config->{format} = $sprintf;
+
+  $config->{$_} = boolify($config->{$_})
+    for (qw[build copy execute full named recursive verbose]);
+  
+  foreach my $m (keys(%map))
+  {
+    my $sub = eval "sub { $map{$m} }"; #? try compile
+
+    error(q[Can't compile given map], $m, $@)
+      if ($@);
+
+    error(q[Given map isn't a subroutine], $m, ref($sub) // q[SCALAR])
+      unless (ref($sub) eq q[CODE]);
+
+    $config->{map}->{$m} = $sub;
+  }
+
+  $config->{verbose} = 1
+    unless ($config->{execute});
 }
 
 sub error($;@)
 {
   my ($msg, @extra) = @_;
 
-  print STDERR join(q[: ], $msg, @extra) . qq[\n];
+  print STDERR join(q[: ], q[Error], $msg, @extra) . qq[\n];
   Pod::Usage::pod2usage(2);
 }
 
@@ -105,30 +136,28 @@ xmrf - Regex-map Rename File
 xmrf [options] regex sprintf
 
  Options:
-   --automatic | -a          auto-mode (default), disable with --no-automatic
+   --build     | -b          create output directory structure as-needed
    --copy      | -c          copy instead of rename, very useful
    --execute   | -e          actually perform the operation, safety measure
+   --full      | -f          pass full path to regex, not just filename
    --help      | -h          show the full help dialog
    --input     | -i <dir>    scan <dir> for files (or subdirs too with -r)
-   --map       | -m <str>    hash of subroutines for mapping actions (fun)
+   --map       | -m <k>=<v>  defines a suboutine <v> to run against <k> (fun)
+   --named     | -n          use named capture groups instead of numeric
    --output    | -o <dir>    put files in <dir>
    --recursive | -r          scan subfolders of the input dir too
-   --simple    | -s          use numeric capture groups instead of named
    --verbose   | -v          show more information, defaults on without execute
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<--automatic>
+=item B<--build>
 
-In automatic mode only the filename without any file extension (as determined
-by B<File::Basename::fileparse>) will be passed to the regex.  When the job is
-complete the output file will be prepended with the selected output folder and
-the extension will be re-attached.
-
-If disabled with B<--no-automatic>, then the entire path for the file and its
-extension will be passed to your regex (sometimes quite useful).
+After the full output path is generated, create the directory structure as
+required with B<File::Path::make_path>.  If not set or B<--no-build> is set
+then an error will be thrown if the output path doesn't exist already for the
+file to be copied to.
 
 =item B<--copy>
 
@@ -139,15 +168,38 @@ input file and output file.
 
 Without specifying B<--execute> only the planned operation will be shown.
 
+=item B<--full>
+
+In B<--no-full> mode (default) only the filename without any file extension (as
+determined by B<File::Basename::fileparse>) will be passed to the regex.  When
+the job is complete the output file will be prepended with the selected output
+folder (defaults to nothing) and the extension will be re-attached.
+
+If enabled with B<--full>, then the entire path for the file and its extension
+will be passed to your regex (sometimes quite useful).
+
 =item B<--input> C<dir>
 
 Change the folder to scan from C<./> to C<dir>.
 
-=item B<--map> C<str>
+=item B<--map> C<key=val>
 
-The given string will be parsed as a Perl-array of subroutines, or if the
-B<--no-simple> flag is specified then a Perl-hash of subroutines should be
-supplied (matching the names used in the regex).
+Each C<key> is either a numeric or named captured group, and each C<val> will
+be compiled as a subroutine that is given the data returned by the capture
+group.  The subroutine should further process the capture group's value and
+ultimately return what the sprintf format is expecting for that slot.
+
+If the B<--no-simple> flag is specified then your C<key>s should match the
+named capture groups, otherwise they should be numeric.
+
+Multiple B<--map> flags can be included to specify more mapping subroutines.
+
+=item B<--named>
+
+In B<--no-named> mode (default) the regex capture groups are taken in order as
+an array.  If B<--named> is specified then it is expected the regex will use
+named capture groups.  These named capture groups will be sorted with Perl'`s
+C<sort> function when applied to the B<sprintf> section.
 
 =item B<--output> C<dir>
 
@@ -162,13 +214,6 @@ path could also be specified as part of the B<sprintf> section, if desired.
 =item B<--recursive>
 
 If set the input folder and all its subfolders will be scanned for files.
-
-=item B<--simple>
-
-In simple mode (default) the regex capture groups are taken in order as an
-array.  If B<--no-simple> is specified then it is expected the regex will use
-named capture groups.  These named capture groups will be sorted with Perl's
-C<sort> function when applied to the B<sprintf> section.
 
 =item B<--verbose>
 
