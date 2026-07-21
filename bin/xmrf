@@ -2,7 +2,18 @@
 
 use strict;
 
- #! map has no env available
+use File::Basename qw[];
+use File::Copy qw[];
+use Getopt::Long qw[];
+
+
+# subroutine definitions
+
+sub boolify(_);
+sub configure(\%\%);
+
+
+# globals
 
 my %config =
 ( #? hardcoded defaults -> env -> getopts (wins)
@@ -10,7 +21,7 @@ my %config =
   copy      => boolify($ENV{XMRF_COPY}      // 0),
   execute   => boolify($ENV{XMRF_EXCUTE}    // 0),
   input     =>         $ENV{XMRF_INPUT}     // q[.],
-  output    =>         $ENV{XMRF_OUTPUT}    // q[.],
+  output    =>         $ENV{XMRF_OUTPUT}    // q[],
   recursive => boolify($ENV{XMRF_RECURSIVE} // 0),
   simple    => boolify($ENV{XMRF_SIMPLE}    // 1),
   verbose   => boolify($ENV{XMRF_VERBOSE}   // 0),
@@ -18,15 +29,17 @@ my %config =
   format    => undef,
   match     => undef,
   #? special config items
+  help      => 0,
   map       => {},
   name      => File::Basename::basename($0),
 );
 
-my %input =
+my %option =
 ( #? note, map is special, very special
   q[automatic|a!] => \$config{automatic},
   q[copy|c!]      => \$config{copy},
   q[execute|e!]   => \$config{execute},
+  q[help|h!]      => \$config{help}, 
   q[input|i=s]    => \$config{input},
   q[output|o=s]   => \$config{output},
   q[recursive|r!] => \$config{recursive},
@@ -37,7 +50,7 @@ my %input =
 
 # int main(void)
 
-configure(%option, %config)
+configure(%option, %config);
 
 
 # subroutines
@@ -49,5 +62,97 @@ sub boolify(_)
 
 sub configure(\%\%)
 {
-
+  my ($option, $config) = @_;
 }
+
+
+__END__
+
+=head1 NAME
+
+xmrf - Regex-map Rename File
+
+=head1 SYNOPSIS
+
+xmrf [options] regex sprintf
+
+ Options:
+   --automatic | -a          auto-mode (default), disable with --no-automatic
+   --copy      | -c          copy instead of rename, very useful
+   --execute   | -e          actually perform the operation, safety measure
+   --help      | -h          show the full help dialog
+   --input     | -i <dir>    scan <dir> for files (or subdirs too with -r)
+   --map       | -m <str>    hash of subroutines for mapping actions (fun)
+   --output    | -o <dir>    put files in <dir>
+   --recursive | -r          scan subfolders of the input dir too
+   --simple    | -s          use numeric capture groups instead of named
+   --verbose   | -v          show more information, defaults on without execute
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-automatic>
+
+In automatic mode only the filename without any file extension (as determined
+by B<File::Basename::fileparse>) will be passed to the regex.  When the job is
+complete the output file will be prepended with the selected output folder and
+the extension will be re-attached.
+
+If disabled with B<--no-automatic>, then the entire path for the file and its
+extension will be passed to your regex (sometimes quite useful).
+
+=item B<-copy>
+
+Use B<File::Copy::copy> instead of B<File::Copy::move> as the operation on the
+input file and output file.
+
+=item B<--execute>
+
+Without specifying B<--execute> only the planned operation will be shown.
+
+=item B<--input> C<dir>
+
+Change the folder to scan from C<./> to C<dir>.
+
+=item B<--map> C<str>
+
+The given string will be parsed as a Perl-array of subroutines, or if the
+B<--no-simple> flag is specified then a Perl-hash of subroutines should be
+supplied (matching the names used in the regex).
+
+=item B<--output> C<dir>
+
+The output folder is a bit different to the input folder.  If unspecified it
+will default to the input folder.  However, if B<--no-automatic> is set, then
+this defaulting to input folder will not occur.
+
+In either mode, it will get prepended to the output file, however it is an
+empty string by default.  This means when in B<--no-automatic> mode, the output
+path could also be specified as part of the B<sprintf> section, if desired.
+
+=item B<--recursive>
+
+If set the input folder and all its subfolders will be scanned for files.
+
+=item B<--simple>
+
+In simple mode (default) the regex capture groups are taken in order as an
+array.  If B<--no-simple> is specified then it is expected the regex will use
+named capture groups.  These named capture groups will be sorted with Perl's
+C<sort> function when applied to the B<sprintf> section.
+
+=item B<--verbose>
+
+Behaves much like C<cp> or C<mv> verbose flag.  If B<--execute> isn't specified
+then it is forced on to show the planned operations.
+
+=back
+
+=head1 DESCRIPTION
+
+B<XMRF> will rename (or copy) files based on an input dir, an output dir, a
+regex, and an sprintf format.  It tries to use some sane defaults for things
+that aren't provided.
+
+=cut
