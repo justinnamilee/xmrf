@@ -2,27 +2,7 @@
 
 use strict;
 
-
-# imports
-
-use Getopt::Long qw[];
-use File::Copy qw[];
-use File::Basename qw[];
-
-
-# sub defs
-
-sub boolify(_);
-sub configure(\%\%);
-sub scan(_);
-
-
-# globals
-
-my %input =
-(
-
-);
+ #! map has no env available
 
 my %config =
 ( #? hardcoded defaults -> env -> getopts (wins)
@@ -40,6 +20,18 @@ my %config =
   #? special config items
   map       => {},
   name      => File::Basename::basename($0),
+);
+
+my %input =
+( #? note, map is special, very special
+  q[automatic|a!] => \$config{automatic},
+  q[copy|c!]      => \$config{copy},
+  q[execute|e!]   => \$config{execute},
+  q[input|i=s]    => \$config{input},
+  q[output|o=s]   => \$config{output},
+  q[recursive|r!] => \$config{recursive},
+  q[simple|s!]    => \$config{simple},
+  q[verbose|v!]   => \$config{verbose}
 );
 
 
