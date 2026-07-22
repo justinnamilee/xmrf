@@ -2,7 +2,6 @@
 
 use strict;
 
-use File::Basename qw[];
 use File::Copy     qw[];
 use File::Spec     qw[];
 use Getopt::Long   qw[];
@@ -13,8 +12,9 @@ use Pod::Usage     qw[];
 
 sub boolify(_);
 sub configure(\%\%);
+sub deconstruct(_);
 sub error($;@);
-sub scan($$);
+sub scan(_);
 
 
 # globals
@@ -29,6 +29,7 @@ my %config =
   named     => $ENV{XMRF_NAMED}     // 0,
   output    => $ENV{XMRF_OUTPUT}    // q[],
   recursive => $ENV{XMRF_RECURSIVE} // 0,
+  suffix    => $ENV{XMRF_SUFFIX}    // q[^(.+)\.(.+?)$],
   verbose   => $ENV{XMRF_VERBOSE}   // 0,
   #? positional arguments (required)
   format    => undef,
@@ -44,11 +45,12 @@ my %option =
   q[copy|c!]      => \$config{copy},
   q[execute|e!]   => \$config{execute},
   q[full|f!]      => \$config{full},
-  q[help|h+]      => \$config{help}, 
+  q[help|h+]      => \$config{help},
   q[input|i=s]    => \$config{input},
   q[named|n!]     => \$config{named},
   q[output|o=s]   => \$config{output},
   q[recursive|r!] => \$config{recursive},
+  q[suffix|s=s]   => \$config{suffix},
   q[verbose|v!]   => \$config{verbose}
 );
 
@@ -58,7 +60,7 @@ my %option =
 configure(%option, %config);
 
 use Data::Dump qw[dd]; #!DEBUG
-my @file = scan($config{input}, $config{recursive});
+my @file = map { deconstruct } scan($config{input});
 dd(q[config], \%config); #!DEBUG
 dd(q[data], \@file); #!DEBUG
 
@@ -93,9 +95,9 @@ sub configure(\%\%)
 
   my ($regex, $sprintf) = @ARGV;
 
-  $config->{match} = eval "qr/$regex/";
+  $config->{match} = eval qq[qr/$regex/];
 
-  error(q[Invalid regex given], $regex, $@)
+  error(q[Invalid match regex given], $@)
     if ($@);
 
   error(q[Sprintf should be non-zero length])
@@ -105,10 +107,10 @@ sub configure(\%\%)
 
   $config->{$_} = boolify($config->{$_})
     for (qw[build copy execute full named recursive verbose]);
-  
+
   foreach my $m (keys(%map))
   {
-    my $sub = eval "sub { $map{$m} }"; #? try compile
+    my $sub = eval qq[sub { $map{$m} }];
 
     error(q[Can't compile given map], $m, $@)
       if ($@);
@@ -119,8 +121,26 @@ sub configure(\%\%)
     $config->{map}->{$m} = $sub;
   }
 
+  $config->{suffix} = eval qq[qr/$config->{suffix}/];
+
+  error(q[Invalid suffix regex given], $@)
+    if ($@);
+
   $config->{verbose} = 1
     unless ($config->{execute});
+}
+
+sub deconstruct(_)
+{
+  my ($path, $e) = @_;
+  my ($v, $d, $f) = File::Spec->splitpath($path);
+
+  if ($f =~ s/$config{option}->{extRegex}/$1/)
+  {
+    $e = $2;
+  }
+
+  return ({file => $f, path => $d, ext => $e // q[]});
 }
 
 sub error($;@)
@@ -131,9 +151,9 @@ sub error($;@)
   Pod::Usage::pod2usage(2);
 }
 
-sub scan($$) #? who needs file::find
+sub scan(_) #? who needs file::find
 {
-  my ($path, $recurse, @f) = @_;
+  my ($path, @f) = @_;
 
   if (-f $path)
   {
@@ -147,7 +167,7 @@ sub scan($$) #? who needs file::find
       {
         my $p = File::Spec->join($path, $i);
 
-        push(@f, -f $p ? $p : (-d $p && $recurse ? scan($p, $recurse) : ()));
+        push(@f, -f $p ? $p : (-d $p && $config{recurse} ? scan($p) : ()));
       }
     }
     else
@@ -181,6 +201,7 @@ xmrf [options] regex sprintf
    --named     | -n          use named capture groups instead of numeric
    --output    | -o <dir>    put files in <dir>
    --recursive | -r          scan subfolders of the input dir too
+   --suffix    | -s <str>    override the default suffix extraction regex
    --verbose   | -v          show more information, defaults on without execute
 
 =head1 OPTIONS
@@ -205,10 +226,10 @@ Without specifying B<--execute> only the planned operation will be shown.
 
 =item B<--full>
 
-In B<--no-full> mode (default) only the filename without any file extension (as
-determined by B<File::Basename::fileparse>) will be passed to the regex.  When
-the job is complete the output file will be prepended with the selected output
-folder (defaults to nothing) and the extension will be re-attached.
+In B<--no-full> mode (default) only the filename (without any file extension)
+will be passed to the regex.  When the job is complete the output file will be
+prepended with the selected output folder (defaults to nothing) and the
+extension will be re-attached.
 
 If enabled with B<--full>, then the entire path for the file and its extension
 will be passed to your regex (sometimes quite useful).
@@ -224,8 +245,8 @@ be compiled as a subroutine that is given the data returned by the capture
 group.  The subroutine should further process the capture group's value and
 ultimately return what the sprintf format is expecting for that slot.
 
-If the B<--no-simple> flag is specified then your C<key>s should match the
-named capture groups, otherwise they should be numeric.
+If the B<--named> flag is specified then your C<key>s should match the named
+capture groups, otherwise they should be numeric.
 
 Multiple B<--map> flags can be included to specify more mapping subroutines.
 
@@ -249,6 +270,12 @@ path could also be specified as part of the B<sprintf> section, if desired.
 =item B<--recursive>
 
 If set the input folder and all its subfolders will be scanned for files.
+
+=item B<--suffix> C<str>
+
+The default suffix extraction regex is lazy, taking only the shortest possible
+value, i.e. C<item.tar.gz> produces C<gz> as the suffix.  Supply a new regex
+with the C<str> provided.
 
 =item B<--verbose>
 
