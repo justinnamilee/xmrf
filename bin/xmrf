@@ -140,7 +140,7 @@ sub deconstruct(_)
     $e = $2;
   }
 
-  return ({file => $f, path => $d, ext => $e // q[]});
+  return ({file => $f, path => File::Spec->catdir($v, $d), ext => $e // q[]});
 }
 
 sub error($;@)
