@@ -276,7 +276,7 @@ If set the input folder and all its subfolders will be scanned for files.
 The default suffix extraction regex is lazy, taking only the shortest possible
 value, i.e. C<item.tar.gz> produces C<gz> as the suffix.  Supply a new regex
 with the C<str> provided, should have exact two capture groups for "file" and
-"suffix", respectively.
+"suffix", respectively.  This isn't used in B<--full> mode.
 
 =item B<--verbose>
 
