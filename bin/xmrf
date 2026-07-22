@@ -135,7 +135,7 @@ sub deconstruct(_)
   my ($path, $e) = @_;
   my ($v, $d, $f) = File::Spec->splitpath($path);
 
-  if ($f =~ s/$config{option}->{extRegex}/$1/)
+  if ($f =~ s/$config{suffix}/$1/)
   {
     $e = $2;
   }
