@@ -59,10 +59,7 @@ my %option =
 
 configure(%option, %config);
 
-use Data::Dump qw[dd]; #!DEBUG
 my @file = map { deconstruct } scan($config{input});
-dd(q[config], \%config); #!DEBUG
-dd(q[data], \@file); #!DEBUG
 
 
 # subroutines
@@ -140,7 +137,13 @@ sub deconstruct(_)
     $e = $2;
   }
 
-  return ({file => $f, path => File::Spec->catdir($v, $d), ext => $e // q[]});
+  return
+  ({
+    ext  => $e // q[],
+    file => $f,
+    full => $path,
+    path => File::Spec->catdir($v, $d),
+  });
 }
 
 sub error($;@)
