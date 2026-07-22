@@ -4,6 +4,7 @@ use strict;
 
 use File::Basename qw[];
 use File::Copy     qw[];
+use File::Spec     qw[];
 use Getopt::Long   qw[];
 use Pod::Usage     qw[];
 
@@ -13,6 +14,7 @@ use Pod::Usage     qw[];
 sub boolify(_);
 sub configure(\%\%);
 sub error($;@);
+sub scan($$);
 
 
 # globals
@@ -55,12 +57,17 @@ my %option =
 
 configure(%option, %config);
 
+use Data::Dump qw[dd]; #!DEBUG
+my @file = scan($config{input}, $config{recursive});
+dd(q[config], \%config); #!DEBUG
+dd(q[data], \@file); #!DEBUG
+
 
 # subroutines
 
 sub boolify(_)
 {
-  !!shift
+  shift ? 1 : 0
 }
 
 sub configure(\%\%)
@@ -122,6 +129,34 @@ sub error($;@)
 
   print STDERR join(q[: ], q[Error], $msg, @extra) . qq[\n];
   Pod::Usage::pod2usage(2);
+}
+
+sub scan($$) #? who needs file::find
+{
+  my ($path, $recurse, @f) = @_;
+
+  if (-f $path)
+  {
+    push(@f, $path);
+  }
+  elsif (-d $path)
+  {
+    if (opendir(my $dh, $path))
+    {
+      foreach my $i (grep { !/^\.\.?$/ } readdir($dh))
+      {
+        my $p = File::Spec->join($path, $i);
+
+        push(@f, -f $p ? $p : (-d $p && $recurse ? scan($p, $recurse) : ()));
+      }
+    }
+    else
+    {
+      warn qq[Unable to open directory: '$path': $!\n];
+    }
+  }
+
+  return (@f);
 }
 
 
