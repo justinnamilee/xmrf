@@ -95,7 +95,7 @@ sub configure(\%\%)
 
   my ($regex, $sprintf) = @ARGV;
 
-  $config->{match} = eval qq[qr/$regex/];
+  $config->{match} = eval { qr/$regex/ };
 
   error(q[Invalid match regex given], $@)
     if ($@);
@@ -121,7 +121,7 @@ sub configure(\%\%)
     $config->{map}->{$m} = $sub;
   }
 
-  $config->{suffix} = eval qq[qr/$config->{suffix}/];
+  $config->{suffix} = eval { qr/$config->{suffix}/ };
 
   error(q[Invalid suffix regex given], $@)
     if ($@);
