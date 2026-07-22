@@ -167,7 +167,7 @@ sub scan(_) #? who needs file::find
       {
         my $p = File::Spec->join($path, $i);
 
-        push(@f, -f $p ? $p : (-d $p && $config{recurse} ? scan($p) : ()));
+        push(@f, -f $p ? $p : (-d $p && $config{recursive} ? scan($p) : ()));
       }
     }
     else
