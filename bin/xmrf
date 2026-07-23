@@ -262,13 +262,11 @@ C<sort> function when applied to the B<sprintf> section.
 
 =item B<--output> C<dir>
 
-The output folder is a bit different to the input folder.  If unspecified it
-will default to the input folder.  However, if B<--no-automatic> is set, then
-this defaulting to input folder will not occur.
-
-In either mode, it will get prepended to the output file, however it is an
-empty string by default.  This means when in B<--no-automatic> mode, the output
-path could also be specified as part of the B<sprintf> section, if desired.
+The output folder is a bit different to the input folder.  It is mostly a
+convenience option.  In either B<--full> or B<--no-full> mode, it will get
+prepended to the output file, however it is an empty string by default.  This
+means the output path could also be specified as part of the B<sprintf>
+section, if desired.
 
 =item B<--recursive>
 
