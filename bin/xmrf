@@ -29,7 +29,7 @@ my %config =
   named     => $ENV{XMRF_NAMED}     // 0,
   output    => $ENV{XMRF_OUTPUT}    // q[],
   recursive => $ENV{XMRF_RECURSIVE} // 0,
-  suffix    => $ENV{XMRF_SUFFIX}    // q[^(.+)\.(.+?)$],
+  suffix    => $ENV{XMRF_SUFFIX}    // q[(?<=.)\.([^.]+)$],
   verbose   => $ENV{XMRF_VERBOSE}   // 0,
   #? positional arguments (required)
   format    => undef,
@@ -132,9 +132,9 @@ sub deconstruct(_)
   my ($path, $e) = @_;
   my ($v, $d, $f) = File::Spec->splitpath($path);
 
-  if ($f =~ s/$config{suffix}/$1/)
+  if ($f =~ s/$config{suffix}//)
   {
-    $e = $2;
+    $e = $1;
   }
 
   return
@@ -276,8 +276,9 @@ If set the input folder and all its subfolders will be scanned for files.
 
 The default suffix extraction regex is lazy, taking only the shortest possible
 value, i.e. C<item.tar.gz> produces C<gz> as the suffix.  Supply a new regex
-with the C<str> provided, should have exact two capture groups for "file" and
-"suffix", respectively.  This isn't used in B<--full> mode.
+with the C<str> provided.  This isn't used in B<--full> mode.  Default regex:
+
+  (?<=.)\.([^.]+)$
 
 =item B<--verbose>
 
