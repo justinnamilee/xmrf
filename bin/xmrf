@@ -62,6 +62,7 @@ my %option =
 configure(%option, %config);
 
 my @file = map { generate } grep { match } map { deconstruct } scan($config{input});
+use Data::Dump qw(dd); dd(@file); #!DEBUG
 
 
 # subroutines
@@ -158,38 +159,37 @@ sub error($;@)
 
 sub generate(_)
 {
-  my ($f) = @_;
+  my ($g) = @_;
 
-  my $output = sprintf($config{format}, @{$f->{match}});
+  my $output = sprintf($config{format}, @{$g->{match}});
 
   if ($config{full} && length($config{output}))
   {
-    $f->{output} = File::Spec->join($config{output}, $output);
-  }
-  elsif ($config{full})
-  {
-    $f->{output} = $output;
+    $output = File::Spec->join($config{output}, $output);
   }
   elsif (length($config{output}))
   {
-    $f->{output} = join
+    $output = join
     (
       q[.],
       File::Spec->join($config{output}, $output),
-      grep { length } $f->{ext}
+      grep { length } $g->{ext}
     )
   }
-  else
+  elsif (!$config{full})
   {
-    $f->{output} = join
+    $output = join
     (
       q[.],
-      File::Spec->join($f->{path}, $output),
-      grep { length } $f->{ext}
+      File::Spec->join($g->{path}, $output),
+      grep { length } $g->{ext}
     )
   }
 
-  return ($f);
+  my ($v, $d, $f) = File::Spec->splitpath($output);
+  $g->{output} = [File::Spec->catpath($v, $d), $f];
+
+  return ($g);
 }
 
 sub match(_)
