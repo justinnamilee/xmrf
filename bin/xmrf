@@ -62,7 +62,6 @@ my %option =
 configure(%option, %config);
 
 my @file = map { generate } grep { match } map { deconstruct } scan($config{input});
-use Data::Dump qw(dd); dd(@file); #!DEBUG
 
 
 # subroutines
