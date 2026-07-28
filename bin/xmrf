@@ -327,7 +327,8 @@ will be passed to your regex (sometimes quite useful).
 
 =item B<--input> C<dir>
 
-Change the folder to scan from C<./> to C<dir>.
+Change the folder to scan from C<./> to C<dir>.  See B<--output> for more
+information on how they work together.
 
 =item B<--map> C<key=val>
 
