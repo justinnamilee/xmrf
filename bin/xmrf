@@ -62,28 +62,6 @@ configure(%option, %config);
 
 my @file = grep { match } map { deconstruct } scan($config{input});
 
-use Data::Dump qw(dd);
-dd(@file);
-
-sub match(_)
-{
-  my ($f, $match) = @_;
-
-  if ($f->{$config{full} ? q[full] : q[file]} =~ $config{match})
-  {
-    $match = 1;
-
-    $f->{match} =
-    [
-      $config{named} && int(%{^CAPTURE})
-        ? (map { ${^CAPTURE{$_}} } sort keys %{^CAPTURE})
-        : @{^CAPTURE}
-    ];
-  }
-
-  return ($match);
-}
-
 
 # subroutines
 
@@ -175,6 +153,25 @@ sub error($;@)
 
   print STDERR join(q[: ], q[Error], $msg, @extra) . qq[\n];
   Pod::Usage::pod2usage(2);
+}
+
+sub match(_)
+{
+  my ($f, $match) = @_;
+
+  if ($f->{$config{full} ? q[full] : q[file]} =~ $config{match})
+  {
+    $match = 1;
+
+    $f->{match} =
+    [
+      $config{named} && int(%{^CAPTURE})
+        ? (map { ${^CAPTURE{$_}} } sort keys %{^CAPTURE})
+        : @{^CAPTURE}
+    ];
+  }
+
+  return ($match);
 }
 
 sub scan(_) #? who needs file::find
