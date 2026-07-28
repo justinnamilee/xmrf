@@ -157,12 +157,10 @@ sub error($;@)
 
 sub match(_)
 {
-  my ($f, $match) = @_;
+  my ($f) = @_;
 
   if ($f->{$config{full} ? q[full] : q[file]} =~ $config{match})
   {
-    $match = 1;
-
     $f->{match} =
     [
       $config{named} && int(%{^CAPTURE})
@@ -171,7 +169,7 @@ sub match(_)
     ];
   }
 
-  return ($match);
+  return (ref($f->{match}));
 }
 
 sub scan(_) #? who needs file::find
