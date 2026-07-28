@@ -64,7 +64,7 @@ configure(%option, %config);
 
 my @file = map { generate } grep { match } map { deconstruct } scan($config{input});
 
-warn qq[Info: Planning mode only, no changes will be made.\n]
+warn qq[Info: Planning mode only, no changes will be made...\n]
   unless $config{execute};
 
 foreach my $f (@file)
