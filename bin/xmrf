@@ -62,12 +62,12 @@ my %option =
 
 configure(%option, %config);
 
-my @file = map { generate } grep { match } map { deconstruct } scan($config{input});
-
 warn qq[Info: Planning mode only, no changes will be made...\n]
   unless $config{execute};
 
-foreach my $f (@file)
+my $error = 0;
+
+foreach my $f (map { generate } grep { match } map { deconstruct } scan($config{input}))
 {
   my ($o, $n, $d) = ($f->{full}, join(q[], @{$f->{output}}), $f->{output}->[0]);
 
@@ -82,14 +82,19 @@ foreach my $f (@file)
   {
     warn qq[Warning: '$d' does not exist (or can't create), skipping...\n];
 
+    $error++;
     next;
   }
 
   unless ($config{copy} ? File::Copy::copy($o, $n) : File::Copy::move($o, $n))
   {
     warn qq[Warning: Failed to process, $!...\n];
+    $error++;
   }
 }
+
+
+exit ($error > 0);
 
 
 # subroutines
