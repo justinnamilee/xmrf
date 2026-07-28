@@ -302,9 +302,9 @@ xmrf [options] regex sprintf
 =item B<--build>
 
 After the full output path is generated, create the directory structure as
-required with B<File::Path::make_path>.  If not set or B<--no-build> is set
-then an error will be thrown if the output path doesn't exist already for the
-file to be copied to.
+required with B<File::Path::make_path>.  If in B<--no-build> mode, then a
+warning will be issued and the current operation will be skipped.  This will
+also happen if B<make_path> fails to create it.
 
 =item B<--copy>
 
