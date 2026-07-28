@@ -236,12 +236,6 @@ sub match(_)
   return (ref($f->{match}));
 }
 
-sub process($$)
-{
-  my ($o, $n) = @_;
-
-}
-
 sub scan(_) #? who needs file::find
 {
   my ($path, @f) = @_;
