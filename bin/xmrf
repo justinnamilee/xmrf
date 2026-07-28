@@ -14,6 +14,7 @@ sub boolify(_);
 sub configure(\%\%);
 sub deconstruct(_);
 sub error($;@);
+sub match(_);
 sub scan(_);
 
 
@@ -59,7 +60,29 @@ my %option =
 
 configure(%option, %config);
 
-my @file = map { deconstruct } scan($config{input});
+my @file = grep { match } map { deconstruct } scan($config{input});
+
+use Data::Dump qw(dd);
+dd(@file);
+
+sub match(_)
+{
+  my ($f, $match) = @_;
+
+  if ($f->{$config{full} ? q[full] : q[file]} =~ $config{match})
+  {
+    $match = 1;
+
+    $f->{match} =
+    [
+      $config{named} && int(%{^CAPTURE})
+        ? (map { ${^CAPTURE{$_}} } sort keys %{^CAPTURE})
+        : @{^CAPTURE}
+    ];
+  }
+
+  return ($match);
+}
 
 
 # subroutines
