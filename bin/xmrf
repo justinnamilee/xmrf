@@ -14,6 +14,7 @@ sub boolify(_);
 sub configure(\%\%);
 sub deconstruct(_);
 sub error($;@);
+sub match(_);
 sub scan(_);
 
 
@@ -59,7 +60,7 @@ my %option =
 
 configure(%option, %config);
 
-my @file = map { deconstruct } scan($config{input});
+my @file = grep { match } map { deconstruct } scan($config{input});
 
 
 # subroutines
@@ -152,6 +153,23 @@ sub error($;@)
 
   print STDERR join(q[: ], q[Error], $msg, @extra) . qq[\n];
   Pod::Usage::pod2usage(2);
+}
+
+sub match(_)
+{
+  my ($f) = @_;
+
+  if ($f->{$config{full} ? q[full] : q[file]} =~ $config{match})
+  {
+    $f->{match} =
+    [
+      $config{named} && int(%{^CAPTURE})
+        ? (map { ${^CAPTURE{$_}} } sort keys %{^CAPTURE})
+        : @{^CAPTURE}
+    ];
+  }
+
+  return (ref($f->{match}));
 }
 
 sub scan(_) #? who needs file::find
