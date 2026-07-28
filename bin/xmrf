@@ -94,6 +94,8 @@ foreach my $f (map { generate } grep { match } map { deconstruct } scan($config{
 }
 
 
+# compute an exit status of a sort
+
 exit ($error > 0);
 
 
