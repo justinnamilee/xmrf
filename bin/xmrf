@@ -3,6 +3,7 @@
 use strict;
 
 use File::Copy     qw[];
+use File::Path     qw[];
 use File::Spec     qw[];
 use Getopt::Long   qw[];
 use Pod::Usage     qw[];
@@ -61,7 +62,41 @@ my %option =
 
 configure(%option, %config);
 
-my @file = map { generate } grep { match } map { deconstruct } scan($config{input});
+warn qq[Info: Planning mode only, no changes will be made...\n]
+  unless $config{execute};
+
+my $error = 0;
+
+foreach my $f (map { generate } grep { match } map { deconstruct } scan($config{input}))
+{
+  my ($o, $n, $d) = ($f->{full}, join(q[], @{$f->{output}}), $f->{output}->[0]);
+
+  printf qq[%s: '%s' -> '%s'\n], ($config{copy} ? q[cp] : q[mv]), $o, $n;
+
+  next
+    unless $config{execute};
+
+  my $mpe = undef;
+
+  if (!-d $d && (!$config{build} || File::Path::make_path($d, {error => \$mpe}) == 0))
+  {
+    warn qq[Warning: '$d' does not exist (or can't create), skipping...\n];
+
+    $error++;
+    next;
+  }
+
+  unless ($config{copy} ? File::Copy::copy($o, $n) : File::Copy::move($o, $n))
+  {
+    warn qq[Warning: Failed to process, $!...\n];
+    $error++;
+  }
+}
+
+
+# compute an exit status of a sort
+
+exit ($error > 0);
 
 
 # subroutines
@@ -268,9 +303,9 @@ xmrf [options] regex sprintf
 =item B<--build>
 
 After the full output path is generated, create the directory structure as
-required with B<File::Path::make_path>.  If not set or B<--no-build> is set
-then an error will be thrown if the output path doesn't exist already for the
-file to be copied to.
+required with B<File::Path::make_path>.  If in B<--no-build> mode, then a
+warning will be issued and the current operation will be skipped.  This will
+also happen if B<make_path> fails to create it.
 
 =item B<--copy>
 
@@ -293,7 +328,8 @@ will be passed to your regex (sometimes quite useful).
 
 =item B<--input> C<dir>
 
-Change the folder to scan from C<./> to C<dir>.
+Change the folder to scan from C<./> to C<dir>.  See B<--output> for more
+information on how they work together.
 
 =item B<--map> C<key=val>
 
