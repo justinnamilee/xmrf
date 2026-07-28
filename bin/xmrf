@@ -64,6 +64,7 @@ configure(%option, %config);
 my @file = map { generate } grep { match } map { deconstruct } scan($config{input});
 use Data::Dump qw(dd); #! DEBUG
 dd(@file); #!DEBUG
+#dd(q[config], \%config);#!  DEBUG
 
 
 # subroutines
@@ -146,7 +147,7 @@ sub deconstruct(_)
     ext  => $e // q[],
     file => $f,
     full => $path,
-    path => File::Spec->catdir($v, $d),
+    path => File::Spec->catpath($v, $d),
   });
 }
 
@@ -172,7 +173,7 @@ sub generate(_)
   {
     $f->{output} = $output;
   }
-  elsif (length($output))
+  elsif (length($config{output}))
   {
     $f->{output} = join
     (
@@ -186,10 +187,12 @@ sub generate(_)
     $f->{output} = join
     (
       q[.],
-      File::Spec->join($config{input}, $output),
+      File::Spec->join($f->{path}, $output),
       length($f->{ext}) ? $f->{ext} : ()
     )
   }
+
+  return ($f);
 }
 
 sub match(_)
