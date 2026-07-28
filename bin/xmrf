@@ -179,7 +179,7 @@ sub generate(_)
     (
       q[.],
       File::Spec->join($config{output}, $output),
-      length($f->{ext}) ? $f->{ext} : ()
+      grep { length } $f->{ext}
     )
   }
   else
@@ -188,7 +188,7 @@ sub generate(_)
     (
       q[.],
       File::Spec->join($f->{path}, $output),
-      length($f->{ext}) ? $f->{ext} : ()
+      grep { length } $f->{ext}
     )
   }
 
