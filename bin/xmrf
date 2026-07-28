@@ -322,7 +322,7 @@ C<sort> function when applied to the B<sprintf> section.
 
 The B<--output> flag, if supplied, will be prepended to the output file from
 the B<format> argument.  In B<--no-full> mode, if unspecified, it defaults to
-the B<--input> folder.
+the B<--input> folder (B<File::Spec> may clean it up as it sees fit, though).
 
 =item B<--recursive>
 
