@@ -64,29 +64,30 @@ configure(%option, %config);
 
 my @file = map { generate } grep { match } map { deconstruct } scan($config{input});
 
-print STDERR qq[Planning mode only, no changes will be made.\n]
+warn qq[Info: Planning mode only, no changes will be made.\n]
   unless $config{execute};
 
 foreach my $f (@file)
 {
   my ($o, $n, $d) = ($f->{full}, join(q[], @{$f->{output}}), $f->{output}->[0]);
-  my $tmp = undef;
 
-  if (!-d $d && (!$config{build} || File::Path::make_path($d, {error => \$tmp}) == 0))
-  {
-    warn qq[Warning: Directory '$d' does not exist (or can't create), skipping '$o' -> '$n'...\n];
-
-    next;
-  }
-
-  printf qq[\u%s: '%s' -> '%s'\n], ($config{copy} ? q[copy] : q[move]), $o, $n;
+  printf qq[%s: '%s' -> '%s'\n], ($config{copy} ? q[cp] : q[mv]), $o, $n;
 
   next
     unless $config{execute};
 
+  my $mpe = undef;
+
+  if (!-d $d && (!$config{build} || File::Path::make_path($d, {error => \$mpe}) == 0))
+  {
+    warn qq[Warning: '$d' does not exist (or can't create), skipping...\n];
+
+    next;
+  }
+
   unless ($config{copy} ? File::Copy::copy($o, $n) : File::Copy::move($o, $n))
   {
-    warn qq[Warning: Failed to process '$o' -> '$n', $!...\n];
+    warn qq[Warning: Failed to process, $!...\n];
   }
 }
 
