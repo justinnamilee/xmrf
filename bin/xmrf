@@ -18,6 +18,7 @@ sub error($;@);
 sub generate(_);
 sub match(_);
 sub scan(_);
+sub transmog($$);
 
 
 # globals
@@ -43,7 +44,7 @@ my %config =
 );
 
 my %option =
-( #? note, map is special, very special
+(
   q[build|b!]     => \$config{build},
   q[copy|c!]      => \$config{copy},
   q[execute|e!]   => \$config{execute},
@@ -234,9 +235,9 @@ sub match(_)
   {
     $f->{match} =
     [
-      $config{named} && int(%{^CAPTURE})
-        ? (map { ${^CAPTURE{$_}} } sort keys %{^CAPTURE})
-        : @{^CAPTURE}
+      $config{named}
+        ? (map { transmog($_, ${^CAPTURE{$_}}) } sort keys %{^CAPTURE})
+        : (map { transmog($_, ${^CAPTURE[$_]}) } 0 .. $#{^CAPTURE})
     ];
   }
 
@@ -269,6 +270,13 @@ sub scan(_) #? who needs file::find
   }
 
   return (@f);
+}
+
+sub transmog($$)
+{
+  my ($k, $v) = @_;
+
+  return (exists($config{map}->{$k}) ? $config{map}->{$k}->($v) : $v);
 }
 
 
