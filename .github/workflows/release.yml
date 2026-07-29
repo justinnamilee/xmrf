@@ -1,0 +1,61 @@
+name: Release Builder
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout...
+        uses: actions/checkout@v4
+
+      - name: build...
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="${GITHUB_REF_NAME#v}"
+          PKG=pkg
+          DEB="xmrf_${VERSION}_all.deb"
+
+          rm -rf "$PKG"
+
+          install -d "$PKG/DEBIAN"
+          install -d "$PKG/usr/bin"
+          install -d "$PKG/usr/share/man/man1"
+
+          install -m755 bin/xmrf "$PKG/usr/bin/xmrf"
+
+          cat >"$PKG/DEBIAN/control" <<EOF
+          Package: xmrf
+          Version: ${VERSION}
+          Section: utils
+          Priority: optional
+          Architecture: all
+          Maintainer: Justin <justin.nami.lee@gmail.com>
+          Depends: perl
+          Description: XMRF
+           Regex-map Rename File
+          EOF
+
+          pod2man bin/xmrf | gzip -9 \
+            > "$PKG/usr/share/man/man1/xmrf.1.gz"
+
+          dpkg-deb --build "$PKG" "$DEB"
+
+          echo "DEB_NAME=$DEB" >> "$GITHUB_ENV"
+
+      - name: Draft...
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          generate_release_notes: true
+          files: ${{ env.DEB_NAME }}
