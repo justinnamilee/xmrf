@@ -2,6 +2,7 @@
 
 package xmrf::app;
 
+
 use strict;
 
 use File::Copy   qw[];
@@ -11,7 +12,7 @@ use Getopt::Long qw[];
 use Pod::Usage   qw[];
 
 
-## subroutine definitions
+## function definitions
 
 sub boolify(_);
 sub configure(\%\%);
@@ -99,6 +100,7 @@ sub run(@)
     unless ($config{copy} ? File::Copy::copy($o, $n) : File::Copy::move($o, $n))
     {
       warn qq[Warning: Failed to process, $!...\n];
+
       $error++;
     }
   }
