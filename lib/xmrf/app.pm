@@ -50,7 +50,7 @@ my %config =
 
 ## int main(void)
 
-sub run(@)
+sub run()
 {
   CONFIGURE:
   {
