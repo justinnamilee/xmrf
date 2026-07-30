@@ -2,14 +2,14 @@
 
 use strict;
 
-use File::Copy     qw[];
-use File::Path     qw[];
-use File::Spec     qw[];
-use Getopt::Long   qw[];
-use Pod::Usage     qw[];
+use File::Copy   qw[];
+use File::Path   qw[];
+use File::Spec   qw[];
+use Getopt::Long qw[];
+use Pod::Usage   qw[];
 
 
-# subroutine definitions
+## subroutine definitions
 
 sub boolify(_);
 sub configure(\%\%);
@@ -21,10 +21,11 @@ sub scan(_);
 sub transmog($$);
 
 
-# globals
+## global config
 
 my %config =
-( #? hardcoded defaults -> env -> getopts (wins)
+(
+  #? hardcoded defaults -> env -> getopts (wins)
   build     => $ENV{XMRF_BUILD}     // 0,
   copy      => $ENV{XMRF_COPY}      // 0,
   execute   => $ENV{XMRF_EXCUTE}    // 0,
@@ -43,25 +44,28 @@ my %config =
   map       => {}
 );
 
-my %option =
-(
-  q[build|b!]     => \$config{build},
-  q[copy|c!]      => \$config{copy},
-  q[execute|e!]   => \$config{execute},
-  q[full|f!]      => \$config{full},
-  q[help|h+]      => \$config{help},
-  q[input|i=s]    => \$config{input},
-  q[named|n!]     => \$config{named},
-  q[output|o=s]   => \$config{output},
-  q[recursive|r!] => \$config{recursive},
-  q[suffix|s=s]   => \$config{suffix},
-  q[verbose|v!]   => \$config{verbose}
-);
+CONFIGURE:
+{
+  my %option =
+  (
+    q[build|b!]     => \$config{build},
+    q[copy|c!]      => \$config{copy},
+    q[execute|e!]   => \$config{execute},
+    q[full|f!]      => \$config{full},
+    q[help|h+]      => \$config{help},
+    q[input|i=s]    => \$config{input},
+    q[named|n!]     => \$config{named},
+    q[output|o=s]   => \$config{output},
+    q[recursive|r!] => \$config{recursive},
+    q[suffix|s=s]   => \$config{suffix},
+    q[verbose|v!]   => \$config{verbose}
+  );
+
+  configure(%option, %config);
+}
 
 
-# int main(void)
-
-configure(%option, %config);
+## int main(void)
 
 warn qq[Info: Planning mode only, no changes will be made...\n]
   unless $config{execute};
@@ -72,7 +76,8 @@ foreach my $f (map { generate } grep { match } map { deconstruct } scan($config{
 {
   my ($o, $n, $d) = ($f->{full}, join(q[], @{$f->{output}}), $f->{output}->[0]);
 
-  printf qq[%s: '%s' -> '%s'\n], ($config{copy} ? q[cp] : q[mv]), $o, $n;
+  printf qq[%s: '%s' -> '%s'\n], ($config{copy} ? q[cp] : q[mv]), $o, $n
+    if $config{verbose};
 
   next
     unless $config{execute};
@@ -95,12 +100,12 @@ foreach my $f (map { generate } grep { match } map { deconstruct } scan($config{
 }
 
 
-# compute an exit status of a sort
+## compute an exit status of a sort
 
 exit ($error > 0);
 
 
-# subroutines
+## subroutines
 
 sub boolify(_)
 {
