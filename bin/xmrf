@@ -355,7 +355,7 @@ Multiple B<--map> flags can be included to specify more mapping subroutines.
 
 In B<--no-named> mode (default) the regex capture groups are taken in order as
 an array.  If B<--named> is specified then it is expected the regex will use
-named capture groups.  These named capture groups will be sorted with Perl'`s
+named capture groups.  These named capture groups will be sorted with Perl's
 C<sort> function when applied to the B<sprintf> section.
 
 =item B<--output> C<dir>
