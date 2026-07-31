@@ -15,7 +15,9 @@ use Pod::Usage   qw[];
 ## function definitions
 
 sub boolify(_);
+sub cget($);
 sub configure(\%\%);
+sub cset($$);
 sub deconstruct(_);
 sub error($;@);
 sub generate(_);
@@ -116,6 +118,12 @@ sub boolify(_)
   shift ? 1 : 0
 }
 
+sub cget($)
+{
+  my ($c) = @_;
+  $config{$c}
+}
+
 sub configure(\%\%)
 {
   my ($option, $config, %map) = @_;
@@ -172,6 +180,12 @@ sub configure(\%\%)
 
   $config->{verbose} = 1
     unless ($config->{execute});
+}
+
+sub cset($$)
+{
+  my ($c, $v) = @_;
+  $config{$c} = $v
 }
 
 sub deconstruct(_)
