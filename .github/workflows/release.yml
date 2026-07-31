@@ -30,8 +30,10 @@ jobs:
           install -d "$PKG/DEBIAN"
           install -d "$PKG/usr/bin"
           install -d "$PKG/usr/share/man/man1"
+          install -d "$PKG/usr/share/xmrf/lib/xmrf"
 
           install -m755 bin/xmrf "$PKG/usr/bin/xmrf"
+          install -m644 lib/xmrf/app.pm "$PKG/usr/share/xmrf/lib/xmrf"
 
           cat >"$PKG/DEBIAN/control" <<EOF
           Package: xmrf
