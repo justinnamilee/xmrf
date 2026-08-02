@@ -126,7 +126,7 @@ sub configure(\%\%)
   Getopt::Long::Configure(qw[bundling ignorecase_always]);
 
   Getopt::Long::GetOptions(%{$option}, q[map|m=s] => \%map)
-    or return help(0, 1, q[Failed parsing given options]);
+    or return help(0, 1, q[Error], q[Failed parsing given options]);
 
   return help(2)
     if $config->{help} > 1;
