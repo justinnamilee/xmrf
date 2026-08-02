@@ -247,7 +247,7 @@ sub generate(_)
 sub help($;$@)
 {
   my ($verbose, $exit, @msg) = @_;
-  
+
   Pod::Usage::pod2usage
   (
     -input => $0,
