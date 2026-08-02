@@ -246,7 +246,7 @@ sub help($;$@)
     (@msg ? (-msg => join(q[: ], @msg)) : ())
   );
 
-  return ($exit ? $exit : 0);
+  return ($exit ? int($exit) : 0);
 }
 
 sub match(_)
