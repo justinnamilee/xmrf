@@ -4,17 +4,7 @@ use strict;
 
 use Test2::V1 qw[-strict -warnings -utf8];
 use FindBin;
-
-BEGIN
-{
-  require lib;
-  foreach my $l
-  (
-    qq[$FindBin::RealBin/lib],
-    qq[$FindBin::RealBin/../lib] #* pref *#
-  )
-  { if (-d $l) { lib->import($l); last } }
-}
+use lib qq[$FindBin::RealBin/../lib];
 
 use xmrf::app;
 T2->pass(q[xmrf::app loaded successfully]);
