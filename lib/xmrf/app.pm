@@ -52,9 +52,11 @@ my %config =
 
 ## int main(void)
 
-sub run()
+sub run(;$)
 {
-  CONFIGURE:
+  my ($noconf) = @_;
+
+  unless ($noconf)
   {
     my %option =
     (
