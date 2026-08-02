@@ -128,11 +128,8 @@ sub configure(\%\%)
   Getopt::Long::GetOptions(%{$option}, q[map|m=s] => \%map)
     or return help(0, 1, q[Error], q[Failed parsing given options]);
 
-  return help(2)
-    if $config->{help} > 1;
-
-  return help(1)
-    if $config->{help} == 1;
+  return help($config->{help} > 1 ? 2 : 1)
+    if $config->{help} > 0;
 
   return help(0, 1, q[Error], q[Input folder must exist], qq['$config->{input}'])
     unless (-d $config->{input});
