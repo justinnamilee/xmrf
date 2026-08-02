@@ -3,7 +3,7 @@
 use strict;
 
 use Test2::V1 qw[-strict -warnings -utf8];
-use Capture::Tiny qw[capture capture_merged];
+use Capture::Tiny qw[capture];
 use FindBin;
 use lib qq[$FindBin::RealBin/../lib];
 
