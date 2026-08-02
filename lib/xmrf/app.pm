@@ -167,9 +167,6 @@ sub configure(\%\%)
     return help(0, 1, q[Error], q[Can't compile given map], $m, $@)
       if ($@);
 
-    return help(0, 1, q[Error], q[Given map isn't a subroutine], $m, ref($sub) // q[SCALAR])
-      unless (ref($sub) eq q[CODE]);
-
     $config->{map}->{$m} = $sub;
   }
 
