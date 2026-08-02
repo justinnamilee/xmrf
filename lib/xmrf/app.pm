@@ -17,8 +17,8 @@ use Pod::Usage   qw[];
 sub boolify(_);
 sub configure(\%\%);
 sub deconstruct(_);
-sub error($;@);
 sub generate(_);
+sub help($;$@);
 sub match(_);
 sub scan(_);
 sub transmog($$);
@@ -69,7 +69,10 @@ sub run()
       q[verbose|v!]   => \$config{verbose}
     );
 
-    configure(%option, %config);
+    my $c = configure(%option, %config);
+
+    return $c
+      unless $c == -1;
   }
 
   print STDERR qq[Info: Planning mode only, no changes will be made...\n]
@@ -123,28 +126,25 @@ sub configure(\%\%)
   Getopt::Long::Configure(qw[bundling ignorecase_always]);
 
   Getopt::Long::GetOptions(%{$option}, q[map|m=s] => \%map)
-    or Pod::Usage::pod2usage(-input => $0, -exitval => 2);
+    or return help(0, 1, q[Error], q[Failed parsing given options]);
 
-  Pod::Usage::pod2usage(-input => $0, -exitval => 0, -verbose => 2, -noperldoc => 1)
-    if $config->{help} > 1;
+  return help($config->{help} > 1 ? 2 : 1)
+    if $config->{help} > 0;
 
-  Pod::Usage::pod2usage(-input => $0, -exitval => 1)
-    if $config->{help} == 1;
-
-  error(q[Input folder must exist], qq['$config->{input}'])
+  return help(0, 1, q[Error], q[Input folder must exist], qq['$config->{input}'])
     unless (-d $config->{input});
 
-  error(q[Incorrect number of positional arguments], int(@ARGV))
+  return help(0, 1, q[Error], q[Incorrect number of positional arguments], int(@ARGV))
     unless (@ARGV == 2);
 
   my ($regex, $sprintf) = @ARGV;
 
   $config->{match} = eval { qr/$regex/ };
 
-  error(q[Invalid match regex given], $@)
+  return help(0, 1, q[Error], q[Invalid match regex given], $@)
     if ($@);
 
-  error(q[Sprintf should be non-zero length])
+  return help(0, 1, q[Error], q[Sprintf should be non-zero length])
     unless (length($sprintf));
 
   $config->{format} = $sprintf;
@@ -156,10 +156,10 @@ sub configure(\%\%)
   {
     my $sub = eval qq[sub { $map{$m} }];
 
-    error(q[Can't compile given map], $m, $@)
+    return help(0, 1, q[Error], q[Can't compile given map], $m, $@)
       if ($@);
 
-    error(q[Given map isn't a subroutine], $m, ref($sub) // q[SCALAR])
+    return help(0, 1, q[Error], q[Given map isn't a subroutine], $m, ref($sub) // q[SCALAR])
       unless (ref($sub) eq q[CODE]);
 
     $config->{map}->{$m} = $sub;
@@ -167,11 +167,13 @@ sub configure(\%\%)
 
   $config->{suffix} = eval { qr/$config->{suffix}/ };
 
-  error(q[Invalid suffix regex given], $@)
+  return help(0, 1, q[Error], q[Invalid suffix regex given], $@)
     if ($@);
 
   $config->{verbose} = 1
     unless ($config->{execute});
+
+  return -1;
 }
 
 sub deconstruct(_)
@@ -191,14 +193,6 @@ sub deconstruct(_)
     full => $path,
     path => File::Spec->catpath($v, $d),
   });
-}
-
-sub error($;@)
-{
-  my ($msg, @extra) = @_;
-
-  print STDERR join(q[: ], q[Error], $msg, @extra) . qq[\n];
-  Pod::Usage::pod2usage(-input => $0, -exitval => 2);
 }
 
 sub generate(_)
@@ -234,6 +228,22 @@ sub generate(_)
   $g->{output} = [File::Spec->catpath($v, $d), $f];
 
   return ($g);
+}
+
+sub help($;$@)
+{
+  my ($verbose, $exit, @msg) = @_;
+  
+  Pod::Usage::pod2usage
+  (
+    -input => $0,
+    -exitval => 'NOEXIT',
+    -verbose => $verbose,
+    -noperldoc => 1,
+    (@msg ? (-msg => join(q[: ], @msg)) : ())
+  );
+
+  return ($exit ? int($exit) : 0);
 }
 
 sub match(_)
