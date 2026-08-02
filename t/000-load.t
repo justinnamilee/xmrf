@@ -11,10 +11,7 @@ BEGIN
   foreach my $l
   (
     qq[$FindBin::RealBin/lib],
-    qq[$FindBin::RealBin/../lib], #* pref *#
-    q[/usr/share/xmrf/lib],
-    q[/usr/libexec/xmrf/lib],
-    q[/usr/lib/xmrf/lib]
+    qq[$FindBin::RealBin/../lib] #* pref *#
   )
   { if (-d $l) { lib->import($l); last } }
 }
