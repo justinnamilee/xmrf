@@ -50,9 +50,11 @@ my %config =
 
 ## int main(void)
 
-sub run()
+sub run(;$)
 {
-  CONFIGURE:
+  my ($noconf) = @_;
+
+  unless ($noconf)
   {
     my %option =
     (
@@ -233,7 +235,7 @@ sub generate(_)
 sub help($;$@)
 {
   my ($verbose, $exit, @msg) = @_;
-  
+
   Pod::Usage::pod2usage
   (
     -input => $0,
