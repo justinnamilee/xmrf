@@ -8,11 +8,14 @@ BEGIN
   require lib;
   foreach my $l
   (
-    qq[$FindBin::RealBin/lib],
-    qq[$FindBin::RealBin/../lib],
+    $ENV{XMRF_TEST}
+      ? qq[$FindBin::RealBin/../lib]
+      : (),
     q[/usr/share/xmrf/lib], #* pref *#
     q[/usr/libexec/xmrf/lib],
-    q[/usr/lib/xmrf/lib]
+    q[/usr/lib/xmrf/lib],
+    qq[$FindBin::RealBin/lib],
+    qq[$FindBin::RealBin/../lib]
   )
   { if (-d $l) { lib->import($l); last } }
 }
