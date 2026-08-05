@@ -112,7 +112,7 @@ sub run(;$)
     }
   }
 
-  return ($error > 0);
+  return ($error > 0 ? 1 : 0);
 }
 
 
