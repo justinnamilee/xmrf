@@ -15,7 +15,9 @@ use Pod::Usage   qw[];
 ## function definitions
 
 sub boolify(_);
+sub cget($);
 sub configure(\%\%);
+sub cset($$);
 sub deconstruct(_);
 sub generate(_);
 sub help($;$@);
@@ -110,7 +112,7 @@ sub run(;$)
     }
   }
 
-  return ($error > 0);
+  return boolify($error > 0);
 }
 
 
@@ -119,6 +121,12 @@ sub run(;$)
 sub boolify(_)
 {
   shift ? 1 : 0
+}
+
+sub cget($)
+{
+  my ($c) = @_;
+  $config{$c}
 }
 
 sub configure(\%\%)
@@ -161,9 +169,6 @@ sub configure(\%\%)
     return help(0, 1, q[Error], q[Can't compile given map], $m, $@)
       if ($@);
 
-    return help(0, 1, q[Error], q[Given map isn't a subroutine], $m, ref($sub) // q[SCALAR])
-      unless (ref($sub) eq q[CODE]);
-
     $config->{map}->{$m} = $sub;
   }
 
@@ -176,6 +181,12 @@ sub configure(\%\%)
     unless ($config->{execute});
 
   return -1;
+}
+
+sub cset($$)
+{
+  my ($c, $v) = @_;
+  $config{$c} = $v
 }
 
 sub deconstruct(_)
