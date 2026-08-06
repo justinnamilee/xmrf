@@ -72,7 +72,7 @@ to use due to popularity.
 
 =head1 OPTIONS
 
-=over 4
+=over
 
 =item B<-b>, B<--build>
 
@@ -193,5 +193,19 @@ pull request.
 
 Finally, there's no B<agents.md> here for a reason, Perl has wonderful
 documentation, go give it a read yourself. B<:)>
+
+=head1 SEE ALSO
+
+=over
+
+=item L<perlre>, https://perldoc.perl.org/perlre
+
+=item L<sprintf>, https://perldoc.perl.org/functions/sprintf
+
+=item L<perlsub>, https://perldoc.perl.org/perlsub
+
+=item fairu-chan, https://github.com/justinnamilee/fairu-chan
+
+=back
 
 =cut
