@@ -63,8 +63,8 @@ xmrf [options] regex sprintf
 
 B<XMRF> will rename (or copy) files based on an input dir, an output dir, a
 regex, and an sprintf format.  It tries to use some sane defaults for things
-that aren't provided.  At least a regex and sprintf are required to get started
-working on the current folder.
+that aren't provided, at least a regex and sprintf are required to get started
+working on the current working directory.
 
 =head1 OPTIONS
 
