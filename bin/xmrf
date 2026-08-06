@@ -130,7 +130,7 @@ files in the current directory:
  mv: './.gitignore' -> './.gitignore-2026-08-06'
  mv: './LICENSE' -> './LICENSE-2026-08-06'
 
-So using an empty capture group we could insert additional data into the output
+So using an empty capture group additional data can be inserted into the output
 using a subroutine.  It may be desirable to modify actual capture data too,
 it will be passed as the first argument to the subroutine (C<$_[0]>):
 
@@ -142,7 +142,8 @@ it will be passed as the first argument to the subroutine (C<$_[0]>):
  mv: './.gitignore' -> './.GITIGNORE-2026-08-06'
  mv: './LICENSE' -> './LICENSE-2026-08-06'
 
-For brevity we used C<shift> here, but you could use C<$_[0]> if desired.
+For brevity C<shift> was used, but C<$_[0]> works as well, obviously (and may
+be required for more complex situations).
 
 =item B<-n>, B<--named>
 
@@ -180,6 +181,14 @@ with the C<str> provided.  This isn't used in B<--full> mode.  Default regex:
 
 Behaves much like the C<cp> or C<mv> verbose option.  If B<--execute> isn't
 enabled then B<--verbose> is forced on to show the planned actions.
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item
 
 =back
 
