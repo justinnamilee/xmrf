@@ -46,19 +46,18 @@ xmrf - Regex-map Rename File
 
 xmrf [options] regex sprintf
 
- Options:
-   --build     | -b          create output directory structure as-needed
-   --copy      | -c          copy instead of rename, very useful
-   --execute   | -e          actually perform the operation, safety measure
-   --full      | -f          pass full path to regex, not just filename
-   --help      | -h          show the full help dialog
-   --input     | -i <dir>    scan <dir> for files (or subdirs too with -r)
-   --map       | -m <k>=<v>  defines a suboutine <v> to run against <k> (fun)
-   --named     | -n          use named capture groups instead of numeric
-   --output    | -o <dir>    put files in <dir>
-   --recursive | -r          scan subfolders of the input dir too
-   --suffix    | -s <str>    override the default suffix extraction regex
-   --verbose   | -v          show more information, defaults on without execute
+  --build     | -b          Create output directory structure as-needed.
+  --copy      | -c          Use copy instead of move as the action to execute.
+  --execute   | -e          Actually perform the actions, safety flag.
+  --full      | -f          Pass the full path to regex, not just filename.
+  --help      | -h          Show full help dialog.
+  --input     | -i <dir>    Scan <dir> for files (or subdirs too with -r).
+  --map       | -m <k>=<v>  Defines a suboutine <v> to run against <k>.
+  --named     | -n          Use named capture groups instead of numeric.
+  --output    | -o <dir>    Prepend <dir> to output file path.
+  --recursive | -r          Scan subfolders of the input directory too.
+  --suffix    | -s <str>    Override the default suffix extraction regex.
+  --verbose   | -v          Show actions as they happen when execute on.
 
 =head1 DESCRIPTION
 
