@@ -6,18 +6,28 @@ use FindBin;
 BEGIN
 {
   require lib;
+
   foreach my $l
   (
-    $ENV{XMRF_TEST}
-      ? qq[$FindBin::RealBin/../lib]
-      : (),
-    q[/usr/share/xmrf/lib], #* pref *#
-    q[/usr/libexec/xmrf/lib],
-    q[/usr/lib/xmrf/lib],
-    qq[$FindBin::RealBin/lib],
-    qq[$FindBin::RealBin/../lib]
+    #? XMRF_LIB will override all other entries
+    exists($ENV{XMRF_LIB}) ? $ENV{XMRF_LIB} :
+    (
+      #? preference order is low to high desc
+      !$ENV{XMRF_DEV}
+        ? qq[$FindBin::RealBin/../lib]
+        : (),
+      $FindBin::Bin eq $FindBin::RealBin
+        ? qq[$FindBin::Bin/lib]
+        : (qq[$FindBin::Bin/lib], qq[$FindBin::RealBin/lib]),
+      q[/usr/libexec/xmrf/lib],
+      q[/usr/lib/xmrf/lib],
+      q[/usr/share/xmrf/lib], #* pref *#
+      $ENV{XMRF_DEV}
+        ? qq[$FindBin::RealBin/../lib]
+        : ()
+    )
   )
-  { if (-d $l) { lib->import($l); last } }
+  { lib->import($l) if -d $l }
 }
 
 use xmrf::app;
