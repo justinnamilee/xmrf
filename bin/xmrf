@@ -211,15 +211,15 @@ law.
 
 =over
 
-=item L<perlre>, https://perldoc.perl.org/perlre
+=item L<perlre|https://perldoc.perl.org/perlre>
 
-=item L<sprintf>, https://perldoc.perl.org/functions/sprintf
+=item L<sprintf|https://perldoc.perl.org/functions/sprintf>
 
-=item L<perlsub>, https://perldoc.perl.org/perlsub
+=item L<perlsub|https://perldoc.perl.org/perlsub>
 
-=item xmrf, https://github.com/justinnamilee/xmrf
+=item L<xmrf|https://github.com/justinnamilee/xmrf>
 
-=item fairu-chan, https://github.com/justinnamilee/fairu-chan
+=item L<fairu-chan|https://github.com/justinnamilee/fairu-chan>
 
 =back
 
