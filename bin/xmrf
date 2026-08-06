@@ -66,6 +66,10 @@ regex, and an sprintf format.  It tries to use some sane defaults for things
 that aren't provided, at least a regex and sprintf are required to get started
 working on the current working directory.
 
+This tool originated as part of another project, B<fairu-chan>, but deserved
+it's own identity.  It was previously called B<rename>, which is apt but hard
+to use due to popularity.
+
 =head1 OPTIONS
 
 =over 4
