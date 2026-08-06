@@ -181,4 +181,17 @@ enabled then B<--verbose> is forced on to show the planned actions.
 
 =back
 
+=head1 CONTRIBUTE
+
+If you've found a bug, have an idea for an improvement, or want to suggest a
+new feature, please open an issue with enough detail to help reproduce or
+understand the problem / feature (such as your environment, steps to reproduce,
+or example output where applicable).
+
+If you'd like to contribute a fix or enhancement yourself, feel free to open a
+pull request.
+
+Finally, there's no B<agents.md> here for a reason, Perl has wonderful
+documentation, go give it a read yourself. B<:)>
+
 =cut
