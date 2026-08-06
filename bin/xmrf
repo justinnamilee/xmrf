@@ -101,7 +101,7 @@ The output folder defaults to the input path (with subdirs if -r) if not
 provided while in this mode.
 
 If enabled with B<--full>, then the entire path for the file and its extension
-will be passed to your regex (sometimes quite useful).  The output folder will
+will be passed to the regex (sometimes quite useful).  The output folder will
 default to nothing if not provided in this mode (even with -r).
 
 =item B<-i>, B<--input> C<dir>
@@ -115,13 +115,13 @@ be compiled as a subroutine that is given the data returned by that capture
 group.  The subroutine should further process the capture group's value and
 ultimately return what the sprintf format is expecting for that slot.
 
-If the B<--named> flag is specified then your C<key>s should match the named
+If the B<--named> flag is specified then the C<key>s should match the named
 capture groups, otherwise they should be numeric (starting from zero, not one).
 
 Multiple B<--map> flags can be included to specify more mapping subroutines.
 
-As a quick example (see B<EXAMPLES>), let's say you want to add the date to all
-files in the current directory:
+As a quick example (see B<EXAMPLES>), let's add the date to all files in the
+current directory:
 
  $ xmrf '^(.+)()' '%s-%s' -m \
   1='my ($d,$m,$y)=(localtime)[3..5]; sprintf(q[%d-%02d-%02d],$y+1900,$m+1,$d)'
