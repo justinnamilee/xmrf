@@ -74,57 +74,89 @@ working on the current working directory.
 
 After the full output path is generated, create the directory structure as
 required with B<File::Path::make_path>.  If in B<--no-build> mode, then a
-warning will be issued and the current operation will be skipped.  This will
-also happen if B<make_path> fails to create it.
+warning will be issued and the current action will be skipped.  It will also
+warn and skip the current action if B<make_path> fails to create it.
 
 =item B<--copy>
 
-Use B<File::Copy::copy> instead of B<File::Copy::move> as the operation on the
-input file and output file.
+Use B<File::Copy::copy> instead of B<File::Copy::move> as the action to perform
+on the old and new paths.
 
 =item B<--execute>
 
-Without specifying B<--execute> only the planned operation will be shown.
+Without specifying B<--execute> only the planned actions will be shown.
 
 =item B<--full>
 
-In B<--no-full> mode (default) only the filename (without any file extension)
-will be passed to the regex.  When the job is complete the output file will be
-prepended with the selected output folder (defaults to nothing) and the
-extension will be re-attached.
+In B<--no-full> mode (B<default>) only the filename (without file extension)
+will be passed to the regex.  When the job is complete the new filename will be
+prepended with the selected output folder and the extension will be re-added.
+The output folder defaults to the input path (with subdirs if -r) if not
+provided while in this mode.
 
 If enabled with B<--full>, then the entire path for the file and its extension
-will be passed to your regex (sometimes quite useful).
+will be passed to your regex (sometimes quite useful).  The output folder will
+default to nothing if not provided in this mode (even with -r).
 
 =item B<--input> C<dir>
 
-Change the folder to scan from C<./> to C<dir>.  See B<--output> for more
-information on how they work together.
+Change the folder to scan from C<./> to C<dir>.
 
 =item B<--map> C<key=val>
 
 Each C<key> is either a numeric or named captured group, and each C<val> will
-be compiled as a subroutine that is given the data returned by the capture
+be compiled as a subroutine that is given the data returned by that capture
 group.  The subroutine should further process the capture group's value and
 ultimately return what the sprintf format is expecting for that slot.
 
 If the B<--named> flag is specified then your C<key>s should match the named
-capture groups, otherwise they should be numeric.
+capture groups, otherwise they should be numeric (starting from zero, not one).
 
 Multiple B<--map> flags can be included to specify more mapping subroutines.
 
+As a quick example (see B<EXAMPLES>), let's say you want to add the date to all
+files in the current directory:
+
+ $ xmrf '^(.+)()' '%s-%s' -m \
+  1='my ($d,$m,$y)=(localtime)[3..5]; sprintf(q[%d-%02d-%02d],$y+1900,$m+1,$d)'
+
+ Info: Planning mode only, no changes will be made...
+ mv: './.gitignore' -> './.gitignore-2026-08-06'
+ mv: './LICENSE' -> './LICENSE-2026-08-06'
+
+So using an empty capture group we could insert additional data into the output
+using a subroutine.  It may be desirable to modify actual capture data too,
+it will be passed as the first argument to the subroutine (C<$_[0]>):
+
+ $ xmrf '^(.+)()' '%s-%s' -m \
+  0='uc shift'            -m \
+  1='my ($d,$m,$y)=(localtime)[3..5]; sprintf(q[%d-%02d-%02d],$y+1900,$m+1,$d)'
+
+ Info: Planning mode only, no changes will be made...
+ mv: './.gitignore' -> './.GITIGNORE-2026-08-06'
+ mv: './LICENSE' -> './LICENSE-2026-08-06'
+
+For brevity we used C<shift> here, but you could use C<$_[0]> if desired.
+
 =item B<--named>
 
-In B<--no-named> mode (default) the regex capture groups are taken in order as
-an array.  If B<--named> is specified then it is expected the regex will use
+In B<--no-named> mode (B<default>) the regex capture groups are taken in order
+as an array.  If B<--named> is specified then it is expected the regex will use
 named capture groups.  These named capture groups will be sorted with Perl's
-C<sort> function when applied to the B<sprintf> section.
+C<sort> function when applied to the B<sprintf> section.  Internally this just
+means swapping from C<@{^CAPTURE}> to C<%{^CAPTURE}> then applying sort to the
+keys.
+
+In numeric mode, for the map subroutines, a list of C<0..$#{^CAPTURE}> is
+generated to pass as the keys to the map subroutines.  In named mode it's the
+sorted keys themselves.
 
 =item B<--output> C<dir>
 
 The B<--output> flag, if supplied, will be prepended to the output file from
 the B<format> argument.  In B<--no-full> mode, if unspecified, it defaults to
-the B<--input> folder.  B<File::Spec> will clean this up as it sees fit.
+the B<--input> folder (with subdirs if -r).  In B<--full> mode it defaults to
+nothing (even with -r).  B<File::Spec> will clean up this path as it sees fit.
 
 =item B<--recursive>
 
@@ -140,8 +172,8 @@ with the C<str> provided.  This isn't used in B<--full> mode.  Default regex:
 
 =item B<--verbose>
 
-Behaves much like C<cp> or C<mv> verbose flag.  If B<--execute> isn't specified
-then it is forced on to show the planned operations.
+Behaves much like the C<cp> or C<mv> verbose option.  If B<--execute> isn't
+enabled then B<--verbose> is forced on to show the planned actions.
 
 =back
 
