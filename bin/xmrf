@@ -165,6 +165,26 @@ the B<format> argument.  In B<--no-full> mode, if unspecified, it defaults to
 the B<--input> folder (with subdirs if -r).  In B<--full> mode it defaults to
 nothing (even with -r).  B<File::Spec> will clean up this path as it sees fit.
 
+Note that the output flag can often be omitted in B<--full> mode, as it's
+possible (maybe preferable) to include the output path right in the B<sprintf>
+like so:
+
+ $ xmrf -f '.+/(.+?)$' /new/path/to/'%s'
+
+While contrived, this example is equivalent to C<mv * /new/path/to>, or:
+
+ $ xmrf -fo /new/path/to '.+/(.+?)$' '%s'
+
+This idea can also be used to insert some relative paths as well, like:
+
+ $ xmrf -b '(.+)' relative/path/'%s'
+
+Which would produce paths like C<./relative/path>, because in B<--no-full> mode
+the output option would be set to C<./> (same as input) if not provided.
+
+These concepts can be mixed and matched to best suit the goals of the actions
+desired.
+
 =item B<-r>, B<--recursive>
 
 If set the input folder and all its subfolders will be scanned for files.
