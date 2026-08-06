@@ -70,23 +70,23 @@ working on the current working directory.
 
 =over 4
 
-=item B<--build>
+=item B<-b>, B<--build>
 
 After the full output path is generated, create the directory structure as
 required with B<File::Path::make_path>.  If in B<--no-build> mode, then a
 warning will be issued and the current action will be skipped.  It will also
 warn and skip the current action if B<make_path> fails to create it.
 
-=item B<--copy>
+=item B<-c>, B<--copy>
 
 Use B<File::Copy::copy> instead of B<File::Copy::move> as the action to perform
 on the old and new paths.
 
-=item B<--execute>
+=item B<-e>, B<--execute>
 
 Without specifying B<--execute> only the planned actions will be shown.
 
-=item B<--full>
+=item B<-f>, B<--full>
 
 In B<--no-full> mode (B<default>) only the filename (without file extension)
 will be passed to the regex.  When the job is complete the new filename will be
@@ -98,11 +98,11 @@ If enabled with B<--full>, then the entire path for the file and its extension
 will be passed to your regex (sometimes quite useful).  The output folder will
 default to nothing if not provided in this mode (even with -r).
 
-=item B<--input> C<dir>
+=item B<-i>, B<--input> C<dir>
 
 Change the folder to scan from C<./> to C<dir>.
 
-=item B<--map> C<key=val>
+=item B<-m>, B<--map> C<key=val>
 
 Each C<key> is either a numeric or named captured group, and each C<val> will
 be compiled as a subroutine that is given the data returned by that capture
@@ -138,7 +138,7 @@ it will be passed as the first argument to the subroutine (C<$_[0]>):
 
 For brevity we used C<shift> here, but you could use C<$_[0]> if desired.
 
-=item B<--named>
+=item B<-n>, B<--named>
 
 In B<--no-named> mode (B<default>) the regex capture groups are taken in order
 as an array.  If B<--named> is specified then it is expected the regex will use
@@ -151,18 +151,18 @@ In numeric mode, for the map subroutines, a list of C<0..$#{^CAPTURE}> is
 generated to pass as the keys to the map subroutines.  In named mode it's the
 sorted keys themselves.
 
-=item B<--output> C<dir>
+=item B<-o>, B<--output> C<dir>
 
 The B<--output> flag, if supplied, will be prepended to the output file from
 the B<format> argument.  In B<--no-full> mode, if unspecified, it defaults to
 the B<--input> folder (with subdirs if -r).  In B<--full> mode it defaults to
 nothing (even with -r).  B<File::Spec> will clean up this path as it sees fit.
 
-=item B<--recursive>
+=item B<-r>, B<--recursive>
 
 If set the input folder and all its subfolders will be scanned for files.
 
-=item B<--suffix> C<str>
+=item B<-s>, B<--suffix> C<str>
 
 The default suffix extraction regex is lazy, taking only the shortest possible
 value, i.e. C<item.tar.gz> produces C<gz> as the suffix.  Supply a new regex
@@ -170,7 +170,7 @@ with the C<str> provided.  This isn't used in B<--full> mode.  Default regex:
 
   (?<=.)\.([^.]+)$
 
-=item B<--verbose>
+=item B<-v>, B<--verbose>
 
 Behaves much like the C<cp> or C<mv> verbose option.  If B<--execute> isn't
 enabled then B<--verbose> is forced on to show the planned actions.
