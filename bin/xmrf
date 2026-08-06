@@ -239,10 +239,9 @@ documentation, go give it a read yourself. B<:)>
 
 =head1 COPYRIGHT
 
-Copyright © 2026 Justin "Nami" Lee.  License GPLv3+: GNU GPL version 3 or later
-B<https://gnu.org/licenses/gpl.html>. This is free software: you are free to
-change and redistribute it.  There is NO WARRANTY, to the extent permitted by
-law.
+Copyright © 2026 Justin "Nami" Lee.  License L<GPLv3+|https://gnu.org/licenses/gpl.html>:
+GNU GPL version 3 or later.  This is free software: you are free to change and
+redistribute it.  There is B<NO WARRANTY>, to the extent permitted by law.
 
 =head1 SEE ALSO
 
