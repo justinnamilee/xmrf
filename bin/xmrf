@@ -36,6 +36,8 @@ exit xmrf::app::run();
 
 __END__
 
+=pod
+
 =head1 NAME
 
 xmrf - Regex-map Rename File
@@ -57,6 +59,13 @@ xmrf [options] regex sprintf
    --recursive | -r          scan subfolders of the input dir too
    --suffix    | -s <str>    override the default suffix extraction regex
    --verbose   | -v          show more information, defaults on without execute
+
+=head1 DESCRIPTION
+
+B<XMRF> will rename (or copy) files based on an input dir, an output dir, a
+regex, and an sprintf format.  It tries to use some sane defaults for things
+that aren't provided.  At least a regex and sprintf are required to get started
+working on the current folder.
 
 =head1 OPTIONS
 
@@ -136,11 +145,5 @@ Behaves much like C<cp> or C<mv> verbose flag.  If B<--execute> isn't specified
 then it is forced on to show the planned operations.
 
 =back
-
-=head1 DESCRIPTION
-
-B<XMRF> will rename (or copy) files based on an input dir, an output dir, a
-regex, and an sprintf format.  It tries to use some sane defaults for things
-that aren't provided.
 
 =cut
