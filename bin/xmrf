@@ -177,7 +177,7 @@ While contrived, this example is equivalent to C<mv * /new/path/to>, or:
 
 This idea can also be used to insert some relative paths as well, like:
 
- $ xmrf -b '(.+)' relative/path/'%s'
+ $ xmrf '(.+)' relative/path/'%s'
 
 Which would produce paths like C<./relative/path>, because in B<--no-full> mode
 the output option would be set to C<./> (same as input) if not provided.
