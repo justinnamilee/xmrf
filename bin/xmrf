@@ -181,6 +181,10 @@ enabled then B<--verbose> is forced on to show the planned actions.
 
 =back
 
+=head1 AUTHOR
+
+Written by Justin "Nami" Lee.
+
 =head1 CONTRIBUTE
 
 If you've found a bug, have an idea for an improvement, or want to suggest a
