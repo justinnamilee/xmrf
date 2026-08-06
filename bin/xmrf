@@ -208,7 +208,15 @@ enabled then B<--verbose> is forced on to show the planned actions.
 
 =over
 
-=item
+=item BASIC
+
+=over
+
+=item Fix a Long-Standing Typo (Actually Happened)
+
+ $ xmrf -ri /media '^(.+)HVEC(.+)' '%sHEVC%s'
+
+=back
 
 =back
 
