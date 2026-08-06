@@ -220,6 +220,12 @@ enabled then B<--verbose> is forced on to show the planned actions.
 
 =back
 
+=head1 ENVIRONMENT
+
+=over
+
+=back
+
 =head1 AUTHOR
 
 Written by Justin "Nami" Lee.
