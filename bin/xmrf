@@ -46,21 +46,21 @@ xmrf - Regex-map Rename File
 
 =head1 SYNOPSIS
 
-xmrf [options] regex sprintf
+ xmrf [options] regex sprintf
 
-  --build     | -b          Create output directory structure as-needed.
-  --copy      | -c          Use copy instead of move as the action to execute.
-  --execute   | -e          Actually perform the actions, safety flag.
-  --full      | -f          Pass the full path to regex, not just filename.
-  --help      | -h          Show full help dialog.
-  --input     | -i <dir>    Scan <dir> for files (and subdirs too with -r).
-  --links     | -l          Enable following and renaming symlinks (B<don't>).
-  --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
-  --named     | -n          Use named capture groups instead of numeric.
-  --output    | -o <dir>    Prepend <dir> to output file path.
-  --recursive | -r          Scan subfolders of the input directory too.
-  --suffix    | -s <str>    Override the default suffix extraction regex.
-  --verbose   | -v          Show actions as they happen when execute on.
+ --build     | -b          Create output directory structure as-needed.
+ --copy      | -c          Use copy instead of move as the action to execute.
+ --execute   | -e          Actually perform the actions, safety flag.
+ --full      | -f          Pass the full path to regex, not just filename.
+ --help      | -h          Show full help dialog.
+ --input     | -i <dir>    Scan <dir> for files (and subdirs too with -r).
+ --links     | -l          Enable following and renaming symlinks (B<don't>).
+ --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
+ --named     | -n          Use named capture groups instead of numeric.
+ --output    | -o <dir>    Prepend <dir> to output file path.
+ --recursive | -r          Scan subfolders of the input directory too.
+ --suffix    | -s <str>    Override the default suffix extraction regex.
+ --verbose   | -v          Show actions as they happen when execute on.
 
 =head1 DESCRIPTION
 

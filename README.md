@@ -4,7 +4,7 @@ xmrf - Regex-map Rename File
 
 # SYNOPSIS
 
-xmrf \[options\] regex sprintf
+    xmrf [options] regex sprintf
 
     --build     | -b          Create output directory structure as-needed.
     --copy      | -c          Use copy instead of move as the action to execute.
