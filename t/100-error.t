@@ -61,15 +61,8 @@ T03_RLANK:
 
   my ($sto, $ste, @ret) = capture { xmrf::app::run() };
 
-  T2->todo(
-    'bug: we allow empty regex right now' =>
-      sub { T2->is($ret[0], 1, q[zero-length positionals gives correct return code]) }
-  );
-
-  T2->todo(
-    'bug: we allow empty regex right now' =>
-      sub { T2->like($sto, qr[Error: Regex], q[zero-length positionals gives correct error message]) }
-  );
+  T2->is($ret[0], 1, q[zero-length positionals gives correct return code]);
+  T2->like($sto, qr[Error: Regex], q[zero-length positionals gives correct error message]);
 
   reeeset;
 }
