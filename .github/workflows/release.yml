@@ -64,7 +64,7 @@ jobs:
 
     steps:
     - name: Perlify...
-      run: dns install -y git rpm-build perl
+      run: dnf install -y git rpm-build perl
 
     - name: Checkout...
       uses: actions/checkout@v4
