@@ -33,7 +33,7 @@ my %config =
   #? hardcoded defaults -> env -> getopts (wins)
   build     => $ENV{XMRF_BUILD}     // 0,
   copy      => $ENV{XMRF_COPY}      // 0,
-  execute   => $ENV{XMRF_EXCUTE}    // 0,
+  execute   => $ENV{XMRF_EXECUTE}   // 0,
   full      => $ENV{XMRF_FULL}      // 0,
   input     => $ENV{XMRF_INPUT}     // q[.],
   named     => $ENV{XMRF_NAMED}     // 0,
