@@ -75,7 +75,8 @@ jobs:
       run: |
         set -euo pipefail
 
-        VERSION="${GITHUB_REF_NAME#v}"
+        # not _super_ friendly, but works: v1.0.1-alpha2 => 1.0.1~alpha.2
+        VERSION="$(perl -pe 's/^v//; s/-/~/; s/-/./g' <<< "$GITHUB_REF_NAME")"
 
         mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 
