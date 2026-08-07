@@ -54,6 +54,7 @@ xmrf [options] regex sprintf
   --full      | -f          Pass the full path to regex, not just filename.
   --help      | -h          Show full help dialog.
   --input     | -i <dir>    Scan <dir> for files (and subdirs too with -r).
+  --links     | -l          Enable following and renaming symlinks (B<don't>).
   --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
   --named     | -n          Use named capture groups instead of numeric.
   --output    | -o <dir>    Prepend <dir> to output file path.
@@ -111,6 +112,12 @@ Show this page.  Use B<-hh> to render the entire page with B<pod2usage>.
 =item B<-i>, B<--input> C<dir>
 
 Change the folder to scan from C<./> to C<dir>.
+
+=item B<-l>, B<--links>
+
+By default B<XMRF> skips over all symlinks, files and directories, for safety.
+This behaviour can be changed by setting B<-l>.  It is not recomended and may
+have severly unexpected results.
 
 =item B<-m>, B<--map> C<key=val>
 
