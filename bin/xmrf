@@ -254,7 +254,7 @@ This one inspired L<fairu-chan|https://github.com/justinnamilee/fairu-chan>.
 =item Boolean Environment Variables
 
 The following are boolean (0 or 1) options you can pass by environment instead
-of using the options.
+of using the option flags.
 
 =over 2
 
@@ -277,7 +277,7 @@ of using the options.
 =item String Environment Variables
 
 The following are string options you can pass by environment instead of using
-the options.
+the option flags.
 
 =over 2
 
