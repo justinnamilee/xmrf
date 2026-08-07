@@ -104,6 +104,10 @@ If enabled with B<--full>, then the entire path for the file and its extension
 will be passed to the regex (sometimes quite useful).  The output folder will
 default to nothing if not provided in this mode (even with -r).
 
+=item B<-h>, B<--help>
+
+Show this page.  Use B<-hh> to render the entire page with B<pod2usage>.
+
 =item B<-i>, B<--input> C<dir>
 
 Change the folder to scan from C<./> to C<dir>.
