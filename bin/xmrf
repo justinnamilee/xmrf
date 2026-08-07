@@ -315,6 +315,45 @@ Skips library scanner and only checks the directory given by this variable.
 
 =back
 
+=head1 INSTALLATION
+
+=head2 With Debian Package
+
+=over 2
+
+=item * Grab the latest C<.deb> release from L<XMRF GitHub|https://github.com/justinnamilee/xmrf/releases/latest>.
+
+=item * Use C<apt> to install it (or whatever).
+
+ $ apt install xmrf_*.deb
+
+=item * Run it!
+
+ $ xmrf
+
+=back
+
+=head2 From Repository
+
+=over 2
+
+=item * Clone the repo.
+
+ $ git clone https://github.com/justinnamilee/xmrf.git
+
+=item * Make sure the version works.
+
+ $ cd xmrf ; prove
+
+=item * Put it somewhere, see C<bin/xmrf> for expected library paths.
+
+Two parts are needed, the wrapper C<bin/xmrf>, and the library
+C<lib/xmrf/app.pm>.  Put the wrapper somewhere accessible via C<$PATH>.
+The library can go anywhere, but the wrapper has places it will look by
+default.  Don't forget to C<chmod +x> the wrapper.
+
+=back
+
 =head1 AUTHOR
 
 Written by Justin "Nami" Lee.
