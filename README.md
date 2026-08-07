@@ -12,6 +12,7 @@ xmrf \[options\] regex sprintf
     --full      | -f          Pass the full path to regex, not just filename.
     --help      | -h          Show full help dialog.
     --input     | -i <dir>    Scan <dir> for files (and subdirs too with -r).
+    --links     | -l          Enable following and renaming symlinks (B<don't>).
     --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
     --named     | -n          Use named capture groups instead of numeric.
     --output    | -o <dir>    Prepend <dir> to output file path.
@@ -67,6 +68,12 @@ to use due to popularity.
 - **-i**, **--input** `dir`
 
     Change the folder to scan from `./` to `dir`.
+
+- **-l**, **--links**
+
+    By default **XMRF** skips over all symlinks, files and directories, for safety.
+    This behaviour can be changed by setting **-l**.  It is not recomended and may
+    have severly unexpected results.
 
 - **-m**, **--map** `key=val`
 
