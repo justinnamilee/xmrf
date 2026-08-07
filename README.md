@@ -36,9 +36,11 @@ to use due to popularity.
 - **-b**, **--build**
 
     After the full output path is generated, create the directory structure as
-    required with **File::Path::make\_path**.  If in **--no-build** mode, then a
-    warning will be issued and the current action will be skipped.  It will also
-    warn and skip the current action if **make\_path** fails to create it.
+    required with **File::Path::make\_path**.  If in **--no-build** mode and the full
+    output directory structure is not already existing, then a warning will be
+    issued and the current action will be skipped.  It will also warn and then skip
+    the current action if **make\_path** fails to create the missing directory
+    structure elements.
 
 - **-c**, **--copy**
 
@@ -63,7 +65,8 @@ to use due to popularity.
 
 - **-h**, **--help**
 
-    Show this page.  Use **-hh** to render the entire page with **pod2usage**.
+    Show this page.  Use **-hh** to render the complete POD with **pod2usage**.  If
+    installed with a packaged version `man xmrf` should work as well.
 
 - **-i**, **--input** `dir`
 
@@ -77,15 +80,30 @@ to use due to popularity.
 
 - **-m**, **--map** `key=val`
 
-    Each `key` is either a numeric or named captured group, and each `val` will
-    be compiled as a subroutine that is given the data returned by that capture
-    group.  The subroutine should further process the capture group's value and
-    ultimately return what the sprintf format is expecting for that slot.
+    Multiple **--map** flags can be included to specify more mapping subroutines.
+
+    Each `key` is either a numeric (**--no-named**) or named (**--named**) captured
+    group, and each `val` will be compiled as a subroutine that is given the data
+    returned by that capture group.  The subroutine should further process the
+    capture group's value and ultimately return what the sprintf format is
+    expecting for that slot.
+
+    **NOTE:** Ensure you lexically scope any variables that are declared with `my`.
+    If needed, the global `%config` is available to reference (or modify should
+    decreased sanity be desired).
 
     If the **--named** flag is specified then the `key`s should match the named
-    capture groups, otherwise they should be numeric (starting from zero, not one).
+    capture groups, otherwise they should be numeric (indexed from **zero**, not
+    one).  You only have to specify maps for desired keys, not all (in case this
+    isn't obvious).  Named mode can be useful for specifying the order in which
+    the output should be populated without needing to resort to `sprintf`'s
+    [format parameter index](https://perldoc.perl.org/functions/sprintf#format-parameter-index).
 
-    Multiple **--map** flags can be included to specify more mapping subroutines.
+         numeric regex: (\d\d).+\[(\w+?)\]          maps: 0='1 + shift', 1='uc shift'
+           named regex: (?<b>\d\d).+\[(?<a>\w+?)\]  maps: a='uc shift', b='1 + shift'
+
+        numeric format: %2$s-%1$02d
+          named format: %s-%02d
 
     As a quick example (see **EXAMPLES**), let's add the date to all files in the
     current directory:
@@ -121,9 +139,9 @@ to use due to popularity.
     means swapping from `@{^CAPTURE}` to `%{^CAPTURE}` then applying sort to the
     keys.
 
-    In numeric mode, for the map subroutines, a list of `0..$#{^CAPTURE}` is
-    generated to pass as the keys to the map subroutines.  In named mode it's the
-    sorted keys themselves.
+    In numeric mode (**--no-named**), for the map subroutines, a list of
+    `0..$#{^CAPTURE}` is generated to pass as the keys to the map subroutines.
+    In named mode it's the sorted keys themselves.
 
 - **-o**, **--output** `dir`
 
@@ -202,7 +220,7 @@ to use due to popularity.
 
         $ xmrf -bi ~/Input -o ~/Output \
           '^(\[[\]]+\] (.+?)(?:\.+)?(?: (?:- )?\d+(?i: ?v\d+)?)? (?:\(|\[).+)$' \
-          '%s/%s'
+          '%2$s/%1$s'
 
     This one inspired [fairu-chan](https://github.com/justinnamilee/fairu-chan).
 
@@ -287,8 +305,28 @@ or example output where applicable).
 If you'd like to contribute a fix or enhancement yourself, feel free to open a
 pull request.
 
-Finally, there's no **agents.md** here for a reason, Perl has wonderful
+Finally, there's no **AGENTS.md** here for a reason, Perl has wonderful
 documentation, go give it a read yourself. **:)**
+
+# HISTORY
+
+- April 16, 2018
+
+    The first one-liner uploaded to GitHub Gists as [rename.pl](https://gist.github.com/justinnamilee/5f3d757beb3f63ba863b0877b790128c).
+
+        opendir(my $d, '.'); my @d = grep { -f } readdir($d); \
+        print @d . qq( files found:\n); foreach my $o (@d) {  \
+        if ($o =~ /x(\d\d)\s+-\s+(.+)/) { my $n =             \
+        sprintf(qq(S09E%02d-E%02d %s), $1*2 -1, $1*2, $2);    \
+        print qq($o\n\t$n\n); rename($o, $n) or warn $!; } }
+
+- May 6, 2024
+
+    The script moves into [fairu-chan](https://github.com/justinnamilee/fairu-chan/commit/6d8aab629910ba0400596705860d36075e64c0fd).
+
+- Jul 13, 2026
+
+    A [new repository](https://github.com/justinnamilee/xmrf) dedicated to the tool is started.
 
 # COPYRIGHT
 

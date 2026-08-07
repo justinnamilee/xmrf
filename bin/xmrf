@@ -80,9 +80,11 @@ to use due to popularity.
 =item B<-b>, B<--build>
 
 After the full output path is generated, create the directory structure as
-required with B<File::Path::make_path>.  If in B<--no-build> mode, then a
-warning will be issued and the current action will be skipped.  It will also
-warn and skip the current action if B<make_path> fails to create it.
+required with B<File::Path::make_path>.  If in B<--no-build> mode and the full
+output directory structure is not already existing, then a warning will be
+issued and the current action will be skipped.  It will also warn and then skip
+the current action if B<make_path> fails to create the missing directory
+structure elements.
 
 =item B<-c>, B<--copy>
 
@@ -107,7 +109,8 @@ default to nothing if not provided in this mode (even with -r).
 
 =item B<-h>, B<--help>
 
-Show this page.  Use B<-hh> to render the entire page with B<pod2usage>.
+Show this page.  Use B<-hh> to render the complete POD with B<pod2usage>.  If
+installed with a packaged version C<man xmrf> should work as well.
 
 =item B<-i>, B<--input> C<dir>
 
@@ -121,15 +124,30 @@ have severly unexpected results.
 
 =item B<-m>, B<--map> C<key=val>
 
-Each C<key> is either a numeric or named captured group, and each C<val> will
-be compiled as a subroutine that is given the data returned by that capture
-group.  The subroutine should further process the capture group's value and
-ultimately return what the sprintf format is expecting for that slot.
+Multiple B<--map> flags can be included to specify more mapping subroutines.
+
+Each C<key> is either a numeric (B<--no-named>) or named (B<--named>) captured
+group, and each C<val> will be compiled as a subroutine that is given the data
+returned by that capture group.  The subroutine should further process the
+capture group's value and ultimately return what the sprintf format is
+expecting for that slot.
+
+B<NOTE:> Ensure you lexically scope any variables that are declared with C<my>.
+If needed, the global C<%config> is available to reference (or modify should
+decreased sanity be desired).
 
 If the B<--named> flag is specified then the C<key>s should match the named
-capture groups, otherwise they should be numeric (starting from zero, not one).
+capture groups, otherwise they should be numeric (indexed from B<zero>, not
+one).  You only have to specify maps for desired keys, not all (in case this
+isn't obvious).  Named mode can be useful for specifying the order in which
+the output should be populated without needing to resort to C<sprintf>'s
+L<format parameter index|https://perldoc.perl.org/functions/sprintf#format-parameter-index>.
 
-Multiple B<--map> flags can be included to specify more mapping subroutines.
+  numeric regex: (\d\d).+\[(\w+?)\]          maps: 0='1 + shift', 1='uc shift'
+    named regex: (?<b>\d\d).+\[(?<a>\w+?)\]  maps: a='uc shift', b='1 + shift'
+
+ numeric format: %2$s-%1$02d
+   named format: %s-%02d
 
 As a quick example (see B<EXAMPLES>), let's add the date to all files in the
 current directory:
@@ -165,9 +183,9 @@ C<sort> function when applied to the B<sprintf> section.  Internally this just
 means swapping from C<@{^CAPTURE}> to C<%{^CAPTURE}> then applying sort to the
 keys.
 
-In numeric mode, for the map subroutines, a list of C<0..$#{^CAPTURE}> is
-generated to pass as the keys to the map subroutines.  In named mode it's the
-sorted keys themselves.
+In numeric mode (B<--no-named>), for the map subroutines, a list of
+C<0..$#{^CAPTURE}> is generated to pass as the keys to the map subroutines.
+In named mode it's the sorted keys themselves.
 
 =item B<-o>, B<--output> C<dir>
 
@@ -254,7 +272,7 @@ on the second capture group.
 
  $ xmrf -bi ~/Input -o ~/Output \
    '^(\[[\]]+\] (.+?)(?:\.+)?(?: (?:- )?\d+(?i: ?v\d+)?)? (?:\(|\[).+)$' \
-   '%s/%s'
+   '%2$s/%1$s'
 
 This one inspired L<fairu-chan|https://github.com/justinnamilee/fairu-chan>.
 
@@ -375,8 +393,32 @@ or example output where applicable).
 If you'd like to contribute a fix or enhancement yourself, feel free to open a
 pull request.
 
-Finally, there's no B<agents.md> here for a reason, Perl has wonderful
+Finally, there's no B<AGENTS.md> here for a reason, Perl has wonderful
 documentation, go give it a read yourself. B<:)>
+
+=head1 HISTORY
+
+=over
+
+=item April 16, 2018
+
+The first one-liner uploaded to GitHub Gists as L<rename.pl|https://gist.github.com/justinnamilee/5f3d757beb3f63ba863b0877b790128c>.
+
+ opendir(my $d, '.'); my @d = grep { -f } readdir($d); \
+ print @d . qq( files found:\n); foreach my $o (@d) {  \
+ if ($o =~ /x(\d\d)\s+-\s+(.+)/) { my $n =             \
+ sprintf(qq(S09E%02d-E%02d %s), $1*2 -1, $1*2, $2);    \
+ print qq($o\n\t$n\n); rename($o, $n) or warn $!; } }
+
+=item May 6, 2024
+
+The script moves into L<fairu-chan|https://github.com/justinnamilee/fairu-chan/commit/6d8aab629910ba0400596705860d36075e64c0fd>.
+
+=item Jul 13, 2026
+
+A L<new repository|https://github.com/justinnamilee/xmrf> dedicated to the tool is started.
+
+=back
 
 =head1 COPYRIGHT
 
