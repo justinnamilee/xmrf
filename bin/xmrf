@@ -53,7 +53,7 @@ xmrf [options] regex sprintf
   --execute   | -e          Actually perform the actions, safety flag.
   --full      | -f          Pass the full path to regex, not just filename.
   --help      | -h          Show full help dialog.
-  --input     | -i <dir>    Scan <dir> for files (or subdirs too with -r).
+  --input     | -i <dir>    Scan <dir> for files (and subdirs too with -r).
   --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
   --named     | -n          Use named capture groups instead of numeric.
   --output    | -o <dir>    Prepend <dir> to output file path.
