@@ -25,13 +25,16 @@ XMRF - Regex-map Rename File
 **XMRF** will rename (or copy) files based on an input dir, an output dir, a
 regex, and an sprintf format.  It tries to use some sane defaults for things
 that aren't provided; at least a regex and sprintf are required to modify files
-on the current working directory.
+in the current working directory.
 
 This tool originated as part of another project, **fairu-chan**, but deserved
 its own identity.  It was previously called **rename**, which is apt but hard
 to use due to popularity.
 
 # OPTIONS
+
+All boolean option flags (flags that take no value) default to their
+**--no-_flag_** variant.
 
 - **-b**, **--build**
 
@@ -49,15 +52,16 @@ to use due to popularity.
 
 - **-e**, **--execute**
 
-    Without specifying **--execute** only the planned actions will be shown.
+    Without specifying **--execute** only the planned actions will be shown, no
+    changes will be made.
 
 - **-f**, **--full**
 
-    In **--no-full** mode (**default**) only the filename (without file extension)
-    will be passed to the regex.  When the job is complete the new filename will be
-    prepended with the selected output folder and the extension will be re-added.
-    The output folder defaults to the input path (with subdirs if -r) if not
-    provided while in this mode.
+    In **--no-full** mode only the filename (without file extension) will be passed
+    to the regex.  When the job is complete the new filename will be prepended with
+    the selected output folder and the extension will be re-added. The output
+    folder defaults to the input path (with subdirs if -r) if not provided while in
+    this mode.
 
     If enabled with **--full**, then the entire path for the file and its extension
     will be passed to the regex (sometimes quite useful).  The output folder will
@@ -75,8 +79,8 @@ to use due to popularity.
 - **-l**, **--links**
 
     By default **XMRF** skips over all symlinks (files and directories) for safety.
-    This behaviour can be changed by setting **-l**.  It is not recomended and may
-    have severly unexpected results.
+    This behaviour can be changed by setting **--links**.  It is not recomended and
+    may have severly unexpected results.
 
 - **-m**, **--map** `key=val`
 
@@ -132,12 +136,11 @@ to use due to popularity.
 
 - **-n**, **--named**
 
-    In **--no-named** mode (**default**) the regex capture groups are taken in order
-    as an array.  If **--named** is specified then it is expected the regex will use
-    named capture groups.  These named capture groups will be sorted with Perl's
-    `sort` function when applied to the **sprintf** section.  Internally this just
-    means swapping from `@{^CAPTURE}` to `%{^CAPTURE}` then applying sort to the
-    keys.
+    In **--no-named** mode the regex capture groups are taken in order as an array.
+    If **--named** is specified then it is expected the regex will use named capture
+    groups.  These named capture groups will be sorted with Perl's `sort` function
+    when applied to the **sprintf** section.  Internally this just means swapping
+    from `@{^CAPTURE}` to `%{^CAPTURE}` then applying `sort` to the keys.
 
     In numeric mode (**--no-named**), for the map subroutines, a list of
     `0..$#{^CAPTURE}` is generated to pass as the keys to the map subroutines.

@@ -67,13 +67,16 @@ XMRF - Regex-map Rename File
 B<XMRF> will rename (or copy) files based on an input dir, an output dir, a
 regex, and an sprintf format.  It tries to use some sane defaults for things
 that aren't provided; at least a regex and sprintf are required to modify files
-on the current working directory.
+in the current working directory.
 
 This tool originated as part of another project, B<fairu-chan>, but deserved
 its own identity.  It was previously called B<rename>, which is apt but hard
 to use due to popularity.
 
 =head1 OPTIONS
+
+All boolean option flags (flags that take no value) default to their
+B<--no-I<flag>> variant.
 
 =over 2
 
@@ -93,15 +96,16 @@ on the old and new paths.
 
 =item B<-e>, B<--execute>
 
-Without specifying B<--execute> only the planned actions will be shown.
+Without specifying B<--execute> only the planned actions will be shown, no
+changes will be made.
 
 =item B<-f>, B<--full>
 
-In B<--no-full> mode (B<default>) only the filename (without file extension)
-will be passed to the regex.  When the job is complete the new filename will be
-prepended with the selected output folder and the extension will be re-added.
-The output folder defaults to the input path (with subdirs if -r) if not
-provided while in this mode.
+In B<--no-full> mode only the filename (without file extension) will be passed
+to the regex.  When the job is complete the new filename will be prepended with
+the selected output folder and the extension will be re-added. The output
+folder defaults to the input path (with subdirs if -r) if not provided while in
+this mode.
 
 If enabled with B<--full>, then the entire path for the file and its extension
 will be passed to the regex (sometimes quite useful).  The output folder will
@@ -119,8 +123,8 @@ Change the folder to scan from C<./> to C<dir>.
 =item B<-l>, B<--links>
 
 By default B<XMRF> skips over all symlinks (files and directories) for safety.
-This behaviour can be changed by setting B<-l>.  It is not recomended and may
-have severly unexpected results.
+This behaviour can be changed by setting B<--links>.  It is not recomended and
+may have severly unexpected results.
 
 =item B<-m>, B<--map> C<key=val>
 
@@ -176,12 +180,11 @@ be required for more complex situations).
 
 =item B<-n>, B<--named>
 
-In B<--no-named> mode (B<default>) the regex capture groups are taken in order
-as an array.  If B<--named> is specified then it is expected the regex will use
-named capture groups.  These named capture groups will be sorted with Perl's
-C<sort> function when applied to the B<sprintf> section.  Internally this just
-means swapping from C<@{^CAPTURE}> to C<%{^CAPTURE}> then applying sort to the
-keys.
+In B<--no-named> mode the regex capture groups are taken in order as an array.
+If B<--named> is specified then it is expected the regex will use named capture
+groups.  These named capture groups will be sorted with Perl's C<sort> function
+when applied to the B<sprintf> section.  Internally this just means swapping
+from C<@{^CAPTURE}> to C<%{^CAPTURE}> then applying C<sort> to the keys.
 
 In numeric mode (B<--no-named>), for the map subroutines, a list of
 C<0..$#{^CAPTURE}> is generated to pass as the keys to the map subroutines.
