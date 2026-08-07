@@ -206,17 +206,44 @@ enabled then B<--verbose> is forced on to show the planned actions.
 
 =head1 EXAMPLES
 
-=over
-
-=item BASIC
+=head2 BASIC
 
 =over
 
-=item Fix a Long-Standing Typo (Actually Happened)
+=item Fix a Long-Standing Typo
 
  $ xmrf -ri /media '^(.+)HVEC(.+)' '%sHEVC%s'
 
+This keeps everything the same, but fixes a type in place.
+
+=item Old-School Backups to Modern
+
+ $ xmrf -i /media/backup/show '_(\d+)x(\d+)_' \
+   '[DVD Backup] Show - S%02dE%02d [480p]'
+
+Back in the day when we backed up our DVDs we used C<x> between a season number and episode.
+
+=item Make CRC32s More Appealing
+
+ $ xmrf -i /media/backup/anime ' (\d+(?:v\d)?) .+\[(.+?)\]' \
+   '[BluRay Backup] Anime - S01E%s [1080p][%s]' \
+   -m 1='uc shift'
+
+Nothing worse than a CRC32 in lowercase.  This one uses a small map-subroutine on the second capture group.
+
 =back
+
+=head2 ADVANCED
+
+=over
+
+=item A Brain Teaser
+
+ $ xmrf -bi ~/Input -o ~/Output \
+   '^(\[[\]]+\] (.+?)(?:\.+)?(?: (?:- )?\d+(?i: ?v\d+)?)? (?:\(|\[).+)$' \
+   '%s/%s'
+
+This one inpsired L<fairu-chan|https://github.com/justinnamilee/fairu-chan>.
 
 =back
 
