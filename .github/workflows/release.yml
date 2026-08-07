@@ -3,61 +3,145 @@ name: Release Builder
 on:
   push:
     tags:
-      - 'v*'
+    - 'v*'
 
 permissions:
   contents: write
 
 jobs:
-  package:
+  build-deb:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout...
-        uses: actions/checkout@v4
+    - name: Checkout...
+      uses: actions/checkout@v4
 
-      - name: Build...
-        shell: bash
-        run: |
-          set -euo pipefail
+    - name: Build...
+      shell: bash
+      run: |
+        set -euo pipefail
 
-          VERSION="${GITHUB_REF_NAME#v}"
-          PKG=pkg
-          DEB="xmrf_${VERSION}_all.deb"
+        VERSION="$(perl -pe 's/^v//; s/-/~/' <<< "$GITHUB_REF_NAME")"
+        PKG=pkg
+        DEB="xmrf_${VERSION}_all.deb"
 
-          rm -rf "$PKG"
+        rm -rf "$PKG"
 
-          install -d "$PKG/DEBIAN"
-          install -d "$PKG/usr/bin"
-          install -d "$PKG/usr/share/man/man1"
-          install -d "$PKG/usr/share/xmrf/lib/xmrf"
+        install -d "$PKG/DEBIAN"
+        install -d "$PKG/usr/bin"
+        install -d "$PKG/usr/share/man/man1"
+        install -d "$PKG/usr/share/xmrf/lib/xmrf"
 
-          install -m755 bin/xmrf "$PKG/usr/bin/xmrf"
-          install -m644 lib/xmrf/app.pm "$PKG/usr/share/xmrf/lib/xmrf"
+        install -m755 bin/xmrf "$PKG/usr/bin/xmrf"
+        install -m644 lib/xmrf/app.pm "$PKG/usr/share/xmrf/lib/xmrf"
 
-          cat >"$PKG/DEBIAN/control" <<EOF
-          Package: xmrf
-          Version: ${VERSION}
-          Section: utils
-          Priority: optional
-          Architecture: all
-          Maintainer: Justin <justin.nami.lee@gmail.com>
-          Depends: perl
-          Description: XMRF
-           Regex-map Rename File
-          EOF
+        cat >"$PKG/DEBIAN/control" <<EOF
+        Package: xmrf
+        Version: ${VERSION}
+        Section: utils
+        Priority: optional
+        Architecture: all
+        Maintainer: Justin <justin.nami.lee@gmail.com>
+        Depends: perl (>= 5.28)
+        Description: XMRF
+          Regex-map Rename File
+        EOF
 
-          pod2man bin/xmrf | gzip -9 \
-            > "$PKG/usr/share/man/man1/xmrf.1.gz"
+        pod2man bin/xmrf | gzip -9 \
+          > "$PKG/usr/share/man/man1/xmrf.1.gz"
 
-          dpkg-deb --build "$PKG" "$DEB"
+        dpkg-deb --build "$PKG" "$DEB"
 
-          echo "DEB_NAME=$DEB" >> "$GITHUB_ENV"
+    - name: Upload .deb...
+      uses: actions/upload-artifact@v4
+      with:
+        name: deb
+        path: xmrf_*.deb
 
-      - name: Draft...
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          draft: true
-          generate_release_notes: true
-          files: ${{ env.DEB_NAME }}
+  build-rpm:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Fedora-ify...
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y rpm
+
+    - name: Checkout...
+      uses: actions/checkout@v4
+
+    - name: Build...
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # not _super_ friendly, but works: v1.0.1-alpha2 => 1.0.1~alpha.2
+        VERSION="$(perl -pe 's/^v//; s/-/~/; s/-/./g' <<< "$GITHUB_REF_NAME")"
+
+        mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+
+        cat >rpmbuild/SPECS/xmrf.spec <<EOF
+        Name:           xmrf
+        Version:        ${VERSION}
+        Release:        1
+        Summary:        Regex-map Rename File
+        License:        MIT
+        BuildArch:      noarch
+        Requires:       perl >= 5.28
+
+        %description
+        XMRF - Regex-map Rename File
+
+        %install
+        mkdir -p %{buildroot}/usr/bin
+        mkdir -p %{buildroot}/usr/share/xmrf/lib/xmrf
+        mkdir -p %{buildroot}/usr/share/man/man1
+
+        install -m755 ${GITHUB_WORKSPACE}/bin/xmrf \
+          %{buildroot}/usr/bin/xmrf
+        install -m644 ${GITHUB_WORKSPACE}/lib/xmrf/app.pm \
+          %{buildroot}/usr/share/xmrf/lib/xmrf/app.pm
+
+        pod2man ${GITHUB_WORKSPACE}/bin/xmrf \
+          > %{buildroot}/usr/share/man/man1/xmrf.1
+
+        %files
+        /usr/bin/xmrf
+        /usr/share/xmrf/lib/xmrf/app.pm
+        /usr/share/man/man1/xmrf.1*
+
+        %changelog
+        EOF
+
+        rpmbuild \
+          --define "_topdir ${GITHUB_WORKSPACE}/rpmbuild" \
+          -bb rpmbuild/SPECS/xmrf.spec
+
+    - name: Upload RPM...
+      uses: actions/upload-artifact@v4
+      with:
+        name: rpm
+        path: rpmbuild/RPMS/noarch/*.rpm
+
+  draft-release:
+    runs-on: ubuntu-latest
+    needs:
+    - build-deb
+    - build-rpm
+
+    steps:
+    - name: Download packages...
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        merge-multiple: true
+
+    - name: Draft...
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        draft: true
+        generate_release_notes: true
+        files: |
+          dist/*.deb
+          dist/*.rpm
