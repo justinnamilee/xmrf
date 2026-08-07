@@ -294,6 +294,8 @@ sub scan(_) #? who needs file::find
       {
         my $p = File::Spec->join($path, $i);
 
+        next if -l $p && !$config{links};
+
         push(@f, -f $p ? $p : (-d $p && $config{recursive} ? scan($p) : ()));
       }
     }
