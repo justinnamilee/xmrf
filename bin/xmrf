@@ -249,6 +249,10 @@ This one inspired L<fairu-chan|https://github.com/justinnamilee/fairu-chan>.
 
 =head1 ENVIRONMENT
 
+B<XMRF> also accepts some options by environment variable.  When loading,
+options passed by command-line flag will override anything passed by
+environment (except for C<XMRF_DEV> and C<XMRF_LIB>).
+
 =over 2
 
 =item Boolean Environment Variables
