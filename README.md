@@ -1,6 +1,6 @@
 # NAME
 
-xmrf - Regex-map Rename File
+XMRF - Regex-map Rename File
 
 # SYNOPSIS
 
