@@ -36,6 +36,7 @@ my %config =
   execute   => $ENV{XMRF_EXECUTE}   // 0,
   full      => $ENV{XMRF_FULL}      // 0,
   input     => $ENV{XMRF_INPUT}     // q[.],
+  links     => $ENV{XMRF_LINKS}     // 0,
   named     => $ENV{XMRF_NAMED}     // 0,
   output    => $ENV{XMRF_OUTPUT}    // q[],
   recursive => $ENV{XMRF_RECURSIVE} // 0,
@@ -66,6 +67,7 @@ sub run(;$)
       q[full|f!]      => \$config{full},
       q[help|h+]      => \$config{help},
       q[input|i=s]    => \$config{input},
+      q[links|l!]     => \$config{links},
       q[named|n!]     => \$config{named},
       q[output|o=s]   => \$config{output},
       q[recursive|r!] => \$config{recursive},
@@ -160,7 +162,7 @@ sub configure(\%\%)
   $config->{format} = $sprintf;
 
   $config->{$_} = boolify($config->{$_})
-    for (qw[build copy execute full named recursive verbose]);
+    for (qw[build copy execute full links named recursive verbose]);
 
   foreach my $m (keys(%map))
   {
