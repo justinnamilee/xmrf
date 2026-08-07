@@ -54,7 +54,7 @@ xmrf [options] regex sprintf
   --full      | -f          Pass the full path to regex, not just filename.
   --help      | -h          Show full help dialog.
   --input     | -i <dir>    Scan <dir> for files (or subdirs too with -r).
-  --map       | -m <k>=<v>  Defines a suboutine <v> to run against <k>.
+  --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
   --named     | -n          Use named capture groups instead of numeric.
   --output    | -o <dir>    Prepend <dir> to output file path.
   --recursive | -r          Scan subfolders of the input directory too.
@@ -65,11 +65,11 @@ xmrf [options] regex sprintf
 
 B<XMRF> will rename (or copy) files based on an input dir, an output dir, a
 regex, and an sprintf format.  It tries to use some sane defaults for things
-that aren't provided, at least a regex and sprintf are required to get started
-working on the current working directory.
+that aren't provided; at least a regex and sprintf are required to modify files
+on the current working directory.
 
 This tool originated as part of another project, B<fairu-chan>, but deserved
-it's own identity.  It was previously called B<rename>, which is apt but hard
+its own identity.  It was previously called B<rename>, which is apt but hard
 to use due to popularity.
 
 =head1 OPTIONS
@@ -214,7 +214,7 @@ enabled then B<--verbose> is forced on to show the planned actions.
 
  $ xmrf -ri /media '^(.+)HVEC(.+)' '%sHEVC%s'
 
-This keeps everything the same, but fixes a type in place.
+This keeps everything the same, but fixes a typo in place.
 
 =item Old-School Backups to Modern
 
@@ -243,7 +243,7 @@ Nothing worse than a CRC32 in lowercase.  This one uses a small map-subroutine o
    '^(\[[\]]+\] (.+?)(?:\.+)?(?: (?:- )?\d+(?i: ?v\d+)?)? (?:\(|\[).+)$' \
    '%s/%s'
 
-This one inpsired L<fairu-chan|https://github.com/justinnamilee/fairu-chan>.
+This one inspired L<fairu-chan|https://github.com/justinnamilee/fairu-chan>.
 
 =back
 
@@ -262,7 +262,7 @@ of using the options.
 
 =item * XMRF_COPY
 
-=item * XMRF_EXCUTE
+=item * XMRF_EXECUTE
 
 =item * XMRF_FULL
 
@@ -276,7 +276,7 @@ of using the options.
 
 =item String Environment Variables
 
-The following are string options you can pass by environemnt instead of using
+The following are string options you can pass by environment instead of using
 the options.
 
 =over 2
