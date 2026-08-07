@@ -21,7 +21,7 @@ jobs:
       run: |
         set -euo pipefail
 
-        VERSION="${GITHUB_REF_NAME#v}"
+        VERSION="$(perl -pe 's/^v//; s/-/~/' <<< "$GITHUB_REF_NAME")"
         PKG=pkg
         DEB="xmrf_${VERSION}_all.deb"
 
