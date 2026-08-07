@@ -324,7 +324,7 @@ documentation, go give it a read yourself. **:)**
 
     The script moves into [fairu-chan](https://github.com/justinnamilee/fairu-chan/commit/6d8aab629910ba0400596705860d36075e64c0fd).
 
-- Jul 13, 2026
+- July 13, 2026
 
     A [new repository](https://github.com/justinnamilee/xmrf) dedicated to the tool is started.
 
