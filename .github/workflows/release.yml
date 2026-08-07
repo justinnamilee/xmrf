@@ -42,7 +42,7 @@ jobs:
         Priority: optional
         Architecture: all
         Maintainer: Justin <justin.nami.lee@gmail.com>
-        Depends: perl
+        Depends: perl (>= 5.28)
         Description: XMRF
           Regex-map Rename File
         EOF
@@ -87,7 +87,7 @@ jobs:
         Summary:        Regex-map Rename File
         License:        MIT
         BuildArch:      noarch
-        Requires:       perl
+        Requires:       perl >= 5.28
 
         %description
         XMRF - Regex-map Rename File
