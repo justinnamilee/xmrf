@@ -74,7 +74,7 @@ to use due to popularity.
 
 =head1 OPTIONS
 
-=over
+=over 2
 
 =item B<-b>, B<--build>
 
@@ -208,7 +208,7 @@ enabled then B<--verbose> is forced on to show the planned actions.
 
 =head2 BASIC
 
-=over
+=over 2
 
 =item Fix a Long-Standing Typo
 
@@ -235,7 +235,7 @@ Nothing worse than a CRC32 in lowercase.  This one uses a small map-subroutine o
 
 =head2 ADVANCED
 
-=over
+=over 2
 
 =item A Brain Teaser
 
@@ -249,7 +249,59 @@ This one inpsired L<fairu-chan|https://github.com/justinnamilee/fairu-chan>.
 
 =head1 ENVIRONMENT
 
-=over
+=over 2
+
+=item Boolean Environment Variables
+
+The following are boolean (0 or 1) options you can pass by environment instead
+of using the options.
+
+=over 2
+
+=item * XMRF_BUILD
+
+=item * XMRF_COPY
+
+=item * XMRF_EXCUTE
+
+=item * XMRF_FULL
+
+=item * XMRF_NAMED
+
+=item * XMRF_RECURSIVE
+
+=item * XMRF_VERBOSE
+
+=back
+
+=item String Environment Variables
+
+The following are string options you can pass by environemnt instead of using
+the options.
+
+=over 2
+
+=item * XMRF_INPUT
+
+=item * XMRF_OUTPUT
+
+=item * XMRF_SUFFIX
+
+=back
+
+=item Special Environment Variables
+
+=over 2
+
+=item * XMRF_DEV B<(boolean)>
+
+Reorders the library scanner for development.
+
+=item * XMRF_LIB B<(string)>
+
+Skips library scanner and only checks the directory given by this variable.
+
+=back
 
 =back
 
@@ -278,7 +330,7 @@ redistribute it.  There is B<NO WARRANTY>, to the extent permitted by law.
 
 =head1 SEE ALSO
 
-=over
+=over 2
 
 =item L<perlre|https://perldoc.perl.org/perlre>
 
