@@ -71,7 +71,7 @@ to use due to popularity.
 
 - **-l**, **--links**
 
-    By default **XMRF** skips over all symlinks, files and directories, for safety.
+    By default **XMRF** skips over all symlinks (files and directories) for safety.
     This behaviour can be changed by setting **-l**.  It is not recomended and may
     have severly unexpected results.
 

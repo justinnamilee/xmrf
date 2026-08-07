@@ -115,7 +115,7 @@ Change the folder to scan from C<./> to C<dir>.
 
 =item B<-l>, B<--links>
 
-By default B<XMRF> skips over all symlinks, files and directories, for safety.
+By default B<XMRF> skips over all symlinks (files and directories) for safety.
 This behaviour can be changed by setting B<-l>.  It is not recomended and may
 have severly unexpected results.
 
