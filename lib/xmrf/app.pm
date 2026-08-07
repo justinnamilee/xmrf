@@ -151,6 +151,9 @@ sub configure(\%\%)
 
   my ($regex, $sprintf) = @ARGV;
 
+  return help(0, 1, q[Error], q[Regex should be non-zero length])
+    unless (length($regex));
+
   $config->{match} = eval { qr/$regex/ };
 
   return help(0, 1, q[Error], q[Invalid match regex given], $@)
