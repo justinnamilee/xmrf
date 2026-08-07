@@ -1,0 +1,3 @@
+#!/bin/sh
+
+pod2markdown bin/xmrf > README.md
