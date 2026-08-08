@@ -59,7 +59,7 @@ jobs:
         Section: utils
         Priority: optional
         Architecture: all
-        Maintainer: Justin <justin.nami.lee@gmail.com>
+        Maintainer: Justin Lee <justin.nami.lee@gmail.com>
         Depends: perl (>= 5.28)
         Description: XMRF
           Regex-map Rename File
@@ -104,7 +104,7 @@ jobs:
         Version:        ${VERSION}
         Release:        1
         Summary:        Regex-map Rename File
-        License:        MIT
+        License:        GPL-3.0-or-later
         BuildArch:      noarch
         Requires:       perl >= 5.28
 
