@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  test:
+  test-source:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +28,7 @@ jobs:
   build-deb:
     runs-on: ubuntu-latest
     needs:
-    - test
+    - test=source
 
     steps:
     - name: Checkout...
@@ -157,11 +157,43 @@ jobs:
         name: rpm
         path: rpmbuild/RPMS/noarch/*.rpm
 
+  test-deb:
+    needs:
+    - build-deb
+    runs-on: ubuntu-latest
+    container: debian:latest
+
+    steps:
+    - name: Download .deb...
+      uses: actions/download-artifact@v4
+      with:
+        name: deb
+        path: pkg
+
+    - name: Test .deb...
+      shell: bash
+      run: |
+        set -euxo pipefail
+
+        apt-get update &>/dev/null
+        apt-get install -y libterm-readline-perl &>/dev/null
+
+        apt-get install -y pkg/*.deb
+
+        dpkg --verify xmrf
+
+        test -x /usr/bin/xmrf
+        test -f /usr/share/xmrf/lib/xmrf/app.pm
+        test -f /usr/share/doc/xmrf/copyright
+        test -f /usr/share/man/man1/xmrf.1.gz
+
+        xmrf -h &>/dev/null
+
   draft-release:
     runs-on: ubuntu-latest
     needs:
-    - build-deb
-    - build-rpm
+    - test-deb
+    - test-rpm
 
     steps:
     - name: Download packages...
