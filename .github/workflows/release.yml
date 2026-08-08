@@ -155,7 +155,7 @@ jobs:
         EOF
 
         rpmbuild \
-          --define "_topdir rpmbuild" \
+          --define "_topdir ${GITHUB_WORKSPACE}/rpmbuild" \
           -bb rpmbuild/SPECS/xmrf.spec
 
     - name: Upload RPM...
