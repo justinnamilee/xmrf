@@ -43,15 +43,33 @@ jobs:
         PKG=pkg
         DEB="xmrf_${VERSION}_all.deb"
 
-        rm -rf "$PKG"
-
         install -d "$PKG/DEBIAN"
-        install -d "$PKG/usr/bin"
-        install -d "$PKG/usr/share/man/man1"
-        install -d "$PKG/usr/share/xmrf/lib/xmrf"
 
-        install -m755 bin/xmrf "$PKG/usr/bin/xmrf"
-        install -m644 lib/xmrf/app.pm "$PKG/usr/share/xmrf/lib/xmrf"
+        install -Dm755 bin/xmrf \
+          "$PKG/usr/bin/xmrf"
+
+        install -Dm644 lib/xmrf/app.pm \
+          "$PKG/usr/share/xmrf/lib/xmrf/app.pm"
+
+        install -d "$PKG/usr/share/man/man1"
+        pod2man bin/xmrf | gzip -9 \
+          > "$PKG/usr/share/man/man1/xmrf.1.gz"
+
+        install -d "$PKG/usr/share/doc/xmrf"
+        cat >"$PKG/usr/share/doc/xmrf/copyright" <<'EOF'
+        Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+        Upstream-Name: xmrf
+
+        Files: *
+        Copyright: 2026 Justin Lee
+        License: GPL-3+
+          This program is free software: you can redistribute it and/or modify
+          it under the terms of the GNU General Public License as published by
+          the Free Software Foundation, either version 3 of the License, or
+          (at your option) any later version.
+          .
+          See /usr/share/common-licenses/GPL-3 for the full license text.
+        EOF
 
         cat >"$PKG/DEBIAN/control" <<EOF
         Package: xmrf
@@ -64,9 +82,6 @@ jobs:
         Description: XMRF
           Regex-map Rename File
         EOF
-
-        pod2man bin/xmrf | gzip -9 \
-          > "$PKG/usr/share/man/man1/xmrf.1.gz"
 
         dpkg-deb --build "$PKG" "$DEB"
 
