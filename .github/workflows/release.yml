@@ -52,7 +52,11 @@ jobs:
           "$PKG/usr/share/xmrf/lib/xmrf/app.pm"
 
         install -d "$PKG/usr/share/man/man1"
-        pod2man bin/xmrf | gzip -9 \
+        pod2man bin/xmrf                   \
+          --center="Regex-map File Rename" \
+          --section=1                      \
+          --release="$GITHUB_REF_NAME"     |
+          gzip -9                          \
           > "$PKG/usr/share/man/man1/xmrf.1.gz"
 
         install -d "$PKG/usr/share/doc/xmrf"
@@ -129,14 +133,17 @@ jobs:
         %global xmrf_libdir /usr/share/xmrf/lib
 
         %install
-        install -Dm755 ${GITHUB_WORKSPACE}/bin/xmrf \
+        install -Dm755 bin/xmrf \
           %{buildroot}%{_bindir}/xmrf
 
-        install -Dm644 ${GITHUB_WORKSPACE}/lib/xmrf/app.pm \
+        install -Dm644 lib/xmrf/app.pm \
           %{buildroot}%{xmrf_libdir}/xmrf/app.pm
 
         install -d %{buildroot}%{_mandir}/man1
-        pod2man ${GITHUB_WORKSPACE}/bin/xmrf \
+        pod2man bin/xmrf                     \
+          --center="Regex-map File Rename"   \
+          --section=1                        \
+          --release="$GITHUB_REF_NAME"       \
           > %{buildroot}%{_mandir}/man1/xmrf.1
 
         %files
@@ -148,7 +155,7 @@ jobs:
         EOF
 
         rpmbuild \
-          --define "_topdir ${GITHUB_WORKSPACE}/rpmbuild" \
+          --define "_topdir rpmbuild" \
           -bb rpmbuild/SPECS/xmrf.spec
 
     - name: Upload RPM...
