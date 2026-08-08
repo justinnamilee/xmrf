@@ -385,8 +385,8 @@ default.  Don't forget to C<chmod +x> the wrapper.
 
 =head1 TESTING
 
-After cloning the repository, testing is fairly simple.  Both L<Test2::V1> and
-L<Capture::Tiny> are required:
+After cloning the repository, testing is fairly simple.  Both B<L<Test2::V1>>
+and B<L<Capture::Tiny>> are required:
 
  $ cpanm -n -q Test2::V1 Capture::Tiny
 
