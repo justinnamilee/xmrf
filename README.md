@@ -274,33 +274,26 @@ environment (except for `XMRF_DEV` and `XMRF_LIB`).
 
 # INSTALLATION
 
-## With Debian Package
+## Packaged Release
 
-- Grab the latest `.deb` release from [XMRF GitHub](https://github.com/justinnamilee/xmrf/releases/latest).
-- Use `apt` to install it (or whatever).
+Grab the latest `.deb` or `.rpm` release from [XMRF GitHub](https://github.com/justinnamilee/xmrf/releases/latest).
+Once downloaded, \`apt\` or \`dnf\` can install it locally to the system, use
+whichever is appropriate for your sytem.
 
-        $ apt install xmrf_*.deb
+    $ apt install ./xmrf*.deb
 
-- Run it!
+    $ dnf install ./xmrf*.rpm
 
-        $ xmrf
+## Manual Installation
 
-## From Repository
+Clone the repository.  Put the wrapper script somewhere (say
+`/usr/local/bin/xmrf`).  Put the library somewhere (say
+`/usr/loca/lib/xmrf/app.pm`).  Set the execute bit on the wrapper.
 
-- Clone the repo.
-
-        $ git clone https://github.com/justinnamilee/xmrf.git
-
-- Make sure the version works.
-
-        $ cd xmrf ; prove
-
-- Put it somewhere, see `bin/xmrf` for expected library paths.
-
-    Two parts are needed, the wrapper `bin/xmrf`, and the library
-    `lib/xmrf/app.pm`.  Put the wrapper somewhere accessible via `$PATH`.
-    The library can go anywhere, but the wrapper has places it will look by
-    default.  Don't forget to `chmod +x` the wrapper.
+    $ cp bin/xmrf /usr/local/bin/xmrf
+    $ cp lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
+    $ chmod 644 /usr/local/lib/xmrf/app.pm
+    $ chmod 755 /usr/local/bin/xmrf
 
 # TESTING
 
