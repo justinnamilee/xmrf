@@ -19,13 +19,12 @@ jobs:
     - name: Get dependencies...
       run: |
         sudo apt-get update
-        sudo apt-get install -y libtest2-suite-perl libcapture-tiny-perl
+        sudo apt-get install -y \
+          cpanminus             \
+          libcapture-tiny-perl  \
+          libtest2-suite-perl
+        sudo cpanm -n -q Test2::V1
 
-        which perl
-        perl -V
-        dpkg -L libtest2-suite-perl | grep 'Test2/V1.pm'
-        perl -MTest2::V1 -e 'print "Test2::V1 OK\n"'
-        perl -MCapture::Tiny -e 'print "Capture::Tiny OK\n"'
 
     - name: Test...
       run: prove -lv t
