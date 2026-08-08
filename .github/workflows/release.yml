@@ -162,6 +162,7 @@ jobs:
     - build-deb
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         image:
         - debian:12
