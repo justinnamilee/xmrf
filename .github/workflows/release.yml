@@ -21,6 +21,12 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libtest2-suite-perl libcapture-tiny-perl
 
+        which perl
+        perl -V
+        dpkg -L libtest2-suite-perl | grep 'Test2/V1.pm'
+        perl -MTest2::V1 -e 'print "Test2::V1 OK\n"'
+        perl -MCapture::Tiny -e 'print "Capture::Tiny OK\n"'
+
     - name: Test...
       run: prove -lv t
 
