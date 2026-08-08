@@ -1,4 +1,4 @@
-<h1 style="font-size: 48px; display: flex; align-items: center; gap: 12px;">
+<h1 style="font-size: 64px; display: flex; align-items: center; gap: 12px; justify-content: center;">
   <img src=".github/public/xmrf.svg" width="64" height="64">
   XMRF &gt;&gt; <em>Regex-map File Rename</em>
 </h1>
