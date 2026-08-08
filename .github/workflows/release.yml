@@ -197,6 +197,8 @@ jobs:
         xmrf -h &>/dev/null
 
   test-rpm:
+    needs:
+    - build-rpm
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
