@@ -97,7 +97,7 @@ jobs:
 
         VERSION="$(perl -pe 's/^v//; s/-/~/; s/-/./g' <<< "$GITHUB_REF_NAME")"
 
-        mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+        install -d rpmbuild/SPECS
 
         cat >rpmbuild/SPECS/xmrf.spec <<EOF
         Name:           xmrf
@@ -111,23 +111,23 @@ jobs:
         %description
         XMRF - Regex-map Rename File
 
+        %global xmrf_libdir /usr/share/xmrf/lib
+
         %install
-        install -d %{buildroot}/usr/bin
-        install -d %{buildroot}/usr/share/xmrf/lib/xmrf
-        install -d %{buildroot}/usr/share/man/man1
+        install -Dm755 ${GITHUB_WORKSPACE}/bin/xmrf \
+          %{buildroot}%{_bindir}/xmrf
 
-        install -m755 ${GITHUB_WORKSPACE}/bin/xmrf \
-          %{buildroot}/usr/bin/xmrf
-        install -m644 ${GITHUB_WORKSPACE}/lib/xmrf/app.pm \
-          %{buildroot}/usr/share/xmrf/lib/xmrf/app.pm
+        install -Dm644 ${GITHUB_WORKSPACE}/lib/xmrf/app.pm \
+          %{buildroot}%{xmrf_libdir}/xmrf/app.pm
 
+        install -d %{buildroot}%{_mandir}/man1
         pod2man ${GITHUB_WORKSPACE}/bin/xmrf \
-          > %{buildroot}/usr/share/man/man1/xmrf.1
+          > %{buildroot}%{_mandir}/man1/xmrf.1
 
         %files
-        /usr/bin/xmrf
-        /usr/share/xmrf/lib/xmrf/app.pm
-        /usr/share/man/man1/xmrf.1*
+        %{_bindir}/xmrf
+        %{xmrf_libdir}/xmrf/app.pm
+        %{_mandir}/man1/xmrf.1*
 
         %changelog
         EOF
