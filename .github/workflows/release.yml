@@ -195,7 +195,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: rpm
-        path: pgk
+        path: pkg
 
     - name: Test .rpm...
       shell: bash
