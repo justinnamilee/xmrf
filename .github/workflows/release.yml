@@ -28,7 +28,7 @@ jobs:
   build-deb:
     runs-on: ubuntu-latest
     needs:
-    - test=source
+    - test-source
 
     steps:
     - name: Checkout...
@@ -94,7 +94,7 @@ jobs:
   build-rpm:
     runs-on: ubuntu-latest
     needs:
-    - test
+    - test-source
 
     steps:
     - name: Fedora-ify...
@@ -175,17 +175,37 @@ jobs:
       run: |
         set -euxo pipefail
 
-        apt-get update &>/dev/null
-        apt-get install -y libterm-readline-perl &>/dev/null
+        export DEBIAN_FRONTEND=noninteractive
 
+        apt-get update
         apt-get install -y pkg/*.deb
 
         dpkg --verify xmrf
+        dpkg -L xmrf | grep 'xmrf\.1'
+        dpkg -L xmrf | grep 'copyright'
 
-        test -x /usr/bin/xmrf
-        test -f /usr/share/xmrf/lib/xmrf/app.pm
-        test -f /usr/share/doc/xmrf/copyright
-        test -f /usr/share/man/man1/xmrf.1.gz
+        xmrf -h &>/dev/null
+
+  test-rpm:
+    runs-on: ubuntu-latest
+    container: fedora-latest
+
+    steps:
+    - name: Download .rpm...
+      uses: actions/download-artifact@v4
+      with:
+        name: rpm
+        path: pgk
+
+    - name: Test .rpm...
+      shell: bash
+      run: |
+        set -euxo pipefail
+
+        dnf install -y pkg/*.rpm
+
+        rpm -V xmrf
+        rpm -ql xmrf | grep 'xmrf\.1'
 
         xmrf -h &>/dev/null
 
