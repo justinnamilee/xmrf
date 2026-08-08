@@ -1,3 +1,5 @@
 #!/bin/sh
 
-pod2markdown bin/xmrf > README.md
+cp .github/public/README.header.md README.md
+chmod 644 README.md
+pod2markdown bin/xmrf >> README.md
