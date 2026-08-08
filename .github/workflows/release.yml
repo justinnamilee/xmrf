@@ -19,12 +19,8 @@ jobs:
     - name: Get dependencies...
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          cpanminus             \
-          libcapture-tiny-perl  \
-          libtest2-suite-perl
-        sudo cpanm -n -q Test2::V1
-
+        sudo apt-get install -y cpanminus
+        sudo cpanm -n -q Test2::V1 Capture::Tiny
 
     - name: Test...
       run: prove -lv t
