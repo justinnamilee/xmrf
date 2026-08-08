@@ -209,7 +209,7 @@ jobs:
         - fedora:42
         - fedora:44
         - rockylinux:9
-        - rockylinux:10
+        - rockylinux/rockylinux:10
     container: ${{ matrix.image }}
 
     steps:
