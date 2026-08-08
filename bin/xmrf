@@ -346,42 +346,26 @@ Skips library scanner and only checks the directory given by this variable.
 
 =head1 INSTALLATION
 
-=head2 With Debian Package
+=head2 Packaged Release
 
-=over 2
+Grab the latest C<.deb> or C<.rpm> release from L<XMRF GitHub|https://github.com/justinnamilee/xmrf/releases/latest>.
+Once downloaded, `apt` or `dnf` can install it locally to the system, use
+whichever is appropriate for your sytem.
 
-=item * Grab the latest C<.deb> release from L<XMRF GitHub|https://github.com/justinnamilee/xmrf/releases/latest>.
+ $ apt install ./xmrf*.deb
 
-=item * Use C<apt> to install it (or whatever).
+ $ dnf install ./xmrf*.rpm
 
- $ apt install xmrf_*.deb
+=head2 Manual Installation
 
-=item * Run it!
+Clone the repository.  Put the wrapper script somewhere (say
+C</usr/local/bin/xmrf>).  Put the library somewhere (say
+C</usr/loca/lib/xmrf/app.pm>).  Set the execute bit on the wrapper.
 
- $ xmrf
-
-=back
-
-=head2 From Repository
-
-=over 2
-
-=item * Clone the repo.
-
- $ git clone https://github.com/justinnamilee/xmrf.git
-
-=item * Make sure the version works.
-
- $ cd xmrf ; prove
-
-=item * Put it somewhere, see C<bin/xmrf> for expected library paths.
-
-Two parts are needed, the wrapper C<bin/xmrf>, and the library
-C<lib/xmrf/app.pm>.  Put the wrapper somewhere accessible via C<$PATH>.
-The library can go anywhere, but the wrapper has places it will look by
-default.  Don't forget to C<chmod +x> the wrapper.
-
-=back
+ $ cp bin/xmrf /usr/local/bin/xmrf
+ $ cp lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
+ $ chmod 644 /usr/local/lib/xmrf/app.pm
+ $ chmod 755 /usr/local/bin/xmrf
 
 =head1 TESTING
 
