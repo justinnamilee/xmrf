@@ -133,14 +133,14 @@ jobs:
         %global xmrf_libdir /usr/share/xmrf/lib
 
         %install
-        install -Dm755 bin/xmrf \
+        install -Dm755 ${GITHUB_WORKSPACE}/bin/xmrf \
           %{buildroot}%{_bindir}/xmrf
 
-        install -Dm644 lib/xmrf/app.pm \
+        install -Dm644 ${GITHUB_WORKSPACE}/lib/xmrf/app.pm \
           %{buildroot}%{xmrf_libdir}/xmrf/app.pm
 
         install -d %{buildroot}%{_mandir}/man1
-        pod2man bin/xmrf                     \
+        pod2man ${GITHUB_WORKSPACE}/bin/xmrf \
           --center="Regex-map File Rename"   \
           --section=1                        \
           --release="$GITHUB_REF_NAME"       \
