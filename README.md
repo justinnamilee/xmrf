@@ -304,8 +304,8 @@ environment (except for `XMRF_DEV` and `XMRF_LIB`).
 
 # TESTING
 
-After cloning the repository, testing is fairly simple.  Both [Test2::V1](https://metacpan.org/pod/Test2%3A%3AV1) and
-[Capture::Tiny](https://metacpan.org/pod/Capture%3A%3ATiny) are required:
+After cloning the repository, testing is fairly simple.  Both **[Test2::V1](https://metacpan.org/pod/Test2%3A%3AV1)**
+and **[Capture::Tiny](https://metacpan.org/pod/Capture%3A%3ATiny)** are required:
 
     $ cpanm -n -q Test2::V1 Capture::Tiny
 
