@@ -198,7 +198,17 @@ jobs:
 
   test-rpm:
     runs-on: ubuntu-latest
-    container: fedora-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+        - fedora:38
+        - fedora:40
+        - fedora:42
+        - fedora:44
+        - rockylinux:9
+        - rockylinux:10
+    container: ${{ matrix.image }}
 
     steps:
     - name: Download .rpm...
