@@ -52,7 +52,11 @@ jobs:
           "$PKG/usr/share/xmrf/lib/xmrf/app.pm"
 
         install -d "$PKG/usr/share/man/man1"
-        pod2man bin/xmrf | gzip -9 \
+        pod2man bin/xmrf                   \
+          --center="Regex-map File Rename" \
+          --section=1                      \
+          --release="$GITHUB_REF_NAME"     |
+          gzip -9                          \
           > "$PKG/usr/share/man/man1/xmrf.1.gz"
 
         install -d "$PKG/usr/share/doc/xmrf"
@@ -137,6 +141,9 @@ jobs:
 
         install -d %{buildroot}%{_mandir}/man1
         pod2man ${GITHUB_WORKSPACE}/bin/xmrf \
+          --center="Regex-map File Rename"   \
+          --section=1                        \
+          --release="$GITHUB_REF_NAME"       \
           > %{buildroot}%{_mandir}/man1/xmrf.1
 
         %files
