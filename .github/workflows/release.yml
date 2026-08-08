@@ -188,7 +188,7 @@ jobs:
         export DEBIAN_FRONTEND=noninteractive
 
         apt-get update
-        apt-get install -y pkg/*.deb
+        apt-get install -y ./pkg/*.deb
 
         dpkg --verify xmrf
         dpkg -L xmrf | grep 'xmrf\.1'
@@ -222,7 +222,7 @@ jobs:
       run: |
         set -euxo pipefail
 
-        dnf install -y pkg/*.rpm
+        dnf install -y ./pkg/*.rpm
 
         rpm -V xmrf
         rpm -ql xmrf | grep 'xmrf\.1'
