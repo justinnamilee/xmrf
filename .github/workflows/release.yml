@@ -9,8 +9,26 @@ permissions:
   contents: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout...
+      uses: actions/checkout@v4
+
+    - name: Get dependencies...
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cpanminus
+        sudo cpanm -n -q Test2::V1 Capture::Tiny
+
+    - name: Test...
+      run: prove -lv t
+
   build-deb:
     runs-on: ubuntu-latest
+    needs:
+    - test
 
     steps:
     - name: Checkout...
@@ -60,6 +78,8 @@ jobs:
 
   build-rpm:
     runs-on: ubuntu-latest
+    needs:
+    - test
 
     steps:
     - name: Fedora-ify...
@@ -75,7 +95,6 @@ jobs:
       run: |
         set -euo pipefail
 
-        # not _super_ friendly, but works: v1.0.1-alpha2 => 1.0.1~alpha.2
         VERSION="$(perl -pe 's/^v//; s/-/~/; s/-/./g' <<< "$GITHUB_REF_NAME")"
 
         mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
@@ -93,9 +112,9 @@ jobs:
         XMRF - Regex-map Rename File
 
         %install
-        mkdir -p %{buildroot}/usr/bin
-        mkdir -p %{buildroot}/usr/share/xmrf/lib/xmrf
-        mkdir -p %{buildroot}/usr/share/man/man1
+        install -d %{buildroot}/usr/bin
+        install -d %{buildroot}/usr/share/xmrf/lib/xmrf
+        install -d %{buildroot}/usr/share/man/man1
 
         install -m755 ${GITHUB_WORKSPACE}/bin/xmrf \
           %{buildroot}/usr/bin/xmrf
