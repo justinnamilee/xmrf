@@ -161,7 +161,16 @@ jobs:
     needs:
     - build-deb
     runs-on: ubuntu-latest
-    container: debian:latest
+    strategy:
+      matrix:
+        image:
+        - debian:12
+        - debian:13
+        - ubuntu:20.04
+        - ubuntu:22.04
+        - ubuntu:24.04
+        - ubuntu:26.04
+    container: ${{ matrix.image }}
 
     steps:
     - name: Download .deb...
