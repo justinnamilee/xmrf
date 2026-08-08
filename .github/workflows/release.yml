@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  test:
+  test-source:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +28,7 @@ jobs:
   build-deb:
     runs-on: ubuntu-latest
     needs:
-    - test
+    - test-source
 
     steps:
     - name: Checkout...
@@ -43,15 +43,33 @@ jobs:
         PKG=pkg
         DEB="xmrf_${VERSION}_all.deb"
 
-        rm -rf "$PKG"
-
         install -d "$PKG/DEBIAN"
-        install -d "$PKG/usr/bin"
-        install -d "$PKG/usr/share/man/man1"
-        install -d "$PKG/usr/share/xmrf/lib/xmrf"
 
-        install -m755 bin/xmrf "$PKG/usr/bin/xmrf"
-        install -m644 lib/xmrf/app.pm "$PKG/usr/share/xmrf/lib/xmrf"
+        install -Dm755 bin/xmrf \
+          "$PKG/usr/bin/xmrf"
+
+        install -Dm644 lib/xmrf/app.pm \
+          "$PKG/usr/share/xmrf/lib/xmrf/app.pm"
+
+        install -d "$PKG/usr/share/man/man1"
+        pod2man bin/xmrf | gzip -9 \
+          > "$PKG/usr/share/man/man1/xmrf.1.gz"
+
+        install -d "$PKG/usr/share/doc/xmrf"
+        cat >"$PKG/usr/share/doc/xmrf/copyright" <<'EOF'
+        Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+        Upstream-Name: xmrf
+
+        Files: *
+        Copyright: 2026 Justin Lee
+        License: GPL-3+
+          This program is free software: you can redistribute it and/or modify
+          it under the terms of the GNU General Public License as published by
+          the Free Software Foundation, either version 3 of the License, or
+          (at your option) any later version.
+          .
+          See /usr/share/common-licenses/GPL-3 for the full license text.
+        EOF
 
         cat >"$PKG/DEBIAN/control" <<EOF
         Package: xmrf
@@ -65,9 +83,6 @@ jobs:
           Regex-map Rename File
         EOF
 
-        pod2man bin/xmrf | gzip -9 \
-          > "$PKG/usr/share/man/man1/xmrf.1.gz"
-
         dpkg-deb --build "$PKG" "$DEB"
 
     - name: Upload .deb...
@@ -79,7 +94,7 @@ jobs:
   build-rpm:
     runs-on: ubuntu-latest
     needs:
-    - test
+    - test-source
 
     steps:
     - name: Fedora-ify...
@@ -97,7 +112,7 @@ jobs:
 
         VERSION="$(perl -pe 's/^v//; s/-/~/; s/-/./g' <<< "$GITHUB_REF_NAME")"
 
-        mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+        install -d rpmbuild/SPECS
 
         cat >rpmbuild/SPECS/xmrf.spec <<EOF
         Name:           xmrf
@@ -111,23 +126,23 @@ jobs:
         %description
         XMRF - Regex-map Rename File
 
+        %global xmrf_libdir /usr/share/xmrf/lib
+
         %install
-        install -d %{buildroot}/usr/bin
-        install -d %{buildroot}/usr/share/xmrf/lib/xmrf
-        install -d %{buildroot}/usr/share/man/man1
+        install -Dm755 ${GITHUB_WORKSPACE}/bin/xmrf \
+          %{buildroot}%{_bindir}/xmrf
 
-        install -m755 ${GITHUB_WORKSPACE}/bin/xmrf \
-          %{buildroot}/usr/bin/xmrf
-        install -m644 ${GITHUB_WORKSPACE}/lib/xmrf/app.pm \
-          %{buildroot}/usr/share/xmrf/lib/xmrf/app.pm
+        install -Dm644 ${GITHUB_WORKSPACE}/lib/xmrf/app.pm \
+          %{buildroot}%{xmrf_libdir}/xmrf/app.pm
 
+        install -d %{buildroot}%{_mandir}/man1
         pod2man ${GITHUB_WORKSPACE}/bin/xmrf \
-          > %{buildroot}/usr/share/man/man1/xmrf.1
+          > %{buildroot}%{_mandir}/man1/xmrf.1
 
         %files
-        /usr/bin/xmrf
-        /usr/share/xmrf/lib/xmrf/app.pm
-        /usr/share/man/man1/xmrf.1*
+        %{_bindir}/xmrf
+        %{xmrf_libdir}/xmrf/app.pm
+        %{_mandir}/man1/xmrf.1*
 
         %changelog
         EOF
@@ -142,11 +157,85 @@ jobs:
         name: rpm
         path: rpmbuild/RPMS/noarch/*.rpm
 
+  test-deb:
+    needs:
+    - build-deb
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+        - debian:12
+        - debian:13
+        - ubuntu:20.04
+        - ubuntu:22.04
+        - ubuntu:24.04
+        - ubuntu:26.04
+    container: ${{ matrix.image }}
+
+    steps:
+    - name: Download .deb...
+      uses: actions/download-artifact@v4
+      with:
+        name: deb
+        path: pkg
+
+    - name: Test .deb...
+      shell: bash
+      run: |
+        set -euxo pipefail
+
+        export DEBIAN_FRONTEND=noninteractive
+
+        apt-get update
+        apt-get install -y ./pkg/*.deb
+
+        dpkg --verify xmrf
+        dpkg -L xmrf | grep 'xmrf\.1'
+        dpkg -L xmrf | grep 'copyright'
+
+        xmrf -h &>/dev/null
+
+  test-rpm:
+    needs:
+    - build-rpm
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+        - fedora:38
+        - fedora:40
+        - fedora:42
+        - fedora:44
+        - rockylinux:9
+        - rockylinux/rockylinux:10
+    container: ${{ matrix.image }}
+
+    steps:
+    - name: Download .rpm...
+      uses: actions/download-artifact@v4
+      with:
+        name: rpm
+        path: pkg
+
+    - name: Test .rpm...
+      shell: bash
+      run: |
+        set -euxo pipefail
+
+        dnf install -y ./pkg/*.rpm
+
+        rpm -V xmrf
+        rpm -ql xmrf | grep 'xmrf\.1'
+
+        xmrf -h &>/dev/null
+
   draft-release:
     runs-on: ubuntu-latest
     needs:
-    - build-deb
-    - build-rpm
+    - test-deb
+    - test-rpm
 
     steps:
     - name: Download packages...
