@@ -3,3 +3,4 @@
 cp .github/public/README.header.md README.md
 chmod 644 README.md
 pod2markdown bin/xmrf >> README.md
+git diff --quiet README.md || git commit README.md -m 'doc: regenerate `README.md`'
