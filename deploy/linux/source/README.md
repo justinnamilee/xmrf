@@ -1,4 +1,4 @@
-# xmrf-via-git-clone
+# xmrf-via-git-clone.sh
 
 ## SYNOPSIS
 
