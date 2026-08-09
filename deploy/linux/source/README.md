@@ -2,7 +2,7 @@
 
 ## SYNOPSIS
 
-    $ [XMRF_DOIT=1] [XMRF_BASE=/prefix] xmrf-via-github-source
+    $ [XMRF_DOIT=1] [XMRF_BASE=/prefix] xmrf-via-git-clone
 
 ## DESCRIPTION
 
