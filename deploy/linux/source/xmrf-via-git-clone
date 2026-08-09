@@ -25,12 +25,18 @@ if [ -n "$(which git)" ]; then
   exit 1
 fi
 
+XMRF_SUDO=
+
+if [ "$(id -u)" -ne 0 ]; then
+  XMRF_SUDO=sudo
+fi
+
 git clone "https://github.com/justinnamilee/xmrf.git" "$XMRF_TMP"
 
 pushd "$XMRF_TMP"
 
-install -Dm755 bin/xmrf "$XMRF_BIN/xmrf"
-install -Dm644 lib/xmrf/app.pm "$XMRF_LIB/xmrf/app.pm"
+$XMRF_SUDO install -Dm755 bin/xmrf "$XMRF_BIN/xmrf"
+$XMRF_SUDO install -Dm644 lib/xmrf/app.pm "$XMRF_LIB/xmrf/app.pm"
 
 popd
 
