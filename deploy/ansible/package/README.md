@@ -16,7 +16,7 @@ its checksum, install it with either the `apt` or `dnf` Ansible module, and
 finally clean up the temporary file (even if the install fails).
 
 It does make a hard assumption that `/tmp` is available and writable by your
-Ansible user with `become=false`, so just bear that in mind.
+Ansible user with `become: false`, so just bear that in mind.
 
 ## OPTIONS
 
