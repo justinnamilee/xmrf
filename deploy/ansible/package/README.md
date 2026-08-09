@@ -3,10 +3,10 @@
 ## SYNOPSIS
 
     $ ansible-playbook --limit deb_group \
-        xmrf-via-github-package.yml
+        xmrf-via-github-releases.yml
 
     $ ansible-playbook --limit rpm_group -e 'xmrf_rpm=1' \
-        xmrf-via-github-package.yml
+        xmrf-via-github-releases.yml
 
 ## DESCRIPTION
 
