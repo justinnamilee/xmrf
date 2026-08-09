@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use HTTP::Tiny;
+use Digest::SHA qw(sha256_hex);
+
+#!! HACK !!#
+my ($e, $a) = system(qw[command -v dnf]) == 0
+  ? qw[rpm application/x-redhat-package-manager]
+  : qw[deb application/x-debian-package];
+
+my $u = q[https://api.github.com/repos/justinnamilee/xmrf/releases/latest];
+
+my $h = HTTP::Tiny->new(agent => 'xmrf-installer')->get($u);
+
+die qq[$h->{status} $h->{reason}\n]
+  unless $h->{success};
+
+my ($v) = $h->{content} =~ /"tag_name"\s*:\s*"([^"]+)/;
+
+die qq[No '$a' found\n]
+  unless $h->{content} =~ /${a}/i;
+
+#!! HACK !!#
+my ($x) = $h->{content} =~ /${a}.+?"browser_download_url"\s*:\s*"([^"]+)/i;
+my ($d) = $h->{content} =~ /${a}.+?"digest"\s*:\s*"(?:sha256:)?([0-9a-f]{64})/i;
+
+die qq[Bad assetz\n]
+  unless $d && $x;
+
+my $f = qq[/tmp/xmrf.$e];
+
+print qq[Release $v: sha256:$d, $x\n];
+
+my $q = HTTP::Tiny->new->get($x);
+
+die qq[Download asset failed\n]
+  unless$q->{success};
+
+open(my $F, q[>], $f)
+  or die qq[Can't open tmp file: $!\n];
+
+binmode $F;
+print $F $q->{content};
+close $F;
+chmod 0600, $f;
+
+my $s = 1;
+
+if (lc sha256_hex($q->{content}) eq lc $d)
+{
+  my $r = $>
+    ? q[sudo ]
+    : q[];
+
+  my $c = $e eq q[deb]
+    ? qq[${r}apt-get install -y ]
+    : qq[${r}dnf install -y ];
+
+  $s = system(qq[$c$f]);
+}
+else
+{
+  warn qq[SHA256 mismatch, not installing\n];
+}
+
+unlink $f;
+exit $s;
