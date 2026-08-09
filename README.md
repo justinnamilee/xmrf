@@ -250,6 +250,7 @@ environment (except for `XMRF_DEV` and `XMRF_LIB`).
     - XMRF\_COPY
     - XMRF\_EXECUTE
     - XMRF\_FULL
+    - XMRF\_LINKS
     - XMRF\_NAMED
     - XMRF\_RECURSIVE
     - XMRF\_VERBOSE
