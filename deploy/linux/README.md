@@ -2,7 +2,7 @@
 
 ## SYNOPSIS
 
-    XMRF_LGG=1 [XMRF_BASE=prefix] ./xmrf-via-github-source
+    XMRF_DOIT=1 [XMRF_BASE=prefix] ./xmrf-via-github-source
 
 ## DESCRIPTION
 
@@ -12,7 +12,7 @@ default, then removes the temporary checkout.
 
 ## OPTIONS
 
-`XMRF_LGG`
+`XMRF_DOIT`
 
 Required. Must be set to a **non-empty** value or the script will not run (for
 safety).
