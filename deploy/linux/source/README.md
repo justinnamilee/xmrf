@@ -1,8 +1,8 @@
-# xmrf-via-github-source
+# xmrf-via-git-clone
 
 ## SYNOPSIS
 
-    XMRF_DOIT=1 [XMRF_BASE=prefix] ./xmrf-via-github-source
+    $ [XMRF_DOIT=1] [XMRF_BASE=/prefix] xmrf-via-git-clone
 
 ## DESCRIPTION
 
@@ -10,12 +10,11 @@ Installs `xmrf` from its GitHub repository. Clones the repository into
 `/tmp/xmrf`, installs the executable and Perl library under `/usr/local` by
 default, then removes the temporary checkout.
 
-## OPTIONS
+## ENVIRONMENT
 
 `XMRF_DOIT`
 
-Required. Must be set to a **non-empty** value or the script will not run (for
-safety).
+Must be set to a **non-empty** value or the script will not run (for safety).
 
 `XMRF_BASE`
 
