@@ -1,4 +1,4 @@
-# xmrf-via-github-package.yml
+# xmrf-via-github-releases.yml
 
 ## SYNOPSIS
 
