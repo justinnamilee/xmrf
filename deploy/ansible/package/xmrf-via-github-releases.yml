@@ -1,0 +1,80 @@
+- name: "Install XMRF..."
+  hosts: all
+  vars:
+    xmrf_api_url: "https://api.github.com/repos/justinnamilee/xmrf/releases/latest"
+    xmrf_pkg_ext: "{{ (xmrf_rpm is defined) | ternary('rpm', 'deb') }}"
+    xmrf_tmp_uri: "/tmp/xmrf.{{( xmrf_rpm is defined) | ternary('rpm', 'deb') }}"
+  become: false
+  gather_facts: false
+  collections:
+  - ansible.builtin
+
+  tasks:
+
+  - name: "Get Repo JSON..."
+    uri:
+      url: "{{ xmrf_api_url }}"
+      return_content: true
+    register: github_release
+    delegate_to: localhost
+    run_once: true
+
+  - name: "Store Tag..."
+    set_fact:
+      latest_version: "{{ github_release.json.tag_name }}"
+    delegate_to: localhost
+    run_once: true
+
+  - name: "Get PKG Info..."
+    set_fact:
+      latest_info: >-
+        {{
+          github_release.json.assets
+          | selectattr('name', 'match', '.*\.' ~ xmrf_pkg_ext ~ '$')
+          | first
+        }}
+    delegate_to: localhost
+    run_once: true
+
+  - name: "Get SHA256 and URL..."
+    set_fact:
+      latest_deb: "{{ latest_info.browser_download_url }}"
+      latest_sha: "{{ latest_info.digest }}"
+    delegate_to: localhost
+    run_once: true
+
+  - name: "Show Info..."
+    debug:
+      msg: "Release {{ latest_version }}: {{ latest_sha }}, {{ latest_deb }}"
+    delegate_to: localhost
+    run_once: true
+
+  - name: "Get and Install PKG..."
+    block:
+
+    - name: "Get PKG File..."
+      get_url:
+        url: "{{ latest_deb }}"
+        dest: "{{ xmrf_tmp_uri }}"
+        mode: '600'
+        checksum: "{{ latest_sha }}"
+
+    - name: "Install PKG (deb)..."
+      become: true
+      apt:
+        deb: "{{ xmrf_tmp_uri }}"
+      when: "not xmrf_rpm is defined"
+
+    - name: "Install PKG (rpm)..."
+      become: true
+      dnf:
+        name: "{{ xmrf_tmp_uri }}"
+        state: present
+      when: "xmrf_rpm is defined"
+
+    always:
+
+    - name: "Remove PKG File..."
+      file:
+        path: "{{ xmrf_tmp_uri }}"
+        state: absent
