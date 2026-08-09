@@ -305,6 +305,8 @@ of using the option flags.
 
 =item * XMRF_FULL
 
+=item * XMRF_LINKS
+
 =item * XMRF_NAMED
 
 =item * XMRF_RECURSIVE
