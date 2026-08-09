@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -e
+
+XMRF_DIR="${XMRF_BASE:-/usr/local}"
+XMRF_BIN="$XMRF_DIR/bin"
+XMRF_LIB="$XMRF_DIR/lib"
+XMRF_TMP=/tmp/xmrf
+
+# hint: You need to set XMRF_LGG to a non-empty string to continue.
+
+if [ -n "$XMRF_LGG" ]; then
+  echo "*** WARNING ***                                              " >&2
+  echo "This script will *probably* work on most Linux installations." >&2
+  echo "That said, please have a look at what it does first... Don't " >&2
+  echo "just run things you find on the internet.  (please)          " >&2
+
+  exit 1
+fi
+
+if [ -n "$(which git)" ]; then
+  echo "ERROR: Unable to find 'git', unable to proceed." >&2
+
+  exit 1
+fi
+
+git clone "https://github.com/justinnamilee/xmrf.git" "$XMRF_TMP"
+
+pushd "$XMRF_TMP"
+
+install -Dm755 bin/xmrf "$XMRF_BIN/xmrf"
+install -Dm644 lib/xmrf/app.pm "$XMRF_LIB/xmrf/app.pm"
+
+popd
+
+rm -rf "$XMRF_TMP"
