@@ -19,7 +19,7 @@ if [ -n "$XMRF_LGG" ]; then
 fi
 
 if [ -n "$(which git)" ]; then
-  echo "ERROR: Unable to find 'git', unable to proceed." >&2
+  echo "ERROR: Unable to find 'git', cannot proceed." >&2
 
   exit 1
 fi
