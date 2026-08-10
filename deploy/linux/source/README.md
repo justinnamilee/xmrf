@@ -4,10 +4,13 @@
 
     $ [XMRF_BASE=/prefix] xmrf-via-github-repository
 
+    $ sudo [XMRF_BASE=/usr/prefix] xmrf-via-github-repository
+
 ## DESCRIPTION
 
 Installs `xmrf` from its GitHub repository using the raw URLs. Grabs each file,
-puts them under `/usr/loca/{bin,lib}` by default.
+puts them under `/usr/loca/{bin,lib}` by default.  The use of `sudo` may be
+required.
 
 ## ENVIRONMENT
 
