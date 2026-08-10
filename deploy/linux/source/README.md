@@ -1,25 +1,26 @@
-# xmrf-via-git-clone.sh
+# xmrf-via-github-repository.pl
 
 ## SYNOPSIS
 
-    $ [XMRF_DOIT=1] [XMRF_BASE=/prefix] xmrf-via-git-clone
+    $ [XMRF_BASE=/prefix] xmrf-via-github-repository
 
 ## DESCRIPTION
 
-Installs `xmrf` from its GitHub repository. Clones the repository into
-`/tmp/xmrf`, installs the executable and Perl library under `/usr/local` by
-default, then removes the temporary checkout.
+Installs `xmrf` from its GitHub repository using the raw URLs. Grabs each file,
+puts them under `/usr/loca/{bin,lib}` by default.
 
 ## ENVIRONMENT
 
-`XMRF_DOIT`
+- `XMRF_BASE`
 
-Must be set to a **non-empty** value or the script will not run (for safety).
+    Optional installation prefix.  Defaults to `/usr/local`.  The executable goes
+    in `$XMRF_BASE/bin` and the library in `$XMRF_BASE/lib`.
 
-`XMRF_BASE`
+## REQUIREMENTS
 
-Optional installation prefix.  Defaults to `/usr/local`.  The executable goes
-in `$XMRF_BASE/bin` and the library in `$XMRF_BASE/lib`.
+- `HTTP::Tiny`
+
+        $ cpanm -n -q HTTP::Tiny
 
 ## AUTHOR
 
