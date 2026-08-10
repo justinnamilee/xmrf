@@ -4,7 +4,7 @@
 
     $ [XMRF_BASE=/prefix] xmrf-via-github-repository
 
-    $ sudo [XMRF_BASE=/usr/prefix] xmrf-via-github-repository
+    $ sudo [XMRF_BASE=/prefix] xmrf-via-github-repository
 
 ## DESCRIPTION
 
