@@ -1,6 +1,7 @@
 # <img alt="xmrf" src=".github/public/xmrf-banner.svg" width="770" height="64">
 
-[![Release](https://img.shields.io/github/v/release/justinnamilee/xmrf)](https://github.com/justinnamilee/xmrf/releases/latest)
+[![Release: Latest](https://img.shields.io/github/v/release/justinnamilee/xmrf)](https://github.com/justinnamilee/xmrf/releases/latest)
+[![Language: Perl](https://img.shields.io/badge/Language-Perl-blue.svg)](https://perl.org)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
 _Your friendly neighborhood file-sorting tool—now with more brimstone._
