@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use HTTP::Tiny;
+use File::Path qw[];
+
+my $b = $ENV{XMRF_BASE} // q[/usr/local];
+my $h = HTTP::Tiny->new;
+my $u = q[https://raw.githubusercontent.com/justinnamilee/xmrf/main/];
+
+foreach my $d ([qw[bin xmrf], 0755], [qw[lib/xmrf app.pm], 0644])
+{
+  my ($r, $i, $m) = @$d;
+  my ($p, $l, $f) = (qq[$b/$r], qq[$u$r/$i], qq[$b/$r/$i]);
+
+  File::Path::make_path($p) || die qq[Unable to create required path "$p": $!\n]
+    unless -d $p;
+
+  die qq[Required path isn't writable "$p"\n]
+    unless -w $p;
+
+  print qq[GET: $l\n];
+
+  my $x = $h->get($l);
+
+
+  die qq[$x->{status} $x->{reason}\n]
+    unless $x->{success};
+
+  printf qq[OUT: %s, mode %o\n], $f, $m;
+
+  open(my $z, q[>], $f)
+    or die qq[$f: $!\n];
+
+  print $z $x->{content};
+  close($z);
+
+  chmod $m, $f;
+}
