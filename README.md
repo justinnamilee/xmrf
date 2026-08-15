@@ -92,6 +92,18 @@ All boolean option flags (flags that take no value) default to their
     This behaviour can be changed by setting **--links**.  It is not recomended and
     may have severly unexpected results.
 
+    Note that this doesn't apply to paths with symlinks in them provided as the
+    input folder, it just prevents the directory scanner from adding files that
+    are symlinks or scanning subfolders that are symlinks in recursive mode.  For
+    example:
+
+        $ ls -l
+        lrwxrwxrwx 1 user user 1 Jan 01 2026 Documents -> /mnt/remote/Documents
+
+    XMRF is more than happy to accept this symlinked folder as its input
+    folder.  However, if this `Documents` symlink contains further symlinks
+    within itself, then those would be skipped by default.
+
 - **-m**, **--map** `key=val`
 
     Multiple **--map** flags can be included to specify more mapping subroutines.

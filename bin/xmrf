@@ -128,6 +128,18 @@ By default B<XMRF> skips over all symlinks (files and directories) for safety.
 This behaviour can be changed by setting B<--links>.  It is not recomended and
 may have severly unexpected results.
 
+Note that this doesn't apply to paths with symlinks in them provided as the
+input folder, it just prevents the directory scanner from adding files that
+are symlinks or scanning subfolders that are symlinks in recursive mode.  For
+example:
+
+  $ ls -l
+  lrwxrwxrwx 1 user user 1 Jan 01 2026 Documents -> /mnt/remote/Documents
+
+XMRF is more than happy to accept this symlinked folder as its input
+folder.  However, if this C<Documents> symlink contains further symlinks
+within itself, then those would be skipped by default.
+
 =item B<-m>, B<--map> C<key=val>
 
 Multiple B<--map> flags can be included to specify more mapping subroutines.
