@@ -170,7 +170,7 @@ sub configure(\%\%)
   $config->{format} = $sprintf;
 
   $config->{$_} = boolify($config->{$_})
-    for (qw[build copy execute full links named recursive verbose]);
+    for (qw[build copy execute full links named recursive verbose version]);
 
   foreach my $m (keys(%map))
   {
