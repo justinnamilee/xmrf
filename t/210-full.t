@@ -3,6 +3,7 @@
 use strict;
 
 use Test2::V1 qw[-strict -warnings -utf8];
+use Cwd qw[];
 use FindBin;
 use lib qq[$FindBin::RealBin/../lib];
 
@@ -59,6 +60,21 @@ T01_BASIC:
   T2->ok(-f qq[$testing/prove-numeric-1.txt], q[basic file rename works]);
 
   reeeset;
+}
+
+T02_EMPTY:
+{
+  local @ARGV = qw(-fe (prove).+?(\d+) %s-empty-%02d.txt);
+  my $cwd = Cwd::getcwd();
+
+  T2->bail_out(join(q[: ], q[chdir], $testing, $!))
+    unless chdir($testing);
+
+  T2->is(xmrf::app::run(), 0, q[empty output run successful]);
+  T2->ok(-f q[prove-empty-01.txt], q[empty output file rename works]);
+
+  T2->bail_out(join(q[: ], q[chdir], $cwd, $!))
+    unless chdir($cwd);
 }
 
 # TODO: Add more advanced testing of "full" here, but might be unrequired.

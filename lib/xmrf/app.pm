@@ -98,7 +98,7 @@ sub run(;$)
 
     my $mpe = undef;
 
-    if (!-d $d && (!$config{build} || File::Path::make_path($d, {error => \$mpe}) == 0))
+    if (length($d) && !-d $d && (!$config{build} || File::Path::make_path($d, {error => \$mpe}) == 0))
     {
       warn qq[Warning: '$d' does not exist (or can't create), skipping...\n];
 
