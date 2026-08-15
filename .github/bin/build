@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+set -e
+
+tag="$1"
+
+if [[ ! $tag =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta)-[0-9]+)?$ ]]; then
+  echo "Usage: $0 <tag> [nocommit]"
+  echo
+  echo "Match: ^v?[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta)-[0-9]+)?\$"
+  echo
+  echo "  EG1: $0 v10.234.4"
+  echo "  EG2: $0 v9.2.1-beta-1"
+  echo
+
+  exit 1
+fi
+
+if [[ ! $tag =~ ^v ]]; then
+  tag="v$tag"
+fi
+
+if ! git diff --quiet && git diff --cached --quiet; then
+  echo "ERROR: Uncommited modified files...bye."
+  exit 1
+fi
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "Warning: Untracked files found:"
+  git status --porcelain
+  read -rp "Continue? [y/N] " answer
+  [[ $answer =~ ^[Yy]$ ]] || exit 1
+fi
+
+echo "Setting version tag..."
+.github/bin/updateVERSION "$tag" "$2"
+
+echo "Regenrate 'README.md' if required..."
+.github/bin/updateREADME "$2"
+
+echo "Send up the new commits..."
+git push
+
+echo "Setting tag..."
+git tag "$tag"
+
+[ -z "$2" ] || exit 0
+
+git push --tags
