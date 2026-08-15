@@ -340,9 +340,6 @@ or example output where applicable).
 If you'd like to contribute a fix or enhancement yourself, feel free to open a
 pull request.
 
-Finally, there's no **AGENTS.md** here for a reason, Perl has wonderful
-documentation, go give it a read yourself. **:)**
-
 # HISTORY
 
 - April 16, 2018
