@@ -11,7 +11,7 @@ _Your friendly neighborhood file-sorting tool—now with more brimstone._
 ---
 # NAME
 
-XMRF - Regex-map Rename File
+XMRF - Regex-map Rename File, advanced command-line file management utiltity.
 
 # SYNOPSIS
 
