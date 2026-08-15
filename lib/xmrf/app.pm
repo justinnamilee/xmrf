@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-package xmrf::app;
+package xmrf::app v1.1.1;
 
 
 use strict;
@@ -47,7 +47,8 @@ my %config =
   match     => undef,
   #? special config items
   help      => 0,
-  map       => {}
+  map       => {},
+  version   => 0
 );
 
 
@@ -72,7 +73,8 @@ sub run(;$)
       q[output|o=s]   => \$config{output},
       q[recursive|r!] => \$config{recursive},
       q[suffix|s=s]   => \$config{suffix},
-      q[verbose|v!]   => \$config{verbose}
+      q[verbose|v!]   => \$config{verbose},
+      q[version]      => \$config{version}
     );
 
     my $c = configure(%option, %config);
@@ -137,11 +139,14 @@ sub configure(\%\%)
 
   Getopt::Long::Configure(qw[bundling ignorecase_always]);
 
-  Getopt::Long::GetOptions(%{$option}, q[map|m=s] => \%map)
-    or return help(0, 1, q[Error], q[Failed parsing given options]);
+  return help(0, 1, q[Error], q[Failed parsing given options])
+    unless Getopt::Long::GetOptions(%{$option}, q[map|m=s] => \%map);
 
   return help($config->{help} > 1 ? 2 : 1)
     if $config->{help} > 0;
+
+  return help(0, 1, q[Version], our $VERSION)
+    if ($config->{version});
 
   return help(0, 1, q[Error], q[Input folder must exist], qq['$config->{input}'])
     unless (-d $config->{input});
@@ -165,7 +170,7 @@ sub configure(\%\%)
   $config->{format} = $sprintf;
 
   $config->{$_} = boolify($config->{$_})
-    for (qw[build copy execute full links named recursive verbose]);
+    for (qw[build copy execute full links named recursive verbose version]);
 
   foreach my $m (keys(%map))
   {

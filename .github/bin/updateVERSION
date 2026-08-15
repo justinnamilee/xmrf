@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <version> [nocommit]"
+  exit 1
+fi
+
+tag="$1"
+
+if [[ $tag =~ ^(v[0-9]+\.[0-9]+\.[0-9]+) ]]; then
+  tag="${BASH_REMATCH[1]}"
+else
+  echo "Error: Invalid version specified..."
+  exit 1
+fi
+
+perl -i -pe "s/^package xmrf::app.*\$/package xmrf::app $tag;/" lib/xmrf/app.pm
+
+[ -z "$2" ] || exit 0
+
+prove
+
+git diff --quiet lib/xmrf/app.pm || git commit lib/xmrf/app.pm -m 'init: bump version in `lib/xmrf/app.pm`'
