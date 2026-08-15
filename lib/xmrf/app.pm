@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-package xmrf::app v1.1.1;
+package xmrf::app v1.2.0;
 
 
 use strict;
