@@ -296,26 +296,27 @@ environment (except for `XMRF_DEV` and `XMRF_LIB`).
 
 # INSTALLATION
 
+More options are available in the [deploy folder](https://github.com/justinnamilee/xmrf/tree/main/deploy).
+
 ## Packaged Release
 
 Grab the latest `.deb` or `.rpm` release from [XMRF GitHub](https://github.com/justinnamilee/xmrf/releases/latest).
 Once downloaded, \`apt\` or \`dnf\` can install it locally to the system, use
 whichever is appropriate for the system.
 
-    $ apt install ./xmrf*.deb
-
-    $ dnf install ./xmrf*.rpm
-
 ## Manual Installation
 
 Clone the repository.  Put the wrapper script somewhere (say
 `/usr/local/bin/xmrf`).  Put the library somewhere (say
-`/usr/loca/lib/xmrf/app.pm`).  Set the execute bit on the wrapper.
+`/usr/local/lib/xmrf/app.pm`).  Set the execute bit on the wrapper.
 
-    $ cp bin/xmrf /usr/local/bin/xmrf
-    $ cp lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
-    $ chmod 644 /usr/local/lib/xmrf/app.pm
-    $ chmod 755 /usr/local/bin/xmrf
+    $ git clone 'https://github.com/justinnamilee/xmrf'
+    $ cd xmrf
+    $ sudo cp bin/xmrf /usr/local/bin/xmrf
+    $ sudo cp lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
+    $ sudo chmod 644 /usr/local/lib/xmrf/app.pm
+    $ sudo chmod 755 /usr/local/bin/xmrf
+    $ xmrf --version
 
 # TESTING
 
