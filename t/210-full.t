@@ -64,7 +64,7 @@ T01_BASIC:
 
 T02_EMPTY:
 {
-  local @ARGV = qw(-fe (prove).+?(\d+) %s-empty-%02d);
+  local @ARGV = qw(-fe (prove).+?(\d+) %s-empty-%02d.txt);
   my $cwd = Cwd::getcwd();
 
   T2->bail_out(join(q[: ], q[chdir], $testing, $!))
