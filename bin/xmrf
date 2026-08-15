@@ -366,26 +366,27 @@ Skips library scanner and only checks the directory given by this variable.
 
 =head1 INSTALLATION
 
+More options are available in the L<deploy folder|https://github.com/justinnamilee/xmrf/tree/main/deploy>.
+
 =head2 Packaged Release
 
 Grab the latest C<.deb> or C<.rpm> release from L<XMRF GitHub|https://github.com/justinnamilee/xmrf/releases/latest>.
 Once downloaded, `apt` or `dnf` can install it locally to the system, use
 whichever is appropriate for the system.
 
- $ apt install ./xmrf*.deb
-
- $ dnf install ./xmrf*.rpm
-
 =head2 Manual Installation
 
 Clone the repository.  Put the wrapper script somewhere (say
 C</usr/local/bin/xmrf>).  Put the library somewhere (say
-C</usr/loca/lib/xmrf/app.pm>).  Set the execute bit on the wrapper.
+C</usr/local/lib/xmrf/app.pm>).  Set the execute bit on the wrapper.
 
- $ cp bin/xmrf /usr/local/bin/xmrf
- $ cp lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
- $ chmod 644 /usr/local/lib/xmrf/app.pm
- $ chmod 755 /usr/local/bin/xmrf
+ $ git clone 'https://github.com/justinnamilee/xmrf'
+ $ cd xmrf
+ $ sudo cp bin/xmrf /usr/local/bin/xmrf
+ $ sudo cp lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
+ $ sudo chmod 644 /usr/local/lib/xmrf/app.pm
+ $ sudo chmod 755 /usr/local/bin/xmrf
+ $ xmrf --version
 
 =head1 TESTING
 
