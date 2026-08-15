@@ -28,6 +28,7 @@ XMRF - Regex-map Rename File
     --recursive | -r          Scan subfolders of the input directory too.
     --suffix    | -s <str>    Override the default suffix extraction regex.
     --verbose   | -v          Show actions as they happen when execute on.
+    --version                 Show the version number of xmrf.
 
 # DESCRIPTION
 
@@ -199,6 +200,11 @@ All boolean option flags (flags that take no value) default to their
     Behaves much like the `cp` or `mv` verbose option.  If **--execute** isn't
     enabled then **--verbose** is forced on to show the planned actions.
 
+- **--version**
+
+    Show the current version number of XMRF, note that any addition of the
+    **--help** option flag will override this.
+
 # EXAMPLES
 
 ## BASIC
@@ -280,7 +286,7 @@ environment (except for `XMRF_DEV` and `XMRF_LIB`).
 
 Grab the latest `.deb` or `.rpm` release from [XMRF GitHub](https://github.com/justinnamilee/xmrf/releases/latest).
 Once downloaded, \`apt\` or \`dnf\` can install it locally to the system, use
-whichever is appropriate for your sytem.
+whichever is appropriate for the system.
 
     $ apt install ./xmrf*.deb
 
