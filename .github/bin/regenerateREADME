@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -e
 
 cp .github/public/README.header.md README.md
 chmod 644 README.md
