@@ -33,18 +33,31 @@ jobs:
           New-Item -ItemType Directory -Force dist
           pp -I lib -o dist/xmrf.exe bin/xmrf
 
+          Get-Item .\dist\xmrf.exe | Format-List Name, Length, FullName
+          Get-Command .\dist\xmrf.exe
+
       - name: Smoke test packaged executable...
         shell: powershell
         run: |
           Write-Host "Workspace: $env:GITHUB_WORKSPACE"
 
           $smoke = Join-Path $env:RUNNER_TEMP "xmrf-smoke"
-          New-Item -ItemType Directory -Force $smoke
+          New-Item -ItemType Directory -Force $smoke | Out-Null
           Copy-Item .\dist\xmrf.exe $smoke
 
           Set-Location $smoke
-          Write-Host "Smoke test from: $(Get-Location)"
-          .\xmrf.exe --help
+
+          .\xmrf.exe --help >stdout.txt 2>stderr.txt
+          $rc = $LASTEXITCODE
+
+          Write-Host "exit=$rc"
+          Write-Host "stdout bytes=$((Get-Item stdout.txt).Length)"
+          Write-Host "stderr bytes=$((Get-Item stderr.txt).Length)"
+
+          Get-Content stderr.txt -TotalCount 50
+          Get-Content stdout.txt -TotalCount 50
+
+          exit $rc
 
       - name: Upload Windows executable...
         uses: actions/upload-artifact@v4
