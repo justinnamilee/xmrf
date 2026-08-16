@@ -47,7 +47,7 @@ jobs:
 
           Set-Location $smoke
 
-          .\xmrf.exe --help >stdout.txt 2>stderr.txt
+          .\xmrf.exe ".*" "testing" >stdout.txt 2>stderr.txt
           $rc = $LASTEXITCODE
 
           Write-Host "exit=$rc"
