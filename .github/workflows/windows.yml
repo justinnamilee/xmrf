@@ -47,18 +47,14 @@ jobs:
 
           Set-Location $smoke
 
-          .\xmrf.exe ".*" "testing" >stdout.txt 2>stderr.txt
+          .\xmrf.exe "(.*)" "%s"
           $rc = $LASTEXITCODE
 
-          Write-Host "exit=$rc"
-          Write-Host "exe bytes=$((Get-Item .\xmrf.exe).Length)"
-          Write-Host "stdout bytes=$((Get-Item stdout.txt).Length)"
-          Write-Host "stderr bytes=$((Get-Item stderr.txt).Length)"
+          Write-Host "xmrf exit code: $rc"
 
-          Get-Content stderr.txt -TotalCount 5
-          Get-Content stdout.txt -TotalCount 5
-
-          exit $rc
+          if ($rc -ne 0) {
+            throw "xmrf smoke test failed with exit code $rc"
+          }
 
       - name: Upload Windows executable...
         uses: actions/upload-artifact@v4
