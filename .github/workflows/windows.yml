@@ -51,11 +51,12 @@ jobs:
           $rc = $LASTEXITCODE
 
           Write-Host "exit=$rc"
+          Write-Host "exe bytes=$((Get-Item .\xmrf.exe).Length)"
           Write-Host "stdout bytes=$((Get-Item stdout.txt).Length)"
           Write-Host "stderr bytes=$((Get-Item stderr.txt).Length)"
 
-          Get-Content stderr.txt -TotalCount 50
-          Get-Content stdout.txt -TotalCount 50
+          Get-Content stderr.txt -TotalCount 5
+          Get-Content stdout.txt -TotalCount 5
 
           exit $rc
 
