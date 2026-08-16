@@ -1,0 +1,28 @@
+name: Windows Perl tests
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+    - "wintest-*"
+
+jobs:
+  test-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get Perl...
+        shell: powershell
+        run: |
+          choco install strawberryperl -y
+          echo "C:\Strawberry\perl\bin" >> $env:GITHUB_PATH
+          echo "C:\Strawberry\c\bin" >> $env:GITHUB_PATH
+
+      - name: Get dependencies...
+        run: |
+          cpanm -n -q Test2::V1 Capture::Tiny
+
+      - name: Test...
+        run: prove -lv t
