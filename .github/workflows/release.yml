@@ -264,16 +264,12 @@ jobs:
       run: |
         set -euxo pipefail
 
-        echo 'path-include=/usr/share/man/*' \
-          > /etc/dpkg/dpkg.cfg.d/99-include-man
+        perl -ni -e 'print unless m{^\s*path-exclude=/usr/share/man/\*\s*$}' \
+          /etc/dpkg/dpkg.cfg.d/excludes
         export DEBIAN_FRONTEND=noninteractive
 
         apt-get update
         apt-get install -y ./pkg/*.deb
-
-        grep -R 'path-\(exclude\|include\)' /etc/dpkg/dpkg.cfg /etc/dpkg/dpkg.cfg.d/ || true
-        find /usr/share/man -name 'xmrf*' -ls
-        dpkg-deb -c ./pkg/*.deb | grep 'xmrf\.1'
 
         dpkg --verify xmrf
         dpkg -L xmrf | grep 'xmrf\.1'
