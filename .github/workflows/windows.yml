@@ -17,8 +17,8 @@ jobs:
         shell: powershell
         run: |
           choco install strawberryperl -y
-          echo "C:\Strawberry\perl\bin" >> $env:GITHUB_PATH
-          echo "C:\Strawberry\c\bin" >> $env:GITHUB_PATH
+          echo 'C:\Strawberry\perl\bin' >> $env:GITHUB_PATH
+          echo 'C:\Strawberry\c\bin' >> $env:GITHUB_PATH
 
       - name: Get dependencies...
         run: |
@@ -31,30 +31,32 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force dist
-          pp -I lib -o dist/xmrf.exe bin/xmrf
+
+          perl -ne '$p ||= /^__END__$/; print if $p && !/^__END__$/' bin/xmrf > dist/xmrf.pod
+          perl -i -pe 's/#\* POD EXE ANCHOR \*#/my\$pod=PAR::read_file(q[xmrf.pod]);open(my\$pfh,q[<],\\\$pod) or die qq[Error: Unable to open POD: \$!\\n];/' lib/xmrf/app.pm
+          perl -i -pe 's/-input => \$0/-input => \$pfh/' lib/xmrf/app.pm
+          perl -i -pe 's/use strict;/use strict;use PAR;/' lib/xmrf/app.pm
+          pp -I lib -a 'dist/xmrf.pod;xmrf.pod' -o dist/xmrf.exe bin/xmrf
 
           Get-Item .\dist\xmrf.exe | Format-List Name, Length, FullName
           Get-Command .\dist\xmrf.exe
 
-      - name: Smoke test packaged executable...
+      - name: Smoke test...
         shell: powershell
         run: |
-          Write-Host "Workspace: $env:GITHUB_WORKSPACE"
-
-          $smoke = Join-Path $env:RUNNER_TEMP "xmrf-smoke"
+          $smoke = Join-Path $env:RUNNER_TEMP 'xmrf-smoke'
           New-Item -ItemType Directory -Force $smoke | Out-Null
           Copy-Item .\dist\xmrf.exe $smoke
 
           Set-Location $smoke
 
           .\xmrf.exe "(.*)" "%s"
-          $rc = $LASTEXITCODE
 
-          Write-Host "xmrf exit code: $rc"
-
-          if ($rc -ne 0) {
+          if ($LASTEXITCODE -ne 0) {
             throw "xmrf smoke test failed with exit code $rc"
           }
+
+          .\xmrf.exe --help
 
       - name: Upload Windows executable...
         uses: actions/upload-artifact@v4
