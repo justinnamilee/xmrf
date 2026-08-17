@@ -370,9 +370,9 @@ More options are available in the L<deploy folder|https://github.com/justinnamil
 
 =head2 Packaged Release
 
-Grab the latest C<exe>, C<.deb>, or C<.rpm> release from L<XMRF GitHub|https://github.com/justinnamilee/xmrf/releases/latest>.
+Grab the latest C<.exe>, C<.deb>, or C<.rpm> release from L<XMRF GitHub|https://github.com/justinnamilee/xmrf/releases/latest>.
 Once downloaded, C<apt> or C<dnf> can install it locally to the system, use
-whichever is appropriate for the system.  The Windows C<exe> is ready to go
+whichever is appropriate for the system.  The Windows C<.exe> is ready to go
 out of the box, just put it in the C<%PATH%>.
 
 =head2 Manual Installation
