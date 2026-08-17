@@ -23,7 +23,7 @@ XMRF - Regex-map Rename File, advanced command-line file management utiltity.
     --full      | -f          Pass the full path to regex, not just filename.
     --help      | -h          Show full help dialog.
     --input     | -i <dir>    Scan <dir> for files (and subdirs too with -r).
-    --links     | -l          Enable following and renaming symlinks (B<don't>).
+    --links     | -l          Enable following and renaming symlinks (don't).
     --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
     --named     | -n          Use named capture groups instead of numeric.
     --output    | -o <dir>    Prepend <dir> to output file path.
