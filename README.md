@@ -300,9 +300,10 @@ More options are available in the [deploy folder](https://github.com/justinnamil
 
 ## Packaged Release
 
-Grab the latest `.deb` or `.rpm` release from [XMRF GitHub](https://github.com/justinnamilee/xmrf/releases/latest).
-Once downloaded, \`apt\` or \`dnf\` can install it locally to the system, use
-whichever is appropriate for the system.
+Grab the latest `exe`, `.deb`, or `.rpm` release from [XMRF GitHub](https://github.com/justinnamilee/xmrf/releases/latest).
+Once downloaded, `apt` or `dnf` can install it locally to the system, use
+whichever is appropriate for the system.  The Windows `exe` is ready to go
+out of the box, just put it in the `%PATH%`.
 
 ## Manual Installation
 
