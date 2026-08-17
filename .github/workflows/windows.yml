@@ -45,15 +45,10 @@ jobs:
             dist/xmrf.ico
 
           # build exe
-          pp -I lib `
-            -a 'dist/xmrf.pod;xmrf.pod' `
-            -o dist/xmrf.exe bin/xmrf
+          pp -I lib -a 'dist/xmrf.pod;xmrf.pod' -o dist/xmrf.exe bin/xmrf
 
           # add meta
-          rcedit dist/xmrf.exe `
-            --set-icon dist/xmrf.ico `
-            --set-file-version '1.2.3' `
-            --set-product-version '1.2.3'
+          rcedit dist/xmrf.exe --set-icon dist/xmrf.ico
 
           Get-Item .\dist\xmrf.exe | Format-List Name, Length, FullName
           Get-Command .\dist\xmrf.exe
