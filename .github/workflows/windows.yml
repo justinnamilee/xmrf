@@ -16,7 +16,7 @@ jobs:
       - name: Get Perl...
         shell: powershell
         run: |
-          choco install strawberryperl imagemagick -y
+          choco install strawberryperl imagemagick rcedit -y
           echo 'C:\Strawberry\perl\bin' >> $env:GITHUB_PATH
           echo 'C:\Strawberry\c\bin' >> $env:GITHUB_PATH
 
@@ -47,8 +47,13 @@ jobs:
           # build exe
           pp -I lib `
             -a 'dist/xmrf.pod;xmrf.pod' `
-            --icon dist/xmrf.ico `
             -o dist/xmrf.exe bin/xmrf
+
+          # add meta
+          rcedit dist/xmrf.exe `
+            --set-icon dist/xmrf.ico `
+            --set-file-version '1.2.3' `
+            --set-product-version '1.2.3'
 
           Get-Item .\dist\xmrf.exe | Format-List Name, Length, FullName
           Get-Command .\dist\xmrf.exe
