@@ -32,7 +32,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force dist
 
-          perl -ne '$p ||= /^__END__$/; print if $p && !/^__END__$/' bin/xmrf > dist/xmrf.pod
+          perl -ne 'BEGIN { open STDOUT, q[>], q[dist/xmrf.pod] or die $! } $p ||= /^__END__$/; print if $p && !/^__END__$/' bin/xmrf
           perl -i -pe 's/#\* POD EXE ANCHOR \*#/my\$pod=PAR::read_file(q[xmrf.pod]);open(my\$pfh,q[<],\\\$pod) or die qq[Error: Unable to open POD: \$!\\n];/' lib/xmrf/app.pm
           perl -i -pe 's/-input => \$0/-input => \$pfh/' lib/xmrf/app.pm
           perl -i -pe 's/use strict;/use strict;use PAR;/' lib/xmrf/app.pm
