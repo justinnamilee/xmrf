@@ -48,8 +48,11 @@ sub reeeset()
 
 cleanup;
 
-T2->bail_out(join(q[: ], q[touch], qq[$testing/prove-garbage-001.txt], $!))
-  unless (open(my $fh, q[>], qq[$testing/prove-garbage-001.txt]));
+open(my $fh, q[>], qq[$testing/prove-garbage-001.txt])
+  or T2->bail_out(join(q[: ], q[touch], q[open], qq[$testing/prove-garbage-001.txt], $!));
+
+close($fh)
+  or T2->bail_out(join(q[: ], q[touch], q[close], qq[$testing/prove-garbage-001.txt], $!));
 
 T01_BASIC:
 {

@@ -25,6 +25,52 @@ jobs:
     - name: Test...
       run: prove -lv t
 
+  build-exe:
+    runs-on: windows-latest
+    needs:
+    - test-source
+
+    steps:
+    - name: Checkout...
+      uses: actions/checkout@v4
+
+    - name: Ensure Perl...
+      shell: powershell
+      run: |
+        choco install strawberryperl -y
+        echo 'C:\Strawberry\perl\bin' >> $env:GITHUB_PATH
+        echo 'C:\Strawberry\c\bin' >> $env:GITHUB_PATH
+
+    - name: Get dependencies...
+      run: |
+        cpanm -n -q Test2::V1 Capture::Tiny
+
+    - name: Test Strawberry...
+      run: |
+        prove -lv t
+
+    - name: Build...
+      shell: powershell
+      run: |
+        New-Item -ItemType Directory -Force dist
+
+        # prep the packed EXE version of the app with perl one-line hackeries
+        perl -ne 'BEGIN { open STDOUT, q[>], q[dist/xmrf.pod] or die $! } $p ||= /^__END__$/; print if $p && !/^__END__$/' bin/xmrf
+        perl -i -pe 's/#\*EXE POD\*#/my\$pod=PAR::read_file(q[xmrf.pod]);open(my\$pfh,q[<],\\\$pod) or die \$!;/' lib/xmrf/app.pm
+        perl -i -pe 's/-input => \$0/-input => \$pfh/' lib/xmrf/app.pm
+        perl -i -pe 's/use strict;/use strict;use PAR;/' lib/xmrf/app.pm
+
+        pp -I lib -a 'dist/xmrf.pod;xmrf.pod' -o dist/xmrf.exe bin/xmrf
+
+        Get-Item .\dist\xmrf.exe | Format-List Name, Length, FullName
+        Get-Command .\dist\xmrf.exe
+
+    - name: Upload...
+      uses: actions/upload-artifact@v4
+      with:
+        name: exe
+        path: dist/xmrf.exe
+
   build-deb:
     runs-on: ubuntu-latest
     needs:
@@ -168,6 +214,28 @@ jobs:
         name: rpm
         path: rpmbuild/RPMS/noarch/*.rpm
 
+  test-exe:
+    needs:
+    - build-exe
+    runs-on: windows-latest
+
+    steps:
+    - name: Download .exe...
+      uses: actions/download-artifact@v4
+      with:
+        name: exe
+        path: pkg
+
+    - name: Test .exe...
+      shell: powershell
+      run: |
+        .\pkg\xmrf --help
+        .\pkg\xmrf -r '(.*)' '%s'
+
+        if ($LASTEXITCODE -ne 0) {
+          throw "xmrf smoke test failed with exit code $rc"
+        }
+
   test-deb:
     needs:
     - build-deb
@@ -196,6 +264,8 @@ jobs:
       run: |
         set -euxo pipefail
 
+        perl -ni -e 'print unless m{^\s*path-exclude=/usr/share/man/\*\s*$}' \
+          /etc/dpkg/dpkg.cfg.d/excludes
         export DEBIAN_FRONTEND=noninteractive
 
         apt-get update
@@ -204,8 +274,11 @@ jobs:
         dpkg --verify xmrf
         dpkg -L xmrf | grep 'xmrf\.1'
         dpkg -L xmrf | grep 'copyright'
+        dpkg -L xmrf |
+          while read -r f; do test -e "$f" || exit 1; done
 
         xmrf -h &>/dev/null
+        xmrf -r '(.*)' '%s'
 
   test-rpm:
     needs:
@@ -241,10 +314,12 @@ jobs:
         rpm -ql xmrf | grep 'xmrf\.1'
 
         xmrf -h &>/dev/null
+        xmrf -r '(.*)' '%s'
 
   draft-release:
     runs-on: ubuntu-latest
     needs:
+    - test-exe
     - test-deb
     - test-rpm
 
@@ -264,3 +339,4 @@ jobs:
         files: |
           dist/*.deb
           dist/*.rpm
+          dist/*.exe

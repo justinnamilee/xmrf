@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-package xmrf::app v1.2.0;
+package xmrf::app v1.2.1;
 
 
 use strict;
@@ -256,6 +256,8 @@ sub generate(_)
 sub help($;$@)
 {
   my ($verbose, $exit, @msg) = @_;
+
+  #*EXE POD*#
 
   Pod::Usage::pod2usage
   (
