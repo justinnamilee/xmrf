@@ -272,6 +272,8 @@ jobs:
         dpkg --verify xmrf
         dpkg -L xmrf | grep 'xmrf\.1'
         dpkg -L xmrf | grep 'copyright'
+        dpkg -L xmrf |
+          while read -r f; do test -e "$f" || exit 1; done
 
         xmrf -h &>/dev/null
         xmrf -r '(.*)' '%s'
