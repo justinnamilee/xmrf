@@ -257,7 +257,7 @@ sub help($;$@)
 {
   my ($verbose, $exit, @msg) = @_;
 
-  #* POD EXE ANCHOR *#
+  #*EXE POD*#
 
   Pod::Usage::pod2usage
   (

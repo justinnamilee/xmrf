@@ -16,7 +16,7 @@ jobs:
       - name: Get Perl...
         shell: powershell
         run: |
-          choco install strawberryperl -y
+          choco install strawberryperl imagemagick -y
           echo 'C:\Strawberry\perl\bin' >> $env:GITHUB_PATH
           echo 'C:\Strawberry\c\bin' >> $env:GITHUB_PATH
 
@@ -32,11 +32,23 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force dist
 
+          # prep the packed EXE version of the app with perl one-line hackeries
           perl -ne 'BEGIN { open STDOUT, q[>], q[dist/xmrf.pod] or die $! } $p ||= /^__END__$/; print if $p && !/^__END__$/' bin/xmrf
-          perl -i -pe 's/#\* POD EXE ANCHOR \*#/my\$pod=PAR::read_file(q[xmrf.pod]);open(my\$pfh,q[<],\\\$pod) or die qq[Error: Unable to open POD: \$!\\n];/' lib/xmrf/app.pm
+          perl -i -pe 's/#\*EXE POD\*#/my\$pod=PAR::read_file(q[xmrf.pod]);open(my\$pfh,q[<],\\\$pod) or die \$!;/' lib/xmrf/app.pm
           perl -i -pe 's/-input => \$0/-input => \$pfh/' lib/xmrf/app.pm
           perl -i -pe 's/use strict;/use strict;use PAR;/' lib/xmrf/app.pm
-          pp -I lib -a 'dist/xmrf.pod;xmrf.pod' -o dist/xmrf.exe bin/xmrf
+
+          # build an icon
+          magick .github/public/xmrf.svg `
+            -background none `
+            -define icon:auto-resize=256,128,96,64,48,32,24,16 `
+            dist/xmrf.ico
+
+          # build exe
+          pp -I lib `
+            -a 'dist/xmrf.pod;xmrf.pod' `
+            --icon dist/xmrf.ico `
+            -o dist/xmrf.exe bin/xmrf
 
           Get-Item .\dist\xmrf.exe | Format-List Name, Length, FullName
           Get-Command .\dist\xmrf.exe
