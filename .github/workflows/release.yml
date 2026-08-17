@@ -229,13 +229,12 @@ jobs:
     - name: Test .exe...
       shell: powershell
       run: |
-        .\pkg\xmrf '(.*)' '%s'
+        .\pkg\xmrf --help
+        .\pkg\xmrf -r '(.*)' '%s'
 
         if ($LASTEXITCODE -ne 0) {
           throw "xmrf smoke test failed with exit code $rc"
         }
-
-        .\pkg\xmrf --help
 
   test-deb:
     needs:
@@ -275,6 +274,7 @@ jobs:
         dpkg -L xmrf | grep 'copyright'
 
         xmrf -h &>/dev/null
+        xmrf -r '(.*)' '%s'
 
   test-rpm:
     needs:
@@ -310,6 +310,7 @@ jobs:
         rpm -ql xmrf | grep 'xmrf\.1'
 
         xmrf -h &>/dev/null
+        xmrf -r '(.*)' '%s'
 
   draft-release:
     runs-on: ubuntu-latest
