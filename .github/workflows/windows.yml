@@ -16,7 +16,7 @@ jobs:
       - name: Get Perl...
         shell: powershell
         run: |
-          choco install strawberryperl imagemagick rcedit -y
+          choco install strawberryperl -y
           echo 'C:\Strawberry\perl\bin' >> $env:GITHUB_PATH
           echo 'C:\Strawberry\c\bin' >> $env:GITHUB_PATH
 
@@ -38,17 +38,8 @@ jobs:
           perl -i -pe 's/-input => \$0/-input => \$pfh/' lib/xmrf/app.pm
           perl -i -pe 's/use strict;/use strict;use PAR;/' lib/xmrf/app.pm
 
-          # build an icon
-          magick .github/public/xmrf.svg `
-            -background none `
-            -define icon:auto-resize=256,128,96,64,48,32,24,16 `
-            dist/xmrf.ico
-
           # build exe
           pp -I lib -a 'dist/xmrf.pod;xmrf.pod' -o dist/xmrf.exe bin/xmrf
-
-          # add meta
-          rcedit dist/xmrf.exe --set-icon dist/xmrf.ico
 
           Get-Item .\dist\xmrf.exe | Format-List Name, Length, FullName
           Get-Command .\dist\xmrf.exe
