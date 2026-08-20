@@ -39,9 +39,8 @@ regex, and an sprintf format.  It tries to use some sane defaults for things
 that aren't provided; at least a regex and sprintf are required to modify files
 in the current working directory.
 
-This tool originated as part of another project, **fairu-chan**, but deserved
-its own identity.  It was previously called **rename**, which is apt but hard
-to use due to popularity.
+This tool uses only core modules, nothing extra required from
+[CPAN](https://www.cpan.org/).
 
 # OPTIONS
 
@@ -345,6 +344,10 @@ If you'd like to contribute a fix or enhancement yourself, feel free to open a
 pull request.
 
 # HISTORY
+
+This tool originated as part of another project, **fairu-chan**, but deserved
+its own identity.  It was previously called **rename**, which is apt but hard
+to use due to popularity.
 
 - April 16, 2018
 
