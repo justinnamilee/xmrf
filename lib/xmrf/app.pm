@@ -74,7 +74,7 @@ sub run(;$)
       q[output|o=s]   => \$config{output},
       q[recursive|r!] => \$config{recursive},
       q[sort|s:s]     => \$config{sort},
-      q[suffix]       => \$config{suffix},
+      q[suffix=s]     => \$config{suffix},
       q[verbose|v!]   => \$config{verbose},
       q[version]      => \$config{version}
     );
