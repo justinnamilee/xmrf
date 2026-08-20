@@ -209,12 +209,20 @@ All boolean option flags (flags that take no value) default to their
     final resulting file paths will be sorted instead.
 
     If in **--no-sort** mode, then however the underlying file system returns data
-    to the [readdir](https://perldoc.perl.org/functions/readdir) call is how the
-    files will be actioned.
+    to the [readdir call](https://perldoc.perl.org/functions/readdir) is how the
+    files will be actioned.  In summary:
 
-    - `--no-sort`, default, however files are returned by file system
-    - `--sort`, `--sort ''`, `--sort 'input'`, sort by input from `readdir`
-    - `--sort 'output'`, sort by final output paths after work is complete
+    - `--no-sort`
+
+        Default, action the files however they are returned by file system.
+
+    - `--sort`, `--sort ''`, `--sort 'input'`
+
+        Sort by input from `readdir`, then process and action.
+
+    - `--sort 'output'`
+
+        Sort by final output paths after work is complete, then action.
 
 - **--suffix** `str`
 

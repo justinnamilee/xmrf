@@ -243,16 +243,22 @@ is by the input paths.  If the optional C<[str]> is set to C<output> then the
 final resulting file paths will be sorted instead.
 
 If in B<--no-sort> mode, then however the underlying file system returns data
-to the L<readdir|https://perldoc.perl.org/functions/readdir> call is how the
-files will be actioned.
+to the L<readdir call|https://perldoc.perl.org/functions/readdir> is how the
+files will be actioned.  In summary:
 
 =over 2
 
-=item C<--no-sort>, default, however files are returned by file system
+=item C<--no-sort>
 
-=item C<--sort>, C<--sort ''>, C<--sort 'input'>, sort by input from C<readdir>
+Default, action the files however they are returned by file system.
 
-=item C<--sort 'output'>, sort by final output paths after work is complete
+=item C<--sort>, C<--sort ''>, C<--sort 'input'>
+
+Sort by input from C<readdir>, then process and action.
+
+=item C<--sort 'output'>
+
+Sort by final output paths after work is complete, then action.
 
 =back
 
