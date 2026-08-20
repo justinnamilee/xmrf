@@ -40,6 +40,7 @@ my %config =
   named     => $ENV{XMRF_NAMED}     // 0,
   output    => $ENV{XMRF_OUTPUT}    // q[],
   recursive => $ENV{XMRF_RECURSIVE} // 0,
+  sort      => $ENV{XMRF_SORT}      // undef,
   suffix    => $ENV{XMRF_SUFFIX}    // q[(?<=.)\.([^.]+)$],
   verbose   => $ENV{XMRF_VERBOSE}   // 0,
   #? positional arguments (required)
@@ -72,7 +73,8 @@ sub run(;$)
       q[named|n!]     => \$config{named},
       q[output|o=s]   => \$config{output},
       q[recursive|r!] => \$config{recursive},
-      q[suffix|s=s]   => \$config{suffix},
+      q[sort|s:s]     => \$config{sort},
+      q[suffix]       => \$config{suffix},
       q[verbose|v!]   => \$config{verbose},
       q[version]      => \$config{version}
     );
@@ -181,6 +183,18 @@ sub configure(\%\%)
 
     $config->{map}->{$m} = $sub;
   }
+
+  $config->{sort} = lc($config->{sort})
+    if length($config->{sort});
+
+  return help(0, 1, q[Error], q[Invalid sort mode provided], $config->{sort})
+    if (length($config->{sort}) && !($config->{sort} ne q[input] || $config->{sort} ne q[output]));
+
+  $config->{sort} = defined($config->{sort})
+    ? length($config->{sort}) && $config->{sort} eq q[output]
+      ? 2 # output sort mode
+      : 1 # input sort mode
+    : 0;  # no sort mode (however FS returns data)
 
   $config->{suffix} = eval { qr/$config->{suffix}/ };
 
