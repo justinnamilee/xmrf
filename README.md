@@ -28,7 +28,8 @@ XMRF - Regex-map Rename File, advanced command-line file management utiltity.
     --named     | -n          Use named capture groups instead of numeric.
     --output    | -o <dir>    Prepend <dir> to output file path.
     --recursive | -r          Scan subfolders of the input directory too.
-    --suffix    | -s <str>    Override the default suffix extraction regex.
+    --sort      | -s [str]    Sort, optionally with in a specific way.
+    --suffix         <str>    Override the default suffix extraction regex.
     --verbose   | -v          Show actions as they happen when execute on.
     --version                 Show the version number of xmrf.
 
@@ -200,7 +201,30 @@ All boolean option flags (flags that take no value) default to their
 
     If set the input folder and all its subfolders will be scanned for files.
 
-- **-s**, **--suffix** `str`
+- **-s**, **--sort** `[str]`
+
+    This flag will enable sorting by the input or output file paths (case will be
+    ignored).  The default, if the optional `[str]` is not provided, empty, or
+    explicitly set to `input`, is by the input paths.  If the optional `[str]` is
+    set to `output` then the final resulting file paths will be sorted instead.
+
+    If in **--no-sort** mode, then however the underlying file system returns data
+    to the [readdir call](https://perldoc.perl.org/functions/readdir) is how the
+    files will be actioned.  In summary:
+
+    - `--no-sort`
+
+        Default, action the files however they are returned by file system.
+
+    - `--sort`, `--sort ''`, `--sort 'input'`
+
+        Sort by input from `readdir`, then process and action.
+
+    - `--sort 'output'`
+
+        Sort by final output paths after work is complete, then action.
+
+- **--suffix** `str`
 
     The default suffix extraction regex is lazy, taking only the shortest possible
     value, i.e. `item.tar.gz` produces `gz` as the suffix.  Supply a new regex
@@ -282,6 +306,7 @@ environment (except for `XMRF_DEV` and `XMRF_LIB`).
 
     - XMRF\_INPUT
     - XMRF\_OUTPUT
+    - XMRF\_SORT (_can be empty, see **--sort**_)
     - XMRF\_SUFFIX
 
 - Special Environment Variables

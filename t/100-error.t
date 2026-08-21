@@ -23,7 +23,7 @@ sub reeeset()
     xmrf::app::cset($c => 0);
   }
 
-  foreach my $c (qw[format match])
+  foreach my $c (qw[format match sort])
   {
     xmrf::app::cset($c => undef);
   }
@@ -102,11 +102,22 @@ T06_BAMAP:
 
 T07_SUFER:
 {
-  local @ARGV = qw[(good) %s -s (fail];
+  local @ARGV = qw[(good) %s --suffix (fail];
 
   my ($sto, $ste, @ret) = capture { xmrf::app::run() };
   T2->is($ret[0], 1, q[bad suffix gives correct return code]);
   T2->like($sto, qr[Error: Invalid suffix], q[bad suffix gives correct error message]);
+
+  reeeset;
+}
+
+T08_SORTY:
+{
+  local @ARGV = qw[(good) %s -s fake];
+
+  my ($sto, $ste, @ret) = capture { xmrf::app::run() };
+  T2->is($ret[0], 1, q[bad sort type correct return code]);
+  T2->like($sto, qr[Error: Invalid sort], q[bad suffix gives correct error message]);
 
   reeeset;
 }

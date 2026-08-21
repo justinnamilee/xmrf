@@ -35,7 +35,7 @@ sub reeeset()
     xmrf::app::cset($c => 0);
   }
 
-  foreach my $c (qw[format match])
+  foreach my $c (qw[format match sort])
   {
     xmrf::app::cset($c => undef);
   }

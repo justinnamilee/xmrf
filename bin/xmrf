@@ -60,7 +60,8 @@ XMRF - Regex-map Rename File, advanced command-line file management utiltity.
  --named     | -n          Use named capture groups instead of numeric.
  --output    | -o <dir>    Prepend <dir> to output file path.
  --recursive | -r          Scan subfolders of the input directory too.
- --suffix    | -s <str>    Override the default suffix extraction regex.
+ --sort      | -s [str]    Sort, optionally with in a specific way.
+ --suffix         <str>    Override the default suffix extraction regex.
  --verbose   | -v          Show actions as they happen when execute on.
  --version                 Show the version number of xmrf.
 
@@ -234,7 +235,34 @@ desired.
 
 If set the input folder and all its subfolders will be scanned for files.
 
-=item B<-s>, B<--suffix> C<str>
+=item B<-s>, B<--sort> C<[str]>
+
+This flag will enable sorting by the input or output file paths (case will be
+ignored).  The default, if the optional C<[str]> is not provided, empty, or
+explicitly set to C<input>, is by the input paths.  If the optional C<[str]> is
+set to C<output> then the final resulting file paths will be sorted instead.
+
+If in B<--no-sort> mode, then however the underlying file system returns data
+to the L<readdir call|https://perldoc.perl.org/functions/readdir> is how the
+files will be actioned.  In summary:
+
+=over 2
+
+=item C<--no-sort>
+
+Default, action the files however they are returned by file system.
+
+=item C<--sort>, C<--sort ''>, C<--sort 'input'>
+
+Sort by input from C<readdir>, then process and action.
+
+=item C<--sort 'output'>
+
+Sort by final output paths after work is complete, then action.
+
+=back
+
+=item B<--suffix> C<str>
 
 The default suffix extraction regex is lazy, taking only the shortest possible
 value, i.e. C<item.tar.gz> produces C<gz> as the suffix.  Supply a new regex
@@ -342,6 +370,8 @@ the option flags.
 =item * XMRF_INPUT
 
 =item * XMRF_OUTPUT
+
+=item * XMRF_SORT (I<can be empty, see B<--sort>>)
 
 =item * XMRF_SUFFIX
 

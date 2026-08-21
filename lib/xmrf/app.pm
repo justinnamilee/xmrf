@@ -40,6 +40,7 @@ my %config =
   named     => $ENV{XMRF_NAMED}     // 0,
   output    => $ENV{XMRF_OUTPUT}    // q[],
   recursive => $ENV{XMRF_RECURSIVE} // 0,
+  sort      => $ENV{XMRF_SORT}      // undef,
   suffix    => $ENV{XMRF_SUFFIX}    // q[(?<=.)\.([^.]+)$],
   verbose   => $ENV{XMRF_VERBOSE}   // 0,
   #? positional arguments (required)
@@ -72,7 +73,8 @@ sub run(;$)
       q[named|n!]     => \$config{named},
       q[output|o=s]   => \$config{output},
       q[recursive|r!] => \$config{recursive},
-      q[suffix|s=s]   => \$config{suffix},
+      q[sort|s:s]     => \$config{sort},
+      q[suffix=s]     => \$config{suffix},
       q[verbose|v!]   => \$config{verbose},
       q[version]      => \$config{version}
     );
@@ -88,9 +90,17 @@ sub run(;$)
 
   my $error = 0;
 
-  foreach my $f (map { generate } grep { match } map { deconstruct } scan($config{input}))
+  foreach my $f
+  (
+    sort { $config{sort} == 2 && qq[\F$a->{output}->{path}] cmp qq[\F$b->{output}->{path}] }
+      map { generate }
+        grep { match }
+          map { deconstruct }
+            sort { $config{sort} == 1 && qq[\F$a] cmp qq[\F$b] } #? no fc
+              scan($config{input})
+  )
   {
-    my ($o, $n, $d) = ($f->{full}, join(q[], @{$f->{output}}), $f->{output}->[0]);
+    my ($o, $n, $d) = ($f->{full}, $f->{output}->{path}, $f->{output}->{dir});
 
     printf qq[%s: '%s' -> '%s'\n], ($config{copy} ? q[cp] : q[mv]), $o, $n
       if $config{verbose};
@@ -182,6 +192,18 @@ sub configure(\%\%)
     $config->{map}->{$m} = $sub;
   }
 
+  $config->{sort} = lc($config->{sort})
+    if length($config->{sort});
+
+  return help(0, 1, q[Error], q[Invalid sort mode provided], $config->{sort})
+    if (length($config->{sort}) && !($config->{sort} eq q[input] || $config->{sort} eq q[output]));
+
+  $config->{sort} = defined($config->{sort})
+    ? length($config->{sort}) && $config->{sort} eq q[output]
+      ? 2 # output sort mode
+      : 1 # input sort mode
+    : 0;  # no sort mode (however FS returns data)
+
   $config->{suffix} = eval { qr/$config->{suffix}/ };
 
   return help(0, 1, q[Error], q[Invalid suffix regex given], $@)
@@ -248,7 +270,13 @@ sub generate(_)
   }
 
   my ($v, $d, $f) = File::Spec->splitpath($output);
-  $g->{output} = [File::Spec->catpath($v, $d), $f];
+
+  $g->{output} =
+  {
+    dir  => File::Spec->catpath($v, $d),
+    file => $f,
+    path => $output
+  };
 
   return ($g);
 }
