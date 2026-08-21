@@ -203,10 +203,10 @@ All boolean option flags (flags that take no value) default to their
 
 - **-s**, **--sort** `[str]`
 
-    This flag will enable sorting by the input or output file paths.  The default,
-    if the optional `[str]` is not provided, empty, or explicitly set to `input`,
-    is by the input paths.  If the optional `[str]` is set to `output` then the
-    final resulting file paths will be sorted instead.
+    This flag will enable sorting by the input or output file paths (case will be
+    ignored).  The default, if the optional `[str]` is not provided, empty, or
+    explicitly set to `input`, is by the input paths.  If the optional `[str]` is
+    set to `output` then the final resulting file paths will be sorted instead.
 
     If in **--no-sort** mode, then however the underlying file system returns data
     to the [readdir call](https://perldoc.perl.org/functions/readdir) is how the

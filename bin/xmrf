@@ -237,10 +237,10 @@ If set the input folder and all its subfolders will be scanned for files.
 
 =item B<-s>, B<--sort> C<[str]>
 
-This flag will enable sorting by the input or output file paths.  The default,
-if the optional C<[str]> is not provided, empty, or explicitly set to C<input>,
-is by the input paths.  If the optional C<[str]> is set to C<output> then the
-final resulting file paths will be sorted instead.
+This flag will enable sorting by the input or output file paths (case will be
+ignored).  The default, if the optional C<[str]> is not provided, empty, or
+explicitly set to C<input>, is by the input paths.  If the optional C<[str]> is
+set to C<output> then the final resulting file paths will be sorted instead.
 
 If in B<--no-sort> mode, then however the underlying file system returns data
 to the L<readdir call|https://perldoc.perl.org/functions/readdir> is how the
