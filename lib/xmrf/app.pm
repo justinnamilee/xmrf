@@ -188,7 +188,7 @@ sub configure(\%\%)
     if length($config->{sort});
 
   return help(0, 1, q[Error], q[Invalid sort mode provided], $config->{sort})
-    if (length($config->{sort}) && !($config->{sort} ne q[input] || $config->{sort} ne q[output]));
+    if (length($config->{sort}) && !($config->{sort} eq q[input] || $config->{sort} eq q[output]));
 
   $config->{sort} = defined($config->{sort})
     ? length($config->{sort}) && $config->{sort} eq q[output]
