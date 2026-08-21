@@ -35,7 +35,7 @@ sub reeeset()
     xmrf::app::cset($c => 0);
   }
 
-  foreach my $c (qw[format match])
+  foreach my $c (qw[format match sort])
   {
     xmrf::app::cset($c => undef);
   }
@@ -122,6 +122,36 @@ T07_DAMAP:
   T2->is(xmrf::app::run(), 0, q[map run successful]);
   T2->ok(-f qq[$testing/prove-map-0000005.txt], q[map file rename works (1)]);
   T2->ok(-f qq[$testing/prove-map-0000006.txt], q[map file rename works (2)]);
+
+  reeeset;
+}
+
+T08_SORTB:
+{
+  local @ARGV = qw[(.*) %s -s];
+
+  T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
+  T2->is(xmrf::app::cget(q[sort]), 1, q[empty sort defaults to 'input' mode]);
+
+  reeeset;
+}
+
+T09_SORTI:
+{
+  local @ARGV = qw[(.*) %s -s input];
+
+  T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
+  T2->is(xmrf::app::cget(q[sort]), 1, q[empty sort defaults to 'input' mode]);
+
+  reeeset;
+}
+
+T10_SORTO:
+{
+  local @ARGV = qw[(.*) %s -s output];
+
+  T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
+  T2->is(xmrf::app::cget(q[sort]), 2, q[empty sort defaults to 'input' mode]);
 
   reeeset;
 }
