@@ -126,46 +126,6 @@ T07_DAMAP:
   reeeset;
 }
 
-T08_NSORT:
-{
-  local @ARGV = qw[-e (.*) %s];
-
-  T2->is(xmrf::app::run(), 0, q[no sort run successful]);
-  T2->is(xmrf::app::cget(q[sort]), 0, q[no sort parsed correctly]);
-
-  reeeset;
-}
-
-T09_SORTB:
-{
-  local @ARGV = qw[-e (.*) %s -s];
-
-  T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
-  T2->is(xmrf::app::cget(q[sort]), 1, q[empty sort parsed correctly]);
-
-  reeeset;
-}
-
-T10_SORTI:
-{
-  local @ARGV = qw[-e (.*) %s -s input];
-
-  T2->is(xmrf::app::run(), 0, q[input sort run successful]);
-  T2->is(xmrf::app::cget(q[sort]), 1, q[input sort parsed correctly]);
-
-  reeeset;
-}
-
-T11_SORTO:
-{
-  local @ARGV = qw[-e (.*) %s -s output];
-
-  T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
-  T2->is(xmrf::app::cget(q[sort]), 2, q[output sort parsed correctly]);
-
-  reeeset;
-}
-
 cleanup;
 
 T2->done_testing;

@@ -57,7 +57,47 @@ sub touch($)
 touch(qq[$testing/prove-garbage-$_.txt])
   foreach 1 .. $limit;
 
-T01_SORTI:
+T01_NSORT:
+{
+  local @ARGV = qw[-e (.*) %s];
+
+  T2->is(xmrf::app::run(), 0, q[no sort run successful]);
+  T2->is(xmrf::app::cget(q[sort]), 0, q[no sort parsed correctly]);
+
+  reeeset;
+}
+
+T02_BSORT:
+{
+  local @ARGV = qw[-e (.*) %s -s];
+
+  T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
+  T2->is(xmrf::app::cget(q[sort]), 1, q[empty sort parsed correctly]);
+
+  reeeset;
+}
+
+T03_ISORT:
+{
+  local @ARGV = qw[-e (.*) %s -s input];
+
+  T2->is(xmrf::app::run(), 0, q[input sort run successful]);
+  T2->is(xmrf::app::cget(q[sort]), 1, q[input sort parsed correctly]);
+
+  reeeset;
+}
+
+T04_OSORT:
+{
+  local @ARGV = qw[-e (.*) %s -s output];
+
+  T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
+  T2->is(xmrf::app::cget(q[sort]), 2, q[output sort parsed correctly]);
+
+  reeeset;
+}
+
+T05_SORTI:
 {
   local @ARGV =
   (
@@ -77,7 +117,7 @@ T01_SORTI:
   T2->is(\@out, \@exp, q[input sort matches expected order])
 }
 
-T02_SORTO:
+T06_SORTO:
 {
   local @ARGV =
   (
