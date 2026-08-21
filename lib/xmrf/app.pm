@@ -99,7 +99,7 @@ sub run(;$)
             scan($config{input})
   )
   {
-    my ($o, $n, $d) = ($f->{full}, join(q[], @{$f->{output}}), $f->{output}->[0]);
+    my ($o, $n, $d) = ($f->{full}, $f->{output}->{path}, $f->{output}->{dir});
 
     printf qq[%s: '%s' -> '%s'\n], ($config{copy} ? q[cp] : q[mv]), $o, $n
       if $config{verbose};
@@ -269,7 +269,13 @@ sub generate(_)
   }
 
   my ($v, $d, $f) = File::Spec->splitpath($output);
-  $g->{output} = [File::Spec->catpath($v, $d), $f];
+
+  $g->{output} =
+  {
+    dir  => File::Spec->catpath($v, $d),
+    file => $f,
+    path => $output
+  };
 
   return ($g);
 }
