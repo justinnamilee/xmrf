@@ -90,7 +90,14 @@ sub run(;$)
 
   my $error = 0;
 
-  foreach my $f (map { generate } grep { match } map { deconstruct } scan($config{input}))
+  foreach my $f
+  (
+    map { generate }
+      grep { match }
+        map { deconstruct }
+          sort { !($config{sort} == 1) || qq[\F$a] cmp qq[\F$b] } #? no fc
+            scan($config{input})
+  )
   {
     my ($o, $n, $d) = ($f->{full}, join(q[], @{$f->{output}}), $f->{output}->[0]);
 
