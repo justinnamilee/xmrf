@@ -102,7 +102,7 @@ T06_BAMAP:
 
 T07_SUFER:
 {
-  local @ARGV = qw[(good) %s -s (fail];
+  local @ARGV = qw[(good) %s --suffix (fail];
 
   my ($sto, $ste, @ret) = capture { xmrf::app::run() };
   T2->is($ret[0], 1, q[bad suffix gives correct return code]);
