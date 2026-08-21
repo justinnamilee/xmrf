@@ -128,7 +128,7 @@ T07_DAMAP:
 
 T08_SORTB:
 {
-  local @ARGV = qw[(.*) %s -s];
+  local @ARGV = qw[-e (.*) %s -s];
 
   T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
   T2->is(xmrf::app::cget(q[sort]), 1, q[empty sort defaults to 'input' mode]);
@@ -138,7 +138,7 @@ T08_SORTB:
 
 T09_SORTI:
 {
-  local @ARGV = qw[(.*) %s -s input];
+  local @ARGV = qw[-e (.*) %s -s input];
 
   T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
   T2->is(xmrf::app::cget(q[sort]), 1, q[empty sort defaults to 'input' mode]);
@@ -148,7 +148,7 @@ T09_SORTI:
 
 T10_SORTO:
 {
-  local @ARGV = qw[(.*) %s -s output];
+  local @ARGV = qw[-e (.*) %s -s output];
 
   T2->is(xmrf::app::run(), 0, q[empty sort run successful]);
   T2->is(xmrf::app::cget(q[sort]), 2, q[empty sort defaults to 'input' mode]);
