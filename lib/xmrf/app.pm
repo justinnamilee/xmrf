@@ -92,11 +92,11 @@ sub run(;$)
 
   foreach my $f
   (
-    sort { $config{sort} != 2 ? 0 : qq[\F$a->{output}->{path}] cmp qq[\F$b->{output}->{path}] }
+    sort { $config{sort} == 2 && qq[\F$a->{output}->{path}] cmp qq[\F$b->{output}->{path}] }
       map { generate }
         grep { match }
           map { deconstruct }
-            sort { $config{sort} != 1 ? 0 : qq[\F$a] cmp qq[\F$b] } #? no fc
+            sort { $config{sort} == 1 && qq[\F$a] cmp qq[\F$b] } #? no fc
               scan($config{input})
   )
   {
