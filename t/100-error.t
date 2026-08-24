@@ -116,7 +116,7 @@ T08_SORTY:
   local @ARGV = qw[(good) %s -s fake];
 
   my ($sto, $ste, @ret) = capture { xmrf::app::run() };
-  T2->is($ret[0], 1, q[bad sort type correct return code]);
+  T2->is($ret[0], 1, q[bad sort type gives correct return code]);
   T2->like($sto, qr[Error: Invalid sort], q[bad suffix gives correct error message]);
 
   reeeset;
