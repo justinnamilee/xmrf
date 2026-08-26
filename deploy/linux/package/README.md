@@ -22,7 +22,7 @@ If current user is not `root`, it will automatically try `sudo`.
 
     Used to calculate and check the SHA256 checksum against what GitHub says.
 
-        $ cpam -n -q Digest::SHA
+        $ cpanm -n -q Digest::SHA
 
 - **HTTP::Tiny**
 
