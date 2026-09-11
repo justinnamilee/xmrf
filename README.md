@@ -337,10 +337,8 @@ Clone the repository.  Put the wrapper script somewhere (say
 
     $ git clone 'https://github.com/justinnamilee/xmrf'
     $ cd xmrf
-    $ sudo cp bin/xmrf /usr/local/bin/xmrf
-    $ sudo cp lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
-    $ sudo chmod 644 /usr/local/lib/xmrf/app.pm
-    $ sudo chmod 755 /usr/local/bin/xmrf
+    $ sudo install -Dm755 bin/xmrf /usr/local/bin/xmrf
+    $ sudo install -Dm644 lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
     $ xmrf --version
 
 # TESTING
