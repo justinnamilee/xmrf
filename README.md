@@ -26,7 +26,7 @@ XMRF - Regex-map Rename File, advanced command-line file management utiltity.
     --links     | -l          Enable following and renaming symlinks (don't).
     --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
     --named     | -n          Use named capture groups instead of numeric.
-    --output    | -o <dir>    Prepend <dir> to output file path.
+    --output    | -o <dir>    Set <dir> as the output file folder.
     --recursive | -r          Scan subfolders of the input directory too.
     --sort      | -s [str]    Sort, optionally in a specific way (input / output).
     --suffix         <str>    Override the default suffix extraction regex.
@@ -172,20 +172,21 @@ All boolean option flags (flags that take no value) default to their
 
 - **-o**, **--output** `dir`
 
-    The **--output** flag, if supplied, will be prepended to the output file from
+    The **--output** flag, if supplied, will be prepended to the output **file** from
     the **format** argument.  In **--no-full** mode, if unspecified, it defaults to
-    the **--input** folder (with subdirs if -r).  In **--full** mode it defaults to
-    nothing (even with -r).  **File::Spec** will clean up this path as it sees fit.
+    the **--input** folder.  In **--full** mode it defaults to nothing (blank).
+    **File::Spec** will clean up this path as it sees fit.
 
     Note that the output flag can often be omitted in **--full** mode, as it's
     possible (maybe preferable) to include the output path right in the **sprintf**
     like so:
 
-        $ xmrf -f '.+/(.+?)$' /new/path/to/'%s'
+        $ xmrf -f '.+/([^\/]+?)/(.+?)$' /new/path/to/'%s/%s'
 
-    While contrived, this example is equivalent to `mv * /new/path/to`, or:
+    While contrived, this example is similar to `mv * /new/path/to`, but for all
+    subfolders, and it saves the final subfolder name.  Alternatively written as:
 
-        $ xmrf -fo /new/path/to '.+/(.+?)$' '%s'
+        $ xmrf -fo /new/path/to '.+/([^\/]+?)/(.+?)$' '%s/%s'
 
     This idea can also be used to insert some relative paths as well, like:
 
@@ -196,6 +197,9 @@ All boolean option flags (flags that take no value) default to their
 
     These concepts can be mixed and matched to best suit the goals of the actions
     desired.
+
+    See also the **-b** flag, which may be required when doing fancy output folder
+    shenanigans.
 
 - **-r**, **--recursive**
 
