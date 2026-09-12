@@ -58,7 +58,7 @@ XMRF - Regex-map Rename File, advanced command-line file management utiltity.
  --links     | -l          Enable following and renaming symlinks (don't).
  --map       | -m <k>=<v>  Defines a subroutine <v> to run against <k>.
  --named     | -n          Use named capture groups instead of numeric.
- --output    | -o <dir>    Prepend <dir> to output file path.
+ --output    | -o <dir>    Set <dir> as the output file folder.
  --recursive | -r          Scan subfolders of the input directory too.
  --sort      | -s [str]    Sort, optionally in a specific way (input / output).
  --suffix         <str>    Override the default suffix extraction regex.
@@ -206,20 +206,21 @@ In named mode it's the sorted keys themselves.
 
 =item B<-o>, B<--output> C<dir>
 
-The B<--output> flag, if supplied, will be prepended to the output file from
+The B<--output> flag, if supplied, will be prepended to the output B<file> from
 the B<format> argument.  In B<--no-full> mode, if unspecified, it defaults to
-the B<--input> folder (with subdirs if -r).  In B<--full> mode it defaults to
-nothing (even with -r).  B<File::Spec> will clean up this path as it sees fit.
+the B<--input> folder.  In B<--full> mode it defaults to nothing (blank).
+B<File::Spec> will clean up this path as it sees fit.
 
 Note that the output flag can often be omitted in B<--full> mode, as it's
 possible (maybe preferable) to include the output path right in the B<sprintf>
 like so:
 
- $ xmrf -f '.+/(.+?)$' /new/path/to/'%s'
+ $ xmrf -rf '.+/([^\/]+?)/(.+?)$' /new/path/to/'%s/%s'
 
-While contrived, this example is equivalent to C<mv * /new/path/to>, or:
+While contrived, this example is similar to C<mv * /new/path/to>, but for all
+subfolders, and it saves the final subfolder name.  Alternatively written as:
 
- $ xmrf -fo /new/path/to '.+/(.+?)$' '%s'
+ $ xmrf -rfo /new/path/to '.+/([^\/]+?)/(.+?)$' '%s/%s'
 
 This idea can also be used to insert some relative paths as well, like:
 
@@ -230,6 +231,9 @@ the output option would be set to C<./> (same as input) if not provided.
 
 These concepts can be mixed and matched to best suit the goals of the actions
 desired.
+
+See also the B<-b> flag, which may be required when doing fancy output folder
+shenanigans.
 
 =item B<-r>, B<--recursive>
 
