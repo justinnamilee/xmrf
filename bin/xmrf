@@ -215,12 +215,12 @@ Note that the output flag can often be omitted in B<--full> mode, as it's
 possible (maybe preferable) to include the output path right in the B<sprintf>
 like so:
 
- $ xmrf -f '.+/([^\/]+?)/(.+?)$' /new/path/to/'%s/%s'
+ $ xmrf -rf '.+/([^\/]+?)/(.+?)$' /new/path/to/'%s/%s'
 
 While contrived, this example is similar to C<mv * /new/path/to>, but for all
 subfolders, and it saves the final subfolder name.  Alternatively written as:
 
- $ xmrf -fo /new/path/to '.+/([^\/]+?)/(.+?)$' '%s/%s'
+ $ xmrf -rfo /new/path/to '.+/([^\/]+?)/(.+?)$' '%s/%s'
 
 This idea can also be used to insert some relative paths as well, like:
 

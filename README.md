@@ -181,12 +181,12 @@ All boolean option flags (flags that take no value) default to their
     possible (maybe preferable) to include the output path right in the **sprintf**
     like so:
 
-        $ xmrf -f '.+/([^\/]+?)/(.+?)$' /new/path/to/'%s/%s'
+        $ xmrf -rf '.+/([^\/]+?)/(.+?)$' /new/path/to/'%s/%s'
 
     While contrived, this example is similar to `mv * /new/path/to`, but for all
     subfolders, and it saves the final subfolder name.  Alternatively written as:
 
-        $ xmrf -fo /new/path/to '.+/([^\/]+?)/(.+?)$' '%s/%s'
+        $ xmrf -rfo /new/path/to '.+/([^\/]+?)/(.+?)$' '%s/%s'
 
     This idea can also be used to insert some relative paths as well, like:
 
