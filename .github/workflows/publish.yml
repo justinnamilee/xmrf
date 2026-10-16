@@ -75,7 +75,7 @@ jobs:
           gpg --batch --import
 
         gpg --armor \
-          --export 77EB2650F7CFEC5B6585A2FD33465E81997C2758 \
+          --export ${{ vars.GPG_KEY_ID }} \
           > site/xmrf-signing.asc
 
     - name: Sign RPM packages...
@@ -85,7 +85,7 @@ jobs:
       run: |
         set -euo pipefail
 
-        KEY_ID="77EB2650F7CFEC5B6585A2FD33465E81997C2758"
+        KEY_ID="${{ vars.GPG_KEY_ID }}"
 
         # Temporary passphrase file for noninteractive signing
         PASSFILE="$(mktemp)"
