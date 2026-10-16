@@ -166,7 +166,7 @@ jobs:
         # Test DNF on Rocky Linux 10
         docker run --rm \
           -v "$PWD/site:/repo:ro" \
-          rockylinux/rockylinux:10 sh -ec '
+          fedora:43 sh -ec '
             cat > /etc/yum.repos.d/xmrf.repo <<EOF
         [xmrf]
         name=XMRF
