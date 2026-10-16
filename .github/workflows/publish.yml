@@ -61,6 +61,7 @@ jobs:
 
     - name: Import signing key...
       env:
+        GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
       shell: bash
       run: |
@@ -75,17 +76,16 @@ jobs:
           gpg --batch --import
 
         gpg --armor \
-          --export ${{ vars.GPG_KEY_ID }} \
+          --export "$GPG_KEY_ID" \
           > site/xmrf-signing.asc
 
     - name: Sign RPM packages...
       env:
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
       shell: bash
       run: |
         set -euo pipefail
-
-        KEY_ID="${{ vars.GPG_KEY_ID }}"
 
         # Temporary passphrase file for noninteractive signing
         PASSFILE="$(mktemp)"
@@ -96,7 +96,7 @@ jobs:
         # Sign every RPM
         for pkg in site/rpm/*.rpm; do
           rpmsign --addsign \
-            --define "_gpg_name $KEY_ID" \
+            --define "_gpg_name $GPG_KEY_ID" \
             --define "_gpg_sign_cmd_extra_args --batch --pinentry-mode loopback --passphrase-file $PASSFILE" \
             "$pkg"
         done
