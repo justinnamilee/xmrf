@@ -37,6 +37,7 @@ jobs:
     - name: Download recent packages...
       env:
         GH_TOKEN: ${{ github.token }}
+        REPO_SIZE: ${{ vars.REPO_SIZE }}
       shell: bash
       run: |
         set -euo pipefail
@@ -46,7 +47,7 @@ jobs:
         gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
           --paginate \
           --jq '.[] | select(.draft == false and .prerelease == false) | .tag_name' |
-          head -n 5 |
+          head -n "$REPO_SIZE" |
           while read -r tag; do
             echo "Downloading packages from $tag"
 
