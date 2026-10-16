@@ -192,7 +192,7 @@ jobs:
 
     - name: Install public assets...
       run: |
-        cp public/bin/install-*.sh site/
+        cp public/install/install-*.sh site/
         cp public/pages/index.html site/index.html
         touch site/.nojekyll
 
