@@ -397,40 +397,6 @@ Skips library scanner and only checks the directory given by this variable.
 
 =back
 
-=head1 INSTALLATION
-
-More options are available in the L<deploy folder|https://github.com/justinnamilee/xmrf/tree/main/deploy>.
-
-=head2 Packaged Release
-
-Grab the latest C<.exe>, C<.deb>, or C<.rpm> release from L<XMRF GitHub|https://github.com/justinnamilee/xmrf/releases/latest>.
-Once downloaded, C<apt> or C<dnf> can install it locally to the system, use
-whichever is appropriate for the system.  The Windows C<.exe> is ready to go
-out of the box, just put it in the C<%PATH%>.
-
-=head2 Manual Installation
-
-Clone the repository.  Put the wrapper script somewhere (say
-C</usr/local/bin/xmrf>).  Put the library somewhere (say
-C</usr/local/lib/xmrf/app.pm>).  Set the execute bit on the wrapper.
-
- $ git clone 'https://github.com/justinnamilee/xmrf'
- $ cd xmrf
- $ sudo install -Dm755 bin/xmrf /usr/local/bin/xmrf
- $ sudo install -Dm644 lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
- $ xmrf --version
-
-=head1 TESTING
-
-After cloning the repository, testing is fairly simple.  Both B<L<Test2::V1>>
-and B<L<Capture::Tiny>> are required:
-
- $ cpanm -n -q Test2::V1 Capture::Tiny
-
-Then it's as simple as running prove on the directory:
-
- $ prove -lv
-
 =head1 AUTHOR
 
 Written by Justin "Nami" Lee.
