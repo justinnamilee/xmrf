@@ -106,6 +106,34 @@
       gap: 8px 24px;
     }
 
+    .install-mode {
+      display: flex;
+      gap: 18px;
+      margin: 16px 0;
+    }
+
+    .install-mode label {
+      cursor: pointer;
+      color: #aaa9a2;
+    }
+
+    .install-mode input {
+      accent-color: #a4af8e;
+    }
+
+    .install-mode label:has(input:checked) {
+      color: #f0eee5;
+    }
+
+    .quick-start:has(#mode-normal:checked) .paranoid,
+    .quick-start:has(#mode-paranoid:checked) .normal {
+      display: none;
+    }
+
+    .quick-start code {
+      margin-top: 8px;
+    }
+
     footer {
       border-top: 1px solid #414440;
       padding-top: 20px;
@@ -133,18 +161,48 @@
   </header>
 
   <main>
-    <section>
-      <h2>Quick Start</h2>
-      <p>Install the XMRF package repository for your distribution.</p>
 
-      <div class="repo">
-        <strong>Debian / Ubuntu</strong>
-        <code>curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | sudo bash</code>
+    <section class="quick-start">
+      <h2>Quick Start</h2>
+      <p>Install XMRF for your distribution.</p>
+
+      <div class="install-mode">
+        <label>
+          <input type="radio" name="install-mode" id="mode-normal" checked>
+          Normal
+        </label>
+        <label>
+          <input type="radio" name="install-mode" id="mode-paranoid">
+          Paranoid
+        </label>
       </div>
 
       <div class="repo">
-        <strong>Fedora / RHEL</strong>
-        <code>curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | sudo bash</code>
+        <strong>Debian / Ubuntu Based</strong>
+
+        <div class="normal">
+          <code>curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | sudo bash</code>
+        </div>
+
+        <div class="paranoid">
+          <code>curl -fsSLO https://justinnamilee.github.io/xmrf/install-apt.sh</code>
+          <code>less install-apt.sh</code>
+          <code>sudo bash install-apt.sh</code>
+        </div>
+      </div>
+
+      <div class="repo">
+        <strong>Fedora / RHEL Based</strong>
+
+        <div class="normal">
+          <code>curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | sudo bash</code>
+        </div>
+
+        <div class="paranoid">
+          <code>curl -fsSLO https://justinnamilee.github.io/xmrf/install-dnf.sh</code>
+          <code>less install-dnf.sh</code>
+          <code>sudo bash install-dnf.sh</code>
+        </div>
       </div>
 
       <p>
@@ -155,6 +213,7 @@
         </small>
       </p>
     </section>
+
 
     <section>
       <h2>Available repositories</h2>
