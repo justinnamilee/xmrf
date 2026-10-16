@@ -58,20 +58,6 @@ jobs:
               --dir site/rpm
           done
 
-    - name: Generate repository metadata...
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        # APT repository (flat layout)
-        cd site/deb
-        dpkg-scanpackages --multiversion . /dev/null > Packages
-        gzip -9 -k -f Packages
-        cd ../..
-
-        # RPM repository
-        createrepo_c site/rpm
-
     - name: Import signing key...
       env:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -90,6 +76,47 @@ jobs:
         gpg --armor \
           --export 77EB2650F7CFEC5B6585A2FD33465E81997C2758 \
           > site/xmrf-signing.asc
+
+    - name: Sign RPM packages...
+      env:
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        KEY_ID="77EB2650F7CFEC5B6585A2FD33465E81997C2758"
+
+        # Temporary passphrase file for noninteractive signing
+        PASSFILE="$(mktemp)"
+        chmod 600 "$PASSFILE"
+        trap 'rm -f "$PASSFILE"' EXIT
+        printf '%s' "$GPG_PASSPHRASE" > "$PASSFILE"
+
+        # Sign every RPM
+        for pkg in site/rpm/*.rpm; do
+          rpmsign --addsign \
+            --define "_gpg_name $KEY_ID" \
+            --define "_gpg_sign_cmd_extra_args --batch --pinentry-mode loopback --passphrase-file $PASSFILE" \
+            "$pkg"
+        done
+
+        # Verify signatures
+        rpm --import site/xmrf-signing.asc
+        rpmkeys --checksig site/rpm/*.rpm
+
+    - name: Generate repository metadata...
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # APT repository (flat layout)
+        cd site/deb
+        dpkg-scanpackages --multiversion . /dev/null > Packages
+        gzip -9 -k -f Packages
+        cd ../..
+
+        # RPM repository
+        createrepo_c site/rpm
 
     - name: Sign APT repository...
       env:
