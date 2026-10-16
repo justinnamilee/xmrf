@@ -1,4 +1,4 @@
-# <img alt="xmrf" src=".github/public/xmrf-banner.svg" width="770" height="64">
+# <img alt="xmrf" src="public/img/xmrf-banner.svg" width="770" height="64">
 
 [![Release: Latest](https://img.shields.io/github/v/release/justinnamilee/xmrf)](https://github.com/justinnamilee/xmrf/releases/latest)
 [![Build: Status](https://img.shields.io/github/actions/workflow/status/justinnamilee/xmrf/release.yml)](https://github.com/justinnamilee/xmrf/actions/workflows/release.yml)
