@@ -178,3 +178,15 @@ jobs:
             rpm -V xmrf
             xmrf -h
           '
+
+    - name: Configure GitHub Pages...
+      uses: actions/configure-pages@v5
+
+    - name: Upload Pages artifact...
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: site
+
+    - name: Deploy GitHub Pages...
+      id: deployment
+      uses: actions/deploy-pages@v4
