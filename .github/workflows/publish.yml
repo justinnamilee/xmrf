@@ -208,6 +208,10 @@ jobs:
 
         printf '%s\n' "$PAGES_INDEX_HTML" > site/index.html
 
+    - name: Install public assets...
+      run: |
+        cp .github/public/install-*.sh site/
+
     - name: Configure GitHub Pages...
       uses: actions/configure-pages@v5
 
