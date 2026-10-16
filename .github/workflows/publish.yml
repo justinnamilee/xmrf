@@ -194,6 +194,7 @@ jobs:
       run: |
         cp .github/public/install-*.sh site/
         cp .github/public/pages.index.html site/index.html
+        touch site/.nojekyll
 
     - name: Configure GitHub Pages...
       uses: actions/configure-pages@v5
