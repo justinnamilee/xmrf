@@ -190,6 +190,24 @@ jobs:
             xmrf -h
           '
 
+    - name: Prepare Pages index...
+      env:
+        PAGES_INDEX_HTML: ${{ vars.PAGES_INDEX_HTML }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # Disable Jekyll processing
+        touch site/.nojekyll
+
+        # Generate landing page from GitHub variable
+        if [[ -z "$PAGES_INDEX_HTML" ]]; then
+          echo "::error::PAGES_INDEX_HTML variable is empty"
+          exit 1
+        fi
+
+        printf '%s\n' "$PAGES_INDEX_HTML" > site/index.html
+
     - name: Configure GitHub Pages...
       uses: actions/configure-pages@v5
 
