@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>XMRF | Package Repositories</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      background: #191b1b;
+      color: #d6d5ce;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 72px 24px 40px;
+      line-height: 1.7;
+    }
+
+    header {
+      border-bottom: 1px solid #414440;
+      padding-bottom: 28px;
+    }
+
+    h1 {
+      font-size: 2.6rem;
+      letter-spacing: -.06em;
+      margin: 0;
+      color: #f0eee5;
+    }
+
+    h2 {
+      font-size: 1rem;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: #b5bcaa;
+      margin: 0 0 12px;
+    }
+
+    p {
+      color: #aaa9a2;
+    }
+
+    .prompt {
+      color: #a4af8e;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+    }
+
+    main {
+      margin-top: 40px;
+    }
+
+    section {
+      margin-bottom: 38px;
+    }
+
+    .repo {
+      border: 1px solid #414440;
+      padding: 18px 20px;
+      margin: 12px 0;
+      background: #202322;
+    }
+
+    .repo strong {
+      color: #ecebe3;
+    }
+
+    .repo p {
+      margin: 5px 0;
+      font-size: .9rem;
+    }
+
+    a {
+      color: #b9c7a2;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    code {
+      display: block;
+      padding: 12px 14px;
+      background: #111313;
+      border: 1px solid #343735;
+      color: #d0cdbb;
+      overflow-x: auto;
+      font-size: .85rem;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+    }
+
+    footer {
+      border-top: 1px solid #414440;
+      padding-top: 20px;
+      font-size: .8rem;
+      color: #858780;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding-top: 36px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1><span class="prompt">$</span> xmrf<span class="prompt">_</span></h1>
+    <p class="subtitle">Regex-map File Rename</p>
+    <p>Official APT and RPM package repositories.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Quick Start</h2>
+      <p>Install the XMRF package repository for your distribution.</p>
+
+      <div class="repo">
+        <strong>Debian / Ubuntu</strong>
+        <code>curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | sudo bash</code>
+      </div>
+
+      <div class="repo">
+        <strong>Fedora / RHEL</strong>
+        <code>curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | sudo bash</code>
+      </div>
+
+      <p>
+        <small>
+          Review scripts before running them:
+          <a href="install-apt.sh">APT</a> ·
+          <a href="install-dnf.sh">DNF</a>
+        </small>
+      </p>
+    </section>
+
+    <section>
+      <h2>Available repositories</h2>
+      <div class="repo">
+        <strong>01 / Debian &amp; Ubuntu</strong>
+        <p>APT repository · architecture independent</p>
+        <a href="deb/InRelease">InRelease ↗</a>
+        &nbsp;·&nbsp;
+        <a href="deb/Packages.gz">Packages.gz ↗</a>
+      </div>
+      <div class="repo">
+        <strong>02 / Fedora &amp; RHEL family</strong>
+        <p>DNF repository · noarch packages</p>
+        <a href="rpm/repodata/repomd.xml">Repository metadata ↗</a>
+      </div>
+    </section>
+
+    <section>
+      <h2>Repository URLs</h2>
+      <p>APT</p>
+      <code>https://justinnamilee.github.io/xmrf/deb/</code>
+      <p>DNF</p>
+      <code>https://justinnamilee.github.io/xmrf/rpm/</code>
+    </section>
+
+    <section>
+      <h2>Security</h2>
+      <p>Repository metadata and RPM packages are signed with the
+        XMRF package signing key.</p>
+      <a href="xmrf-signing.asc">Download public signing key ↗</a>
+    </section>
+
+    <section>
+      <h2>Project</h2>
+      <div class="links">
+        <a href="https://github.com/justinnamilee/xmrf">Source code ↗</a>
+        <a href="https://github.com/justinnamilee/xmrf/releases">All releases ↗</a>
+        <a href="https://github.com/justinnamilee/xmrf/issues">Issues ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    XMRF · Package distribution via GitHub Pages
+  </footer>
+</body>
+
+</html>
