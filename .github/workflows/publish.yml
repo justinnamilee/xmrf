@@ -105,6 +105,7 @@ jobs:
         # Verify signatures
         rpm --import site/xmrf-signing.asc
         rpmkeys --checksig site/rpm/*.rpm
+        rpm -qpi --qf '%{SIGPGP:pgpsig}\n' site/rpm/*.rpm
 
     - name: Generate repository metadata...
       shell: bash
@@ -143,6 +144,14 @@ jobs:
           gpg --batch --yes --pinentry-mode loopback \
             --passphrase-fd 0 \
             --armor --detach-sign -o Release.gpg Release
+
+        # Verify the clearsigned Release file
+        gpg --batch --verify InRelease
+
+        # Verify the detached signature
+        gpg --batch --verify Release.gpg Release
+
+        echo "APT repository signatures verified successfully."
 
     - name: Smoke test...
       shell: bash
