@@ -33,10 +33,10 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 echo "Setting version tag..."
-.github/bin/updateVERSION "$tag" "$2"
+public/bin/updateVERSION "$tag" "$2"
 
 echo "Regenrate 'README.md' if required..."
-.github/bin/updateREADME "$2"
+public/bin/updateREADME "$2"
 
 echo "Send up the new commits..."
 git push
