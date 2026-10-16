@@ -1,0 +1,194 @@
+name: Publish Package Repositories
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Checkout...
+      uses: actions/checkout@v4
+
+    - name: Install dependencies...
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          gnupg \
+          dpkg-dev \
+          createrepo-c \
+          rpm
+
+    - name: Download recent packages...
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPO_SIZE: ${{ vars.REPO_SIZE }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        mkdir -p site/deb site/rpm
+
+        gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+          --paginate \
+          --jq '.[] | select(.draft == false and .prerelease == false) | .tag_name' |
+          head -n "$REPO_SIZE" |
+          while read -r tag; do
+            echo "Downloading packages from $tag"
+
+            gh release download "$tag" \
+              --pattern '*.deb' \
+              --dir site/deb
+
+            gh release download "$tag" \
+              --pattern '*.rpm' \
+              --dir site/rpm
+          done
+
+    - name: Import signing key...
+      env:
+        GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
+        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        export GNUPGHOME="$(mktemp -d)"
+        chmod 700 "$GNUPGHOME"
+
+        echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+
+        printf '%s\n' "$GPG_PRIVATE_KEY" |
+          gpg --batch --import
+
+        gpg --armor \
+          --export "$GPG_KEY_ID" \
+          > site/xmrf-signing.asc
+
+    - name: Sign RPM packages...
+      env:
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # Temporary passphrase file for noninteractive signing
+        PASSFILE="$(mktemp)"
+        chmod 600 "$PASSFILE"
+        trap 'rm -f "$PASSFILE"' EXIT
+        printf '%s' "$GPG_PASSPHRASE" > "$PASSFILE"
+
+        # Sign every RPM
+        for pkg in site/rpm/*.rpm; do
+          rpmsign --addsign \
+            --define "_gpg_name $GPG_KEY_ID" \
+            --define "_gpg_sign_cmd_extra_args --batch --pinentry-mode loopback --passphrase-file $PASSFILE" \
+            "$pkg"
+        done
+
+        # Verify signatures
+        rpm --import site/xmrf-signing.asc
+        rpmkeys --checksig site/rpm/*.rpm
+
+    - name: Generate repository metadata...
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # APT repository (flat layout)
+        cd site/deb
+        dpkg-scanpackages --multiversion . /dev/null > Packages
+        gzip -9 -k -f Packages
+        cd ../..
+
+        # RPM repository
+        createrepo_c site/rpm
+
+    - name: Sign APT repository...
+      env:
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        cd site/deb
+
+        apt-ftparchive \
+          -o APT::FTPArchive::Release::Origin=XMRF \
+          -o APT::FTPArchive::Release::Label=XMRF \
+          release . > Release
+
+        printf '%s\n' "$GPG_PASSPHRASE" |
+          gpg --batch --yes --pinentry-mode loopback \
+            --passphrase-fd 0 \
+            --clearsign -o InRelease Release
+
+        printf '%s\n' "$GPG_PASSPHRASE" |
+          gpg --batch --yes --pinentry-mode loopback \
+            --passphrase-fd 0 \
+            --armor --detach-sign -o Release.gpg Release
+
+    - name: Smoke test...
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # Test APT on Debian 13
+        docker run --rm \
+          -v "$PWD/site:/repo:ro" \
+          debian:13 sh -ec '
+            cp /repo/xmrf-signing.asc /usr/share/keyrings/xmrf.asc
+
+            echo "deb [signed-by=/usr/share/keyrings/xmrf.asc] file:/repo/deb ./" \
+              > /etc/apt/sources.list.d/xmrf.list
+
+            apt-get update
+            apt-get install -y xmrf
+            xmrf -h
+          '
+
+        # Test DNF on Rocky Linux 10
+        docker run --rm \
+          -v "$PWD/site:/repo:ro" \
+          rockylinux/rockylinux:10 sh -ec '
+            cat > /etc/yum.repos.d/xmrf.repo <<EOF
+        [xmrf]
+        name=XMRF
+        baseurl=file:///repo/rpm
+        enabled=1
+        gpgcheck=1
+        gpgkey=file:///repo/xmrf-signing.asc
+        EOF
+
+            dnf install -y xmrf
+            rpm -V xmrf
+            xmrf -h
+          '
+
+    - name: Configure GitHub Pages...
+      uses: actions/configure-pages@v5
+
+    - name: Upload Pages artifact...
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: site
+
+    - name: Deploy GitHub Pages...
+      id: deployment
+      uses: actions/deploy-pages@v4
