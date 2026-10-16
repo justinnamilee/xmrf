@@ -1,0 +1,118 @@
+name: Publish Package Repositories
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Checkout...
+      uses: actions/checkout@v4
+
+    - name: Install dependencies...
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          gnupg \
+          dpkg-dev \
+          createrepo-c \
+          rpm
+
+    - name: Download recent packages...
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        mkdir -p site/deb site/rpm
+
+        gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+          --paginate \
+          --jq '.[] | select(.draft == false and .prerelease == false) | .tag_name' |
+          head -n 5 |
+          while read -r tag; do
+            echo "Downloading packages from $tag"
+
+            gh release download "$tag" \
+              --pattern '*.deb' \
+              --dir site/deb
+
+            gh release download "$tag" \
+              --pattern '*.rpm' \
+              --dir site/rpm
+          done
+
+    - name: Generate repository metadata...
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # APT repository (flat layout)
+        cd site/deb
+        dpkg-scanpackages --multiversion . /dev/null > Packages
+        gzip -9 -k -f Packages
+        cd ../..
+
+        # RPM repository
+        createrepo_c site/rpm
+
+    - name: Import signing key...
+      env:
+        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        export GNUPGHOME="$(mktemp -d)"
+        chmod 700 "$GNUPGHOME"
+
+        echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+
+        printf '%s\n' "$GPG_PRIVATE_KEY" |
+          gpg --batch --import
+
+        gpg --armor \
+          --export 77EB2650F7CFEC5B6585A2FD33465E81997C2758 \
+          > site/xmrf-signing.asc
+
+    - name: Sign APT repository...
+      env:
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        cd site/deb
+
+        apt-ftparchive \
+          -o APT::FTPArchive::Release::Origin=XMRF \
+          -o APT::FTPArchive::Release::Label=XMRF \
+          release . > Release
+
+        printf '%s\n' "$GPG_PASSPHRASE" |
+          gpg --batch --yes --pinentry-mode loopback \
+            --passphrase-fd 0 \
+            --clearsign -o InRelease Release
+
+        printf '%s\n' "$GPG_PASSPHRASE" |
+          gpg --batch --yes --pinentry-mode loopback \
+            --passphrase-fd 0 \
+            --armor --detach-sign -o Release.gpg Release
+
+
