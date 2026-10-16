@@ -142,4 +142,39 @@ jobs:
             --passphrase-fd 0 \
             --armor --detach-sign -o Release.gpg Release
 
+    - name: Smoke test...
+      shell: bash
+      run: |
+        set -euo pipefail
 
+        # Test APT on Debian 13
+        docker run --rm \
+          -v "$PWD/site:/repo:ro" \
+          debian:13 sh -ec '
+            cp /repo/xmrf-signing.asc /usr/share/keyrings/xmrf.asc
+
+            echo "deb [signed-by=/usr/share/keyrings/xmrf.asc] file:/repo/deb ./" \
+              > /etc/apt/sources.list.d/xmrf.list
+
+            apt-get update
+            apt-get install -y xmrf
+            xmrf -h
+          '
+
+        # Test DNF on Rocky Linux 10
+        docker run --rm \
+          -v "$PWD/site:/repo:ro" \
+          rockylinux/rockylinux:10 sh -ec '
+            cat > /etc/yum.repos.d/xmrf.repo <<EOF
+        [xmrf]
+        name=XMRF
+        baseurl=file:///repo/rpm
+        enabled=1
+        gpgcheck=1
+        gpgkey=file:///repo/xmrf-signing.asc
+        EOF
+
+            dnf install -y xmrf
+            rpm -V xmrf
+            xmrf -h
+          '
