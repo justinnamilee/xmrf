@@ -16,30 +16,24 @@ See the [repository page](https://justinnamilee.github.io/xmrf/) for details, or
 
 - Debian / Ubuntu Based:
 
-      $ curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | sudo bash
+      curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | sudo bash
 
 - Fedora / RHEL Based:
 
-      $ curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | sudo bash
+      curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | sudo bash
 
-## Ansible
+### Ansible
 
 - [via Releases](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/package)
 - [via Repository](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/respository)
 
-## Packaged Release
+### Packaged Release
 
 Grab the latest `.exe`, `.deb`, or `.rpm` release from [XMRF GitHub](https://github.com/justinnamilee/xmrf/releases/latest).
-Once downloaded, `apt` or `dnf` can install it locally to the system, use
-whichever is appropriate for the system.  The Windows `.exe` is ready to go
-out of the box, just put it in the `%PATH%`.  **Note these packaged versions
-are unsigned.**
+The Windows `.exe` is ready to go out of the box, just put it in the `%PATH%`.
+**Note the packaged versions are unsigned.**
 
-## Manual Installation
-
-Clone the repository.  Put the wrapper script somewhere (say
-`/usr/local/bin/xmrf`).  Put the library somewhere (say
-`/usr/local/lib/xmrf/app.pm`).  Set the execute bit on the wrapper.
+### Manual Installation
 
     $ git clone 'https://github.com/justinnamilee/xmrf'
     $ cd xmrf
@@ -57,5 +51,7 @@ and **[Capture::Tiny](https://metacpan.org/pod/Capture%3A%3ATiny)** are required
 Then it's as simple as running prove on the directory:
 
     $ prove -lv
+
+---
 
 ---
