@@ -11,7 +11,7 @@
 
     # Key Information
     key_sha256: "a7a198be8ad76cb739e3e7b02626db473fbe1e9fa85dce1aca9d18ce04aa9623"
-    key_url: https://packages.example.com/debian/key.gpg
+    key_url: https://justinnamilee.github.io/xmrf/xmrf-signing.asc
 
     # Debian / Ubuntu repository
     deb_repo_url: https://justinnamilee.github.io/xmrf/deb/
@@ -205,3 +205,11 @@
               - "{{ 'dnf' if ansible_facts['pkg_mgr'] in ['dnf', 'dnf5'] else 'yum' }}"
               - makecache
           changed_when: false
+
+    # --------------------------------------------------
+    # Install XMRF
+    # --------------------------------------------------
+    - name: Install XMRF
+      ansible.builtin.package:
+        name: xmrf
+        state: latest
