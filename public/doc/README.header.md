@@ -24,8 +24,8 @@ See the [repository page](https://justinnamilee.github.io/xmrf/) for details, or
 
 ### Ansible
 
-- [via Releases](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/package)
-- [via Repository](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/respository)
+There's Ansible playbooks for installed [via Releases](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/package),
+or [via Repository](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/respository).
 
 ### Packaged Release
 
@@ -51,7 +51,5 @@ and **[Capture::Tiny](https://metacpan.org/pod/Capture%3A%3ATiny)** are required
 Then it's as simple as running prove on the directory:
 
     $ prove -lv
-
----
 
 ---
