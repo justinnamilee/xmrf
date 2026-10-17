@@ -42,7 +42,7 @@ jobs:
       run: |
         set -euo pipefail
 
-        mkdir -p site/deb site/rpm
+        mkdir -p site/deb/pool/main site/rpm
 
         gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
           --paginate \
@@ -53,7 +53,7 @@ jobs:
 
             gh release download "$tag" \
               --pattern '*.deb' \
-              --dir site/deb
+              --dir site/deb/pool/main
 
             gh release download "$tag" \
               --pattern '*.rpm' \
@@ -112,11 +112,29 @@ jobs:
       run: |
         set -euo pipefail
 
-        # APT repository (flat layout)
-        cd site/deb
-        dpkg-scanpackages --multiversion . /dev/null > Packages
-        gzip -9 -k -f Packages
-        cd ../..
+        # APT repository
+        DEB_ROOT="site/deb"
+        DIST="$DEB_ROOT/dists/stable"
+        ARCHES="amd64 arm64 armhf i386 ppc64el riscv64 s390x"
+
+        mkdir -p "$DIST/main"
+
+        pushd "$DEB_ROOT"
+
+        # Generate one master package index
+        dpkg-scanpackages --multiversion pool/main /dev/null \
+          > Packages.master
+
+        # Publish an index for each architecture
+        for arch in $ARCHES; do
+          mkdir -p "dists/stable/main/binary-$arch"
+
+          cp Packages.master "dists/stable/main/binary-$arch/Packages"
+          gzip -9 -k -f "dists/stable/main/binary-$arch/Packages"
+        done
+
+        rm Packages.master
+        popd
 
         # RPM repository
         createrepo_c site/rpm
@@ -128,11 +146,18 @@ jobs:
       run: |
         set -euo pipefail
 
-        cd site/deb
+        # Archy
+        ARCHES="amd64 arm64 armhf i386 ppc64el riscv64 s390x"
+
+        cd site/deb/dists/stable
 
         apt-ftparchive \
           -o APT::FTPArchive::Release::Origin=XMRF \
           -o APT::FTPArchive::Release::Label=XMRF \
+          -o APT::FTPArchive::Release::Suite=stable \
+          -o APT::FTPArchive::Release::Codename=stable \
+          -o APT::FTPArchive::Release::Architectures="all $ARCHES" \
+          -o APT::FTPArchive::Release::Components=main \
           release . > Release
 
         printf '%s\n' "$GPG_PASSPHRASE" |
@@ -145,10 +170,8 @@ jobs:
             --passphrase-fd 0 \
             --armor --detach-sign -o Release.gpg Release
 
-        # Verify the clearsigned Release file
+        # Verify signatures
         gpg --batch --verify InRelease
-
-        # Verify the detached signature
         gpg --batch --verify Release.gpg Release
 
         echo "APT repository signatures verified successfully."
@@ -164,7 +187,7 @@ jobs:
           debian:13 sh -ec '
             cp /repo/xmrf-signing.asc /usr/share/keyrings/xmrf.asc
 
-            echo "deb [signed-by=/usr/share/keyrings/xmrf.asc] file:/repo/deb ./" \
+            echo "deb [signed-by=/usr/share/keyrings/xmrf.asc] file:/repo/deb stable main" \
               > /etc/apt/sources.list.d/xmrf.list
 
             apt-get update

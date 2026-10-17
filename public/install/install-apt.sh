@@ -86,7 +86,8 @@ install -m 644 "$TMPDIR/xmrf.gpg" "$KEYRING"
 cat > "$TMPDIR/xmrf.sources" <<EOF
 Types: deb
 URIs: $REPO_URL/deb/
-Suites: ./
+Suites: stable
+Components: main
 Signed-By: $KEYRING
 EOF
 
