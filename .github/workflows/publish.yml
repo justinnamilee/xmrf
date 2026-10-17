@@ -190,7 +190,7 @@ jobs:
             xmrf -h
           '
 
-        # Test DNF on Rocky Linux 10
+        # Test DNF on Fedora 43
         docker run --rm \
           -v "$PWD/site:/repo:ro" \
           fedora:43 sh -ec '
@@ -229,3 +229,35 @@ jobs:
     - name: Deploy GitHub Pages...
       id: deployment
       uses: actions/deploy-pages@v4
+
+    - name: Live test...
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        rm -rf site/
+        sleep 10
+
+        # Test APT on Debian 13
+        docker run --rm \
+          -v "$PWD/site:/repo:ro" \
+          debian:13 sh -ec '
+            apt-get update
+            apt-get install -y ca-certificates curl
+
+            curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | bash
+
+            xmrf -h
+          '
+
+        # Test DNF on Fedora 43
+        docker run --rm \
+          -v "$PWD/site:/repo:ro" \
+          fedora:43 sh -ec '
+            dnf install -y curl ca-certificates
+
+            curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | bash
+
+            rpm -V xmrf
+            xmrf -h
+          '
