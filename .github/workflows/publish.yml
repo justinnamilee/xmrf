@@ -125,7 +125,7 @@ jobs:
         dpkg-scanpackages --multiversion pool/main /dev/null \
           > "$DIST/$MASTER/Packages"
 
-        gzip -9 -f "$DIST/$MASTER/Packages"
+        gzip -9 -k -f "$DIST/$MASTER/Packages"
 
         popd
 
