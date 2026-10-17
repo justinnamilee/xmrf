@@ -222,7 +222,7 @@ jobs:
 
     - name: List assests ...
       run: |
-        tree -A -n --charset=ascii site/
+        tree -n --charset=ascii site/
 
     - name: Configure GitHub Pages...
       uses: actions/configure-pages@v5
