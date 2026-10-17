@@ -43,7 +43,7 @@ The Windows `.exe` is ready to go out of the box, just put it in the `%PATH%`.
     $ sudo install -Dm644 lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
     $ xmrf --version
 
-## TESTING
+#### TESTING
 
 After cloning the repository, testing is fairly simple.  Both **[Test2::V1](https://metacpan.org/pod/Test2%3A%3AV1)**
 and **[Capture::Tiny](https://metacpan.org/pod/Capture%3A%3ATiny)** are required:
