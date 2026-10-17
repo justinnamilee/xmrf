@@ -1,42 +1,29 @@
 
 ---
-- name: Configure third-party package repository
+- name: Configure XMRF Repository
   hosts: all
   become: true
   gather_facts: true
 
   vars:
-    # --------------------------------------------------
-    # Common configuration
-    # --------------------------------------------------
-    repo_name: example
-    repo_description: Example Package Repository
-    key_sha256: "a7a198be8ad76cb739e3e7b02626db473fbe1e9fa85dce1aca9d18ce04aa9623"
+    repo_name: XMRF
+    repo_description: "XMRF Package Repository"
 
-    # --------------------------------------------------
+    # Key Information
+    key_sha256: "a7a198be8ad76cb739e3e7b02626db473fbe1e9fa85dce1aca9d18ce04aa9623"
+    key_url: https://packages.example.com/debian/key.gpg
+
     # Debian / Ubuntu repository
-    # --------------------------------------------------
-    deb_repo_url: https://packages.example.com/debian
+    deb_repo_url: https://justinnamilee.github.io/xmrf/deb/
     deb_repo_suite: stable
     deb_repo_components: main
 
-    # Must serve a binary OpenPGP keyring (.gpg)
-    deb_key_url: https://packages.example.com/debian/key.gpg
-
-    # --------------------------------------------------
     # Fedora / RHEL repository
-    # --------------------------------------------------
-    # DNF expands $releasever and $basearch itself
-    rpm_repo_url: 'https://packages.example.com/rpm/$releasever/$basearch'
+    rpm_repo_url:  https://justinnamilee.github.io/xmrf/rpm/
 
-    # Must serve a compatible OpenPGP public key
-    rpm_key_url: https://packages.example.com/rpm/key.asc
-
-    # --------------------------------------------------
     # Derived paths
-    # --------------------------------------------------
     deb_key_dir: /etc/apt/keyrings
-    deb_key_file: "{{ deb_key_dir }}/{{ repo_name }}.gpg"
+    deb_key_file: "{{ deb_key_dir }}/{{ repo_name }}.asc"
     deb_repo_file: "/etc/apt/sources.list.d/{{ repo_name }}"
 
     rpm_key_dir: /etc/pki/rpm-gpg
@@ -73,9 +60,6 @@
       }}
 
   tasks:
-    # --------------------------------------------------
-    # Validation
-    # --------------------------------------------------
     - name: Reject conflicting force options
       ansible.builtin.assert:
         that:
@@ -100,7 +84,7 @@
       ansible.builtin.assert:
         that:
           - deb_repo_url is match('^https://')
-          - deb_key_url is match('^https://')
+          - key_url is match('^https://')
           - key_sha256 is match('^[a-fA-F0-9]{64}$')
       when: is_deb
 
@@ -108,7 +92,7 @@
       ansible.builtin.assert:
         that:
           - rpm_repo_url is match('^https://')
-          - rpm_key_url is match('^https://')
+          - key_url is match('^https://')
           - key_sha256 is match('^[a-fA-F0-9]{64}$')
       when: is_rpm
 
@@ -128,7 +112,7 @@
 
         - name: Download and verify APT signing key
           ansible.builtin.get_url:
-            url: "{{ deb_key_url }}"
+            url: "{{ key_url }}"
             dest: "{{ deb_key_file }}"
             checksum: "sha256:{{ key_sha256 }}"
             validate_certs: true
@@ -186,7 +170,7 @@
 
         - name: Download and verify RPM signing key
           ansible.builtin.get_url:
-            url: "{{ rpm_key_url }}"
+            url: "{{ key_url }}"
             dest: "{{ rpm_key_file }}"
             checksum: "sha256:{{ key_sha256 }}"
             validate_certs: true
