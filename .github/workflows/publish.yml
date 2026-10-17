@@ -125,7 +125,7 @@ jobs:
         dpkg-scanpackages --multiversion pool/main /dev/null \
           > "$DIST/$MASTER/Packages"
 
-        gzip -9 -k -f "$DIST/$MASTER/Packages"
+        gzip -9 -f "$DIST/$MASTER/Packages"
 
         popd
 
@@ -166,6 +166,8 @@ jobs:
         # Verify signatures
         gpg --batch --verify InRelease
         gpg --batch --verify Release.gpg Release
+
+        popd
 
         echo "APT repository signatures verified successfully."
 
