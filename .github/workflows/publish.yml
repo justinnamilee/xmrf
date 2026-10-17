@@ -115,26 +115,18 @@ jobs:
 
         # APT repository
         DEB_ROOT="site/deb"
-        DIST="$DEB_ROOT/dists/stable"
-        ARCHES="amd64 arm64 armhf i386 ppc64el riscv64 s390x"
+        DIST="dists/stable"
+        MASTER="main/binary-all"
 
-        mkdir -p "$DIST/main"
-
+        mkdir -p "$DEB_ROOT/$DIST/$MASTER"
         pushd "$DEB_ROOT"
 
         # Generate one master package index
         dpkg-scanpackages --multiversion pool/main /dev/null \
-          > Packages.master
+          > "$DIST/$MASTER/Packages"
 
-        # Publish an index for each architecture
-        for arch in $ARCHES; do
-          mkdir -p "dists/stable/main/binary-$arch"
+        gzip -9 -k -f "$DIST/$MASTER/Packages"
 
-          cp Packages.master "dists/stable/main/binary-$arch/Packages"
-          gzip -9 -k -f "dists/stable/main/binary-$arch/Packages"
-        done
-
-        rm Packages.master
         popd
 
         # RPM repository
@@ -150,7 +142,7 @@ jobs:
         # Archy
         ARCHES="amd64 arm64 armhf i386 ppc64el riscv64 s390x"
 
-        cd site/deb/dists/stable
+        pushd site/deb/dists/stable
 
         apt-ftparchive \
           -o APT::FTPArchive::Release::Origin=XMRF \
