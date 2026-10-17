@@ -32,6 +32,7 @@ jobs:
           gnupg \
           dpkg-dev \
           createrepo-c \
+          tree \
           rpm
 
     - name: Download recent packages...
@@ -114,26 +115,18 @@ jobs:
 
         # APT repository
         DEB_ROOT="site/deb"
-        DIST="$DEB_ROOT/dists/stable"
-        ARCHES="amd64 arm64 armhf i386 ppc64el riscv64 s390x"
+        DIST="dists/stable"
+        MASTER="main/binary-all"
 
-        mkdir -p "$DIST/main"
-
+        mkdir -p "$DEB_ROOT/$DIST/$MASTER"
         pushd "$DEB_ROOT"
 
         # Generate one master package index
         dpkg-scanpackages --multiversion pool/main /dev/null \
-          > Packages.master
+          > "$DIST/$MASTER/Packages"
 
-        # Publish an index for each architecture
-        for arch in $ARCHES; do
-          mkdir -p "dists/stable/main/binary-$arch"
+        gzip -9 -k -f "$DIST/$MASTER/Packages"
 
-          cp Packages.master "dists/stable/main/binary-$arch/Packages"
-          gzip -9 -k -f "dists/stable/main/binary-$arch/Packages"
-        done
-
-        rm Packages.master
         popd
 
         # RPM repository
@@ -149,7 +142,7 @@ jobs:
         # Archy
         ARCHES="amd64 arm64 armhf i386 ppc64el riscv64 s390x"
 
-        cd site/deb/dists/stable
+        pushd site/deb/dists/stable
 
         apt-ftparchive \
           -o APT::FTPArchive::Release::Origin=XMRF \
@@ -174,6 +167,8 @@ jobs:
         gpg --batch --verify InRelease
         gpg --batch --verify Release.gpg Release
 
+        popd
+
         echo "APT repository signatures verified successfully."
 
     - name: Smoke test...
@@ -195,7 +190,7 @@ jobs:
             xmrf -h
           '
 
-        # Test DNF on Rocky Linux 10
+        # Test DNF on Fedora 43
         docker run --rm \
           -v "$PWD/site:/repo:ro" \
           fedora:43 sh -ec '
@@ -219,6 +214,10 @@ jobs:
         cp public/pages/index.html site/index.html
         touch site/.nojekyll
 
+    - name: List assests ...
+      run: |
+        tree -n --charset=ascii site/
+
     - name: Configure GitHub Pages...
       uses: actions/configure-pages@v5
 
@@ -230,3 +229,35 @@ jobs:
     - name: Deploy GitHub Pages...
       id: deployment
       uses: actions/deploy-pages@v4
+
+    - name: Live test...
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        rm -rf site/
+        sleep 10
+
+        # Test APT on Debian 13
+        docker run --rm \
+          -v "$PWD/site:/repo:ro" \
+          debian:13 sh -ec '
+            apt-get update
+            apt-get install -y ca-certificates curl
+
+            curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | bash
+
+            xmrf -h
+          '
+
+        # Test DNF on Fedora 43
+        docker run --rm \
+          -v "$PWD/site:/repo:ro" \
+          fedora:43 sh -ec '
+            dnf install -y curl ca-certificates
+
+            curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | bash
+
+            rpm -V xmrf
+            xmrf -h
+          '

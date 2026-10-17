@@ -1,0 +1,215 @@
+
+---
+- name: Configure XMRF Repository
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    repo_name: XMRF
+    repo_description: "XMRF Package Repository"
+
+    # Key Information
+    key_sha256: "a7a198be8ad76cb739e3e7b02626db473fbe1e9fa85dce1aca9d18ce04aa9623"
+    key_url: https://justinnamilee.github.io/xmrf/xmrf-signing.asc
+
+    # Debian / Ubuntu repository
+    deb_repo_url: https://justinnamilee.github.io/xmrf/deb/
+    deb_repo_suite: stable
+    deb_repo_components: main
+
+    # Fedora / RHEL repository
+    rpm_repo_url:  https://justinnamilee.github.io/xmrf/rpm/
+
+    # Derived paths
+    deb_key_dir: /etc/apt/keyrings
+    deb_key_file: "{{ deb_key_dir }}/{{ repo_name }}.asc"
+    deb_repo_file: "/etc/apt/sources.list.d/{{ repo_name }}"
+
+    rpm_key_dir: /etc/pki/rpm-gpg
+    rpm_key_file: "{{ rpm_key_dir }}/RPM-GPG-KEY-{{ repo_name }}"
+    rpm_repo_file: "/etc/yum.repos.d/{{ repo_name }}.repo"
+
+    # OS selection
+    force_deb: false
+    force_rpm: false
+
+    # Effective OS selection
+    is_rpm: >-
+      {{
+        (force_rpm | bool)
+        or (
+          not (force_deb | bool)
+          and ansible_facts['os_family'] == 'RedHat'
+        )
+      }}
+
+    is_deb: "{{ not (is_rpm | bool) }}"
+
+    use_deb822: >-
+      {{
+        (
+          ansible_facts['distribution'] == 'Ubuntu'
+          and ansible_facts['distribution_version'] is version('24.04', '>=')
+        )
+        or
+        (
+          ansible_facts['distribution'] == 'Debian'
+          and ansible_facts['distribution_major_version'] | int >= 13
+        )
+      }}
+
+  tasks:
+    - name: Reject conflicting force options
+      ansible.builtin.assert:
+        that:
+          - not ((force_deb | bool) and (force_rpm | bool))
+        fail_msg: "Cannot force both DEB and RPM"
+        quiet: true
+
+    - name: Warn on unknown operating system
+      ansible.builtin.debug:
+        msg: >-
+          WARNING: Unrecognized OS family
+          {{ ansible_facts['os_family'] }}
+          ({{ ansible_facts['distribution'] }}).
+          Defaulting to DEB. Override with
+          -e force_deb=true or -e force_rpm=true.
+      when:
+        - not (force_deb | bool)
+        - not (force_rpm | bool)
+        - ansible_facts['os_family'] not in ['Debian', 'RedHat']
+
+    - name: Validate Debian repository configuration
+      ansible.builtin.assert:
+        that:
+          - deb_repo_url is match('^https://')
+          - key_url is match('^https://')
+          - key_sha256 is match('^[a-fA-F0-9]{64}$')
+      when: is_deb
+
+    - name: Validate RPM repository configuration
+      ansible.builtin.assert:
+        that:
+          - rpm_repo_url is match('^https://')
+          - key_url is match('^https://')
+          - key_sha256 is match('^[a-fA-F0-9]{64}$')
+      when: is_rpm
+
+    # --------------------------------------------------
+    # Debian / Ubuntu
+    # --------------------------------------------------
+    - name: Configure Debian-family repository
+      when: is_deb
+      block:
+        - name: Create APT keyring directory
+          ansible.builtin.file:
+            path: "{{ deb_key_dir }}"
+            state: directory
+            owner: root
+            group: root
+            mode: '0755'
+
+        - name: Download and verify APT signing key
+          ansible.builtin.get_url:
+            url: "{{ key_url }}"
+            dest: "{{ deb_key_file }}"
+            checksum: "sha256:{{ key_sha256 }}"
+            validate_certs: true
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: Configure legacy APT repository
+          ansible.builtin.copy:
+            dest: "{{ deb_repo_file }}.list"
+            content: |
+              deb [signed-by={{ deb_key_file }}] {{ deb_repo_url }} {{ deb_repo_suite }} {{ deb_repo_components }}
+            owner: root
+            group: root
+            mode: '0644'
+          when: not use_deb822
+
+        - name: Configure Deb822 APT repository
+          ansible.builtin.copy:
+            dest: "{{ deb_repo_file }}.sources"
+            content: |
+              Types: deb
+              URIs: {{ deb_repo_url }}
+              Suites: {{ deb_repo_suite }}
+              Components: {{ deb_repo_components }}
+              Signed-By: {{ deb_key_file }}
+            owner: root
+            group: root
+            mode: '0644'
+          when: use_deb822
+
+        - name: Remove obsolete APT repository format
+          ansible.builtin.file:
+            path: >-
+              {{ deb_repo_file }}.{{ 'list' if use_deb822 else 'sources' }}
+            state: absent
+
+        - name: Update APT cache
+          ansible.builtin.apt:
+            update_cache: true
+
+    # --------------------------------------------------
+    # Fedora / RHEL
+    # --------------------------------------------------
+    - name: Configure Red Hat-family repository
+      when: is_rpm
+      block:
+        - name: Create RPM signing key directory
+          ansible.builtin.file:
+            path: "{{ rpm_key_dir }}"
+            state: directory
+            owner: root
+            group: root
+            mode: '0755'
+
+        - name: Download and verify RPM signing key
+          ansible.builtin.get_url:
+            url: "{{ key_url }}"
+            dest: "{{ rpm_key_file }}"
+            checksum: "sha256:{{ key_sha256 }}"
+            validate_certs: true
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: Import RPM signing key
+          ansible.builtin.rpm_key:
+            key: "{{ rpm_key_file }}"
+            state: present
+
+        - name: Configure DNF/YUM repository
+          ansible.builtin.copy:
+            dest: "{{ rpm_repo_file }}"
+            content: |
+              [{{ repo_name }}]
+              name={{ repo_description }}
+              baseurl={{ rpm_repo_url }}
+              enabled=1
+              gpgcheck=1
+              gpgkey=file://{{ rpm_key_file }}
+              repo_gpgcheck=0
+              sslverify=1
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: Update DNF/YUM metadata cache
+          ansible.builtin.command:
+            argv:
+              - "{{ 'dnf' if ansible_facts['pkg_mgr'] in ['dnf', 'dnf5'] else 'yum' }}"
+              - makecache
+          changed_when: false
+
+    # --------------------------------------------------
+    # Install XMRF
+    # --------------------------------------------------
+    - name: Install XMRF
+      ansible.builtin.package:
+        name: xmrf
+        state: latest
