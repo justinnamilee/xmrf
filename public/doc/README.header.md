@@ -12,6 +12,8 @@ _Your friendly neighborhood file-sorting tool—now with more brimstone._
 
 # INSTALLATION
 
+### GitHub.io Repositories
+
 See the [repository page](https://justinnamilee.github.io/xmrf/) for details, or just run one of these...
 
 - Debian / Ubuntu Based:
@@ -29,9 +31,9 @@ or [via Repository](https://github.com/justinnamilee/xmrf/tree/main/public/deplo
 
 ### Packaged Release
 
-Grab the latest `.exe`, `.deb`, or `.rpm` release from [XMRF GitHub](https://github.com/justinnamilee/xmrf/releases/latest).
+Grab the latest `.exe`, `.deb`, or `.rpm` release from [XMRF GitHub Releases](https://github.com/justinnamilee/xmrf/releases/latest).
 The Windows `.exe` is ready to go out of the box, just put it in the `%PATH%`.
-**Note the packaged versions are unsigned.**
+**Note, the packaged versions are unsigned.**
 
 ### Manual Installation
 
@@ -41,7 +43,7 @@ The Windows `.exe` is ready to go out of the box, just put it in the `%PATH%`.
     $ sudo install -Dm644 lib/xmrf/app.pm /usr/local/lib/xmrf/app.pm
     $ xmrf --version
 
-# TESTING
+## TESTING
 
 After cloning the repository, testing is fairly simple.  Both **[Test2::V1](https://metacpan.org/pod/Test2%3A%3AV1)**
 and **[Capture::Tiny](https://metacpan.org/pod/Capture%3A%3ATiny)** are required:
