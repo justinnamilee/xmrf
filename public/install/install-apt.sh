@@ -2,7 +2,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="https://justinnamilee.github.io/xmrf"
+REPO_URL="https://xmrf.taiz.me"
 KEY_ID="77EB2650F7CFEC5B6585A2FD33465E81997C2758"
 KEYRING="/etc/apt/keyrings/xmrf.gpg"
 SOURCE="/etc/apt/sources.list.d/xmrf.sources"

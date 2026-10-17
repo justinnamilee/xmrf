@@ -245,7 +245,7 @@ jobs:
             apt-get update
             apt-get install -y ca-certificates curl
 
-            curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | bash
+            curl -fsSL https://xmrf.taiz.me/install-apt.sh | bash
 
             xmrf -h
           '
@@ -256,7 +256,7 @@ jobs:
           fedora:43 sh -ec '
             dnf install -y curl ca-certificates
 
-            curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | bash
+            curl -fsSL https://xmrf.taiz.me/install-dnf.sh | bash
 
             rpm -V xmrf
             xmrf -h

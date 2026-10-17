@@ -14,15 +14,15 @@ _Your friendly neighborhood file-sorting tool—now with more brimstone._
 
 ### GitHub.io Repositories
 
-See the [repository page](https://justinnamilee.github.io/xmrf/) for details, or just run one of these...
+See the [repository page](https://xmrf.taiz.me/) for details, or just run one of these...
 
 - Debian / Ubuntu Based:
 
-      curl -fsSL https://justinnamilee.github.io/xmrf/install-apt.sh | sudo bash
+      curl -fsSL https://xmrf.taiz.me/install-apt.sh | sudo bash
 
 - Fedora / RHEL Based:
 
-      curl -fsSL https://justinnamilee.github.io/xmrf/install-dnf.sh | sudo bash
+      curl -fsSL https://xmrf.taiz.me/install-dnf.sh | sudo bash
 
 ### Ansible
 

@@ -11,15 +11,15 @@
 
     # Key Information
     key_sha256: "a7a198be8ad76cb739e3e7b02626db473fbe1e9fa85dce1aca9d18ce04aa9623"
-    key_url: https://justinnamilee.github.io/xmrf/xmrf-signing.asc
+    key_url: https://xmrf.taiz.me/xmrf-signing.asc
 
     # Debian / Ubuntu repository
-    deb_repo_url: https://justinnamilee.github.io/xmrf/deb/
+    deb_repo_url: https://xmrf.taiz.me/deb/
     deb_repo_suite: stable
     deb_repo_components: main
 
     # Fedora / RHEL repository
-    rpm_repo_url:  https://justinnamilee.github.io/xmrf/rpm/
+    rpm_repo_url:  https://xmrf.taiz.me/rpm/
 
     # Derived paths
     deb_key_dir: /etc/apt/keyrings
