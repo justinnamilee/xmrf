@@ -32,6 +32,7 @@ jobs:
           gnupg \
           dpkg-dev \
           createrepo-c \
+          tree \
           rpm
 
     - name: Download recent packages...
@@ -218,6 +219,10 @@ jobs:
         cp public/install/install-*.sh site/
         cp public/pages/index.html site/index.html
         touch site/.nojekyll
+
+    - name: List assests ...
+      run: |
+        tree -A site/
 
     - name: Configure GitHub Pages...
       uses: actions/configure-pages@v5
