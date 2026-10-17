@@ -24,7 +24,7 @@ See the [repository page](https://justinnamilee.github.io/xmrf/) for details, or
 
 ### Ansible
 
-There's Ansible playbooks for installed [via Releases](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/package),
+There's Ansible playbooks for installing [via Releases](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/package),
 or [via Repository](https://github.com/justinnamilee/xmrf/tree/main/public/deploy/ansible/respository).
 
 ### Packaged Release
