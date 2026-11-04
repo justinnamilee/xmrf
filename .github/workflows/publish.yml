@@ -33,6 +33,7 @@ jobs:
           dpkg-dev \
           createrepo-c \
           tree \
+          apt-utils \
           rpm
 
     - name: Download recent packages...
@@ -92,7 +93,8 @@ jobs:
         # Temporary passphrase file for noninteractive signing
         PASSFILE="$(mktemp)"
         chmod 600 "$PASSFILE"
-        trap 'rm -f "$PASSFILE"' EXIT
+        RPMDB="$(mktemp -d)"
+        trap 'rm -rf "$PASSFILE" "$RPMDB"' EXIT
         printf '%s' "$GPG_PASSPHRASE" > "$PASSFILE"
 
         # Sign every RPM
@@ -104,9 +106,10 @@ jobs:
         done
 
         # Verify signatures
-        rpm --import site/xmrf-signing.asc
-        rpmkeys --checksig site/rpm/*.rpm
-        rpm -qpi --qf '%{SIGPGP:pgpsig}\n' site/rpm/*.rpm
+        rpm --dbpath "$RPMDB" --initdb
+        rpm --dbpath "$RPMDB" --import site/xmrf-signing.asc
+        rpmkeys --dbpath "$RPMDB" --checksig site/rpm/*.rpm
+        rpm --dbpath "$RPMDB" -qpi --qf '%{SIGPGP:pgpsig}\n' site/rpm/*.rpm
 
     - name: Generate repository metadata...
       shell: bash
