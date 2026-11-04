@@ -17,7 +17,7 @@ renaming, moving, and organizing files using regular expressions and flexible fo
 rules. Written in Perl with no external runtime dependencies, XMRF supports recursive
 processing, custom transformations, and a safe preview mode.
 
-    $ xmrf [regex] [sprintf]
+    $ xmrf [options] regex sprintf
 
 # INSTALLATION
 
