@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-package xmrf::app v1.3.2;
+package xmrf::app v1.3.3;
 
 
 use strict;
@@ -196,10 +196,10 @@ sub configure(\%\%)
     if length($config->{sort});
 
   return help(0, 1, q[Error], q[Invalid sort mode provided], $config->{sort})
-    if (length($config->{sort}) && !($config->{sort} eq q[input] || $config->{sort} eq q[output]));
+    if (length($config->{sort}) && $config->{sort} !~ qr[^(?:i|in|input|o|out|output)$]);
 
   $config->{sort} = defined($config->{sort})
-    ? length($config->{sort}) && $config->{sort} eq q[output]
+    ? length($config->{sort}) && $config->{sort} =~ qr[^(?:o|out|output)]
       ? 2 # output sort mode
       : 1 # input sort mode
     : 0;  # no sort mode (however FS returns data)

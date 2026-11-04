@@ -10,6 +10,15 @@ _Your friendly neighborhood file-sorting tool—now with more brimstone._
 
 ---
 
+# ABOUT
+
+XMRF (Regex-map Rename File) is a powerful, lightweight, command-line utility for batch
+renaming, moving, and organizing files using regular expressions and flexible formatting
+rules. Written in Perl with no external runtime dependencies, XMRF supports recursive
+processing, custom transformations, and a safe preview mode.
+
+    $ xmrf [regex] [sprintf]
+
 # INSTALLATION
 
 ### GitHub.io Repositories
@@ -54,12 +63,13 @@ Then it's as simple as running prove on the directory:
 
     $ prove -lv
 
----
-# NAME
+# MANPAGE
+
+## NAME
 
 XMRF - Regex-map Rename File, advanced command-line file management utiltity.
 
-# SYNOPSIS
+## SYNOPSIS
 
     $ xmrf [options] regex sprintf
 
@@ -79,7 +89,7 @@ XMRF - Regex-map Rename File, advanced command-line file management utiltity.
     --verbose   | -v          Show actions as they happen when execute on.
     --version                 Show the version number of xmrf.
 
-# DESCRIPTION
+## DESCRIPTION
 
 **XMRF** will rename (or copy) files based on an input dir, an output dir, a
 regex, and an sprintf format.  It tries to use some sane defaults for things
@@ -89,7 +99,7 @@ in the current working directory.
 This tool uses only core modules, nothing extra required from
 [CPAN](https://www.cpan.org/).
 
-# OPTIONS
+## OPTIONS
 
 All boolean option flags (flags that take no value) default to their
 **--no-_flag_** variant.
@@ -258,19 +268,24 @@ All boolean option flags (flags that take no value) default to their
     explicitly set to `input`, is by the input paths.  If the optional `[str]` is
     set to `output` then the final resulting file paths will be sorted instead.
 
+    Note that `i` or `in` are valid short forms for `input`, and `o` or `out`
+    are valid for `output`.
+
     If in **--no-sort** mode, then however the underlying file system returns data
     to the [readdir call](https://perldoc.perl.org/functions/readdir) is how the
-    files will be actioned.  In summary:
+    files will be actioned.
+
+    **In summary**:
 
     - `--no-sort`
 
         Default, action the files however they are returned by file system.
 
-    - `--sort`, `--sort ''`, `--sort 'input'`
+    - `--sort`, `--sort ''`, `--sort 'input'`, `-si`, `-sin`
 
         Sort by input from `readdir`, then process and action.
 
-    - `--sort 'output'`
+    - `--sort 'output'`, `-so`, `-sout`
 
         Sort by final output paths after work is complete, then action.
 
@@ -292,9 +307,9 @@ All boolean option flags (flags that take no value) default to their
     Show the current version number of XMRF, note that any addition of the
     **--help** option flag will override this.
 
-# EXAMPLES
+## EXAMPLES
 
-## BASIC
+### BASIC
 
 - Fix a Long-Standing Typo
 
@@ -319,7 +334,7 @@ All boolean option flags (flags that take no value) default to their
     Nothing worse than a CRC32 in lowercase.  This one uses a small map-subroutine
     on the second capture group.
 
-## ADVANCED
+### ADVANCED
 
 - A Brain Teaser
 
@@ -329,7 +344,7 @@ All boolean option flags (flags that take no value) default to their
 
     This one inspired [fairu-chan](https://github.com/justinnamilee/fairu-chan).
 
-# ENVIRONMENT
+## ENVIRONMENT
 
 **XMRF** also accepts some options by environment variable.  When loading,
 options passed by command-line flag will override anything passed by
@@ -368,11 +383,11 @@ environment (except for `XMRF_DEV` and `XMRF_LIB`).
 
         Skips library scanner and only checks the directory given by this variable.
 
-# AUTHOR
+## AUTHOR
 
 Written by Justin "Nami" Lee.
 
-# CONTRIBUTE
+## CONTRIBUTE
 
 If you've found a bug, have an idea for an improvement, or want to suggest a
 new feature, please open an issue with enough detail to help reproduce or
@@ -382,7 +397,7 @@ or example output where applicable).
 If you'd like to contribute a fix or enhancement yourself, feel free to open a
 pull request.
 
-# HISTORY
+## HISTORY
 
 This tool originated as part of another project, **fairu-chan**, but deserved
 its own identity.  It was previously called **rename**, which is apt but hard
@@ -406,13 +421,13 @@ to use due to popularity.
 
     A [new repository](https://github.com/justinnamilee/xmrf) dedicated to the tool is started.
 
-# COPYRIGHT
+## COPYRIGHT
 
 Copyright © 2026 Justin "Nami" Lee.  License [GPLv3+](https://gnu.org/licenses/gpl.html):
 GNU GPL version 3 or later.  This is free software: you are free to change and
 redistribute it.  There is **NO WARRANTY**, to the extent permitted by law.
 
-# SEE ALSO
+## SEE ALSO
 
 - [perlre](https://perldoc.perl.org/perlre)
 - [sprintf](https://perldoc.perl.org/functions/sprintf)

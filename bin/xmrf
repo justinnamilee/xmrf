@@ -246,9 +246,14 @@ ignored).  The default, if the optional C<[str]> is not provided, empty, or
 explicitly set to C<input>, is by the input paths.  If the optional C<[str]> is
 set to C<output> then the final resulting file paths will be sorted instead.
 
+Note that C<i> or C<in> are valid short forms for C<input>, and C<o> or C<out>
+are valid for C<output>.
+
 If in B<--no-sort> mode, then however the underlying file system returns data
 to the L<readdir call|https://perldoc.perl.org/functions/readdir> is how the
-files will be actioned.  In summary:
+files will be actioned.
+
+B<In summary>:
 
 =over 2
 
@@ -256,11 +261,11 @@ files will be actioned.  In summary:
 
 Default, action the files however they are returned by file system.
 
-=item C<--sort>, C<--sort ''>, C<--sort 'input'>
+=item C<--sort>, C<--sort ''>, C<--sort 'input'>, C<-si>, C<-sin>
 
 Sort by input from C<readdir>, then process and action.
 
-=item C<--sort 'output'>
+=item C<--sort 'output'>, C<-so>, C<-sout>
 
 Sort by final output paths after work is complete, then action.
 

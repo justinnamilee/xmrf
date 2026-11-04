@@ -10,6 +10,15 @@ _Your friendly neighborhood file-sorting tool—now with more brimstone._
 
 ---
 
+# ABOUT
+
+XMRF (Regex-map Rename File) is a powerful, lightweight, command-line utility for batch
+renaming, moving, and organizing files using regular expressions and flexible formatting
+rules. Written in Perl with no external runtime dependencies, XMRF supports recursive
+processing, custom transformations, and a safe preview mode.
+
+    $ xmrf [regex] [sprintf]
+
 # INSTALLATION
 
 ### GitHub.io Repositories
@@ -54,4 +63,5 @@ Then it's as simple as running prove on the directory:
 
     $ prove -lv
 
----
+# MANPAGE
+
