@@ -40,8 +40,6 @@ inc/
 # cpanfile.snapshot should generally be ignored for library code, otherwise included
 # cpanfile.snapshot
 
-# Local
-testing/
 # Release staging
 /.packaging/
 /dist/
@@ -49,3 +47,6 @@ testing/
 
 # Local Alpine private signing key
 /xmrf-alpine.rsa
+
+# Local
+testing/

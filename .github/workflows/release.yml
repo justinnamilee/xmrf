@@ -22,10 +22,10 @@ concurrency:
 
 jobs:
   test-source:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-    - name: Checkout
+    - name: Checkout...
       uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       with:
         persist-credentials: false
@@ -34,11 +34,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y cpanminus
         sudo cpanm --notest --quiet Test2::V1 Capture::Tiny
-    - name: Test source
+    - name: Test source...
       run: prove -lv t
 
   build-exe:
-    runs-on: windows-2025
+    runs-on: windows-latest
     timeout-minutes: 30
     defaults:
       run:
@@ -53,7 +53,6 @@ jobs:
         persist-credentials: false
 
     - name: Ensure Perl...
-      shell: pwsh
       run: |
         choco install strawberryperl -y --no-progress
         if ($LASTEXITCODE -ne 0) { throw "Strawberry Perl installation failed" }
@@ -72,15 +71,12 @@ jobs:
         if ($LASTEXITCODE -ne 0) { throw "Source tests failed" }
 
     - name: Build...
-      shell: pwsh
       run: |
         New-Item -ItemType Directory -Force dist
-
         perl .github/scripts/build-exe.pl
         if ($LASTEXITCODE -ne 0) { throw "EXE staging failed" }
         pp -I dist/lib -M Pod::Text -a 'dist/xmrf.pod;xmrf.pod' -o dist/xmrf.exe dist/bin/xmrf
         if ($LASTEXITCODE -ne 0) { throw "PAR packing failed" }
-
         Get-Item .\dist\xmrf.exe | Format-List Name, Length, FullName
         Get-Command .\dist\xmrf.exe
 
