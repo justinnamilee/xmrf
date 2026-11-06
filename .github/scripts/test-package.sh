@@ -1,9 +1,9 @@
 #!/bin/sh
-# Runs inside the target distribution. No bash, Node, or source-tree Perl
-# libraries are required; installation must resolve the runtime dependencies.
+
 set -eu
-format=${1:?Package format required}
 cd /tmp
+
+format=${1:?Package format required}
 
 case "$format" in
   deb)
@@ -12,9 +12,11 @@ case "$format" in
       [ -f "$config" ] || continue
       sed -i '\|^[[:space:]]*path-exclude=/usr/share/man/\*[[:space:]]*$|d' "$config"
     done
+
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y /packages/*.deb
+
     dpkg --verify xmrf
     test "$(dpkg-query -W -f='${Architecture}' xmrf)" = all
     ;;
@@ -24,19 +26,15 @@ case "$format" in
     test "$(rpm -q --qf '%{ARCH}' xmrf)" = noarch
     ;;
   apk)
-    # Release APKs are unsigned until a separate Alpine signing setup exists.
     apk add --no-cache --allow-untrusted /packages/*.apk
     apk info -e xmrf
     ;;
   archlinux)
-    # Avoid partial upgrades on the rolling Arch image. Install the dependency
-    # explicitly: pacman -U alone cannot refresh the repository databases.
     pacman -Syu --noconfirm perl
     pacman -U --noconfirm /packages/*.pkg.tar.zst
     pacman -Qkk xmrf
+
     test "$(pacman -Qi xmrf | sed -n 's/^Architecture[[:space:]]*:[[:space:]]*//p')" = any
-    # Check the installed version against the filename, including prereleases.
-    # This catches nFPM dropping the prerelease from Arch's .PKGINFO.
     set -- /packages/*.pkg.tar.zst
     expected=${1##*/}
     expected=${expected#xmrf-}
@@ -58,14 +56,16 @@ test -s /usr/share/licenses/xmrf/LICENSE
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 cd "$work"
+
 xmrf --help > help.txt
 grep -q 'Usage:' help.txt
-# The current CLI routes --version through help(exit => 1).
-# Check that existing interface without changing application behavior here.
+
+# xmrf sends --version through help(exit => 1)
 version_rc=0
 xmrf --version > version.txt 2>&1 || version_rc=$?
 test "$version_rc" -eq 1
 grep -q '^Version: v[0-9]' version.txt
+
 mkdir input
 printf 'package smoke test\n' > input/example-001.txt
 # Planning must leave the input untouched.
@@ -82,5 +82,6 @@ case "$format" in
   apk) apk del xmrf ;;
   archlinux) pacman -R --noconfirm xmrf ;;
 esac
+
 test ! -e /usr/bin/xmrf
 test ! -e /usr/share/xmrf/lib/xmrf/app.pm

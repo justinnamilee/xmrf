@@ -23,8 +23,8 @@ sub write_file {
 make_path('dist/lib/xmrf', 'dist/bin');
 
 my $entry = read_file('bin/xmrf');
-
 write_file('dist/bin/xmrf', $entry);
+
 $entry =~ /^__END__\r?\n(.*)\z/ms or die "No POD in bin/xmrf";
 write_file('dist/xmrf.pod', $1);
 
