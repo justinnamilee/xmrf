@@ -165,14 +165,13 @@
 <body>
   <header>
     <h1><span class="prompt">$</span> xmrf<span class="prompt">_</span></h1>
-    <p class="subtitle">Regex-map Rename File · Official APT and RPM package repositories.</p>
+    <p class="subtitle">Regex-map Rename File · Signed APT, RPM, Alpine and Arch repositories.</p>
     <div class="intro">
       <p>
         <strong>XMRF (Regex-map Rename File)</strong> is a powerful,
         lightweight command-line utility for batch renaming, moving,
         and organizing files using regular expressions and flexible
-        formatting rules. Written in Perl with no external runtime
-        dependencies, XMRF supports recursive processing, custom
+        formatting rules. Written in Perl using only core modules, XMRF supports recursive processing, custom
         transformations, and a safe preview mode.
       </p>
 
@@ -201,38 +200,29 @@
       </div>
 
       <div class="repo">
-        <strong>Debian / Ubuntu based</strong>
-
+        <strong>One installer · APT / DNF / APK / Pacman</strong>
+        <p>Detects your distribution, verifies signing keys, and configures updates.</p>
         <div class="normal">
-          <code>curl -fsSL https://xmrf.taiz.me/install-apt.sh | sudo bash</code>
+          <code>curl -fsSL https://xmrf.taiz.me/install.sh | sudo sh</code>
+          <p>On Alpine, run as root using the built-in wget:</p>
+          <code>wget -qO- https://xmrf.taiz.me/install.sh | sh</code>
         </div>
-
         <div class="paranoid">
-          <code>curl -fsSLO https://xmrf.taiz.me/install-apt.sh</code>
-          <code>less install-apt.sh</code>
-          <code>sudo bash install-apt.sh</code>
+          <code>curl -fsSLO https://xmrf.taiz.me/install.sh</code>
+          <code>less install.sh</code>
+          <code>sudo sh install.sh</code>
+          <p>On Alpine, download with wget, review the file, then run sh install.sh as root.</p>
         </div>
+        <p>Arch installation performs a full system upgrade with pacman -Syu.</p>
       </div>
-
-      <div class="repo">
-        <strong>Fedora / RHEL based</strong>
-
-        <div class="normal">
-          <code>curl -fsSL https://xmrf.taiz.me/install-dnf.sh | sudo bash</code>
-        </div>
-
-        <div class="paranoid">
-          <code>curl -fsSLO https://xmrf.taiz.me/install-dnf.sh</code>
-          <code>less install-dnf.sh</code>
-          <code>sudo bash install-dnf.sh</code>
-        </div>
-      </div>
-
       <p>
         <small>
-          <strong>Please</strong> review scripts before running them:
+          Review <a href="install.sh">install.sh</a> before running it.
+          Existing aliases remain available:
           <a href="install-apt.sh">APT</a> ·
-          <a href="install-dnf.sh">DNF</a>
+          <a href="install-dnf.sh">DNF</a> ·
+          <a href="install-apk.sh">APK</a> ·
+          <a href="install-pacman.sh">Pacman</a>.
         </small>
       </p>
     </section>
@@ -242,15 +232,29 @@
       <h2>Available repositories</h2>
       <div class="repo">
         <strong>01 / Debian &amp; Ubuntu based</strong>
-        <p>APT repository · architecture independent</p>
+        <p>APT repository · architecture independent · signed Release metadata</p>
         <a href="deb/dists/stable/InRelease">InRelease ↗</a>
         &nbsp;·&nbsp;
         <a href="deb/dists/stable/main/binary-all/Packages.gz">Packages.gz ↗</a>
       </div>
       <div class="repo">
         <strong>02 / Fedora &amp; RHEL based</strong>
-        <p>DNF repository · noarch packages</p>
+        <p>DNF repository · noarch · signed packages and metadata</p>
         <a href="rpm/repodata/repomd.xml">Repository metadata ↗</a>
+        &nbsp;·&nbsp;
+        <a href="rpm/repodata/repomd.xml.asc">Signature ↗</a>
+      </div>
+      <div class="repo">
+        <strong>03 / Alpine Linux</strong>
+        <p>APK repository · noarch · signed index authenticates package hashes</p>
+        <a href="apk/noarch/APKINDEX.tar.gz">APKINDEX.tar.gz ↗</a>
+      </div>
+      <div class="repo">
+        <strong>04 / Arch Linux</strong>
+        <p>Pacman repository · any · signed packages and databases</p>
+        <a href="arch/any/xmrf.db">Repository database ↗</a>
+        &nbsp;·&nbsp;
+        <a href="arch/any/xmrf.db.sig">Signature ↗</a>
       </div>
     </section>
 
@@ -260,15 +264,31 @@
       <code>https://xmrf.taiz.me/deb/</code>
       <p>DNF</p>
       <code>https://xmrf.taiz.me/rpm/</code>
+      <p>APK · the client selects its native architecture automatically</p>
+      <code>https://xmrf.taiz.me/apk/</code>
+      <p>Pacman · architecture independent</p>
+      <code>https://xmrf.taiz.me/arch/any/</code>
     </section>
 
     <section>
-      <h2>Security</h2>
-      <p>Repository metadata and RPM packages are signed with the
-        XMRF package signing key.
-        <a href="xmrf-signing.asc">Download public signing key ↗</a>
+      <h2>Signing keys</h2>
+      <p>
+        APT, RPM and Arch use the XMRF OpenPGP signing key.
+        The installer checks its full fingerprint before trusting it.
+        <a href="xmrf-signing.asc">Download OpenPGP key ↗</a>
       </p>
-      <code>sha256sum: a7a198be8ad76cb739e3e7b02626db473fbe1e9fa85dce1aca9d18ce04aa9623</code>
+      <code>77EB2650F7CFEC5B6585A2FD33465E81997C2758</code>
+      <p>
+        Alpine uses a separate RSA key for its signed package index.
+        The OpenPGP key above authenticates this RSA public key.
+        <a href="xmrf-alpine.rsa.pub">Download Alpine key ↗</a>
+        &nbsp;·&nbsp;
+        <a href="xmrf-alpine.rsa.pub.asc">OpenPGP signature ↗</a>
+      </p>
+      <p>
+        Repositories contain stable releases. For preview versions or the
+        portable Windows EXE, visit <a href="https://github.com/justinnamilee/xmrf/releases">GitHub Releases ↗</a>.
+      </p>
     </section>
 
     <section>

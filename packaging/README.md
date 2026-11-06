@@ -65,15 +65,17 @@ checkout credentials. Only the draft-release job has `contents: write`.
 Drafts include `SHA256SUMS` for every package and the EXE; checksums detect
 corruption but are not signatures or provenance attestations.
 
-APK and Arch assets are downloadable packages, not signed package repositories.
-The isolated Alpine test uses `--allow-untrusted` for the local unsigned APK;
-do not treat that as an installation policy for a public repository. Existing
-APT/RPM repository publishing and signing remain in `publish.yml`. This change
-does not provision Alpine or Arch repository keys or indexes.
+The publishing workflow now builds signed APT, RPM, APK and Arch repositories.
+The release builder still tests unsigned local APK assets with
+`--allow-untrusted`; that flag is limited to the release-builder package test.
+Public repository installation always verifies signatures. See
+[REPOSITORIES.md](REPOSITORIES.md) for signing keys, required secrets, repository
+layout, installers and the publishing test gates.
 
 Action SHA pins do not freeze dependencies fetched by actions or installers.
-Container tags, distro mirrors, Chocolatey/Strawberry Perl, and CPAN module
-downloads still follow their upstreams. Pages artifacts are archived directly
+The release-builder container tags, distro mirrors, Chocolatey/Strawberry Perl,
+and CPAN module downloads still follow their upstreams. The repository publisher
+uses immutable container digests, with signed system updates inside them. Pages artifacts are archived directly
 and uploaded with the pinned artifact action, avoiding a nested action reference.
 For stronger reproducibility, separately lock container digests and the Windows
 toolchain/CPAN distributions, and review updates before merging them.

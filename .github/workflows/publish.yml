@@ -4,277 +4,171 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/publish.yml'
+      - '.github/scripts/**'
+      - 'public/install/**'
+      - 'public/pages/**'
+      - 'packaging/REPOSITORIES.md'
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: github-pages
+  group: github-pages-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
   cancel-in-progress: false
 
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+# Verified multi-platform manifest digests; package managers still receive
+# signed updates from their official repositories inside these images.
+env:
+  ALPINE_IMAGE: alpine:3.24@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a
+  ARCH_IMAGE: archlinux:base@sha256:ece6c971fec3c532fd508bce299a446deaf469feecbfe7c353e995bc1a5e7bba
+  DEBIAN_IMAGE: debian:13@sha256:9c6e381421d0f48d1b8133e573f33c185ee16cbf505eda9c4a8a4791b25ea8a6
+  FEDORA_IMAGE: fedora:44@sha256:15da97ed9aa94dd3d92c3925eb89520f6c80e07ea7ee24cba848d1f8b6912b3e
 
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
-    - name: Checkout...
+    - name: Checkout
       uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       with:
         persist-credentials: false
+    - name: Check download selection and shell scripts
+      run: |
+        python3 -m unittest discover -s .github/scripts/tests -v
+        bash -n .github/scripts/build-repositories.sh .github/scripts/run-repository-test.sh
+        sh -n public/install/install.sh
+        sh -n .github/scripts/test-repository.sh
+        shellcheck public/install/install.sh .github/scripts/build-repositories.sh \
+          .github/scripts/run-repository-test.sh .github/scripts/test-repository.sh
 
-    - name: Install dependencies...
+  build:
+    needs: checks
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && !github.event.release.prerelease)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    # Preserve access to signing secrets if they live in the existing environment.
+    environment: github-pages
+    outputs:
+      deployment_id: ${{ steps.assets.outputs.deployment_id }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      with:
+        persist-credentials: false
+    - name: Install repository tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          gnupg \
-          dpkg-dev \
-          createrepo-c \
-          tree \
-          apt-utils \
-          rpm
-
-    - name: Download recent packages...
+        sudo apt-get install -y gnupg openssl dpkg-dev apt-utils rpm createrepo-c
+    - name: Download recent stable packages
       env:
         GH_TOKEN: ${{ github.token }}
         REPO_SIZE: ${{ vars.REPO_SIZE }}
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        mkdir -p site/deb/pool/main site/rpm
-
-        gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
-          --paginate \
-          --jq '.[] | select(.draft == false and .prerelease == false) | .tag_name' |
-          head -n "$REPO_SIZE" |
-          while read -r tag; do
-            echo "Downloading packages from $tag"
-
-            gh release download "$tag" \
-              --pattern '*.deb' \
-              --dir site/deb/pool/main
-
-            gh release download "$tag" \
-              --pattern '*.rpm' \
-              --dir site/rpm
-          done
-
-    - name: Import signing key...
+      run: python3 .github/scripts/repository_assets.py site
+    - name: Sign packages and repository indexes
       env:
         GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        export GNUPGHOME="$(mktemp -d)"
-        chmod 700 "$GNUPGHOME"
-
-        echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
-
-        printf '%s\n' "$GPG_PRIVATE_KEY" |
-          gpg --batch --import
-
-        gpg --armor \
-          --export "$GPG_KEY_ID" \
-          > site/xmrf-signing.asc
-
-    - name: Sign RPM packages...
-      env:
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
-      shell: bash
+        APK_PRIVATE_KEY: ${{ secrets.APK_PRIVATE_KEY }}
+      run: bash .github/scripts/build-repositories.sh site
+    - name: Install public assets
+      id: assets
       run: |
-        set -euo pipefail
-
-        # Temporary passphrase file for noninteractive signing
-        PASSFILE="$(mktemp)"
-        chmod 600 "$PASSFILE"
-        RPMDB="$(mktemp -d)"
-        trap 'rm -rf "$PASSFILE" "$RPMDB"' EXIT
-        printf '%s' "$GPG_PASSPHRASE" > "$PASSFILE"
-
-        # Sign every RPM
-        for pkg in site/rpm/*.rpm; do
-          rpmsign --addsign \
-            --define "_gpg_name $GPG_KEY_ID" \
-            --define "_gpg_sign_cmd_extra_args --batch --pinentry-mode loopback --passphrase-file $PASSFILE" \
-            "$pkg"
+        cp public/install/install.sh site/install.sh
+        for manager in apt dnf apk pacman; do
+          cp public/install/install.sh "site/install-$manager.sh"
         done
-
-        # Verify signatures
-        rpm --dbpath "$RPMDB" --initdb
-        rpm --dbpath "$RPMDB" --import site/xmrf-signing.asc
-        rpmkeys --dbpath "$RPMDB" --checksig site/rpm/*.rpm
-        rpm --dbpath "$RPMDB" -qpi --qf '%{SIGPGP:pgpsig}\n' site/rpm/*.rpm
-
-    - name: Generate repository metadata...
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        # APT repository
-        DEB_ROOT="site/deb"
-        DIST="dists/stable"
-        MASTER="main/binary-all"
-
-        mkdir -p "$DEB_ROOT/$DIST/$MASTER"
-        pushd "$DEB_ROOT"
-
-        # Generate one master package index
-        dpkg-scanpackages --multiversion pool/main /dev/null \
-          > "$DIST/$MASTER/Packages"
-
-        gzip -9 -k -f "$DIST/$MASTER/Packages"
-
-        popd
-
-        # RPM repository
-        createrepo_c site/rpm
-
-    - name: Sign APT repository...
-      env:
-        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        # Archy
-        ARCHES="amd64 arm64 armhf i386 ppc64el riscv64 s390x"
-
-        pushd site/deb/dists/stable
-
-        apt-ftparchive \
-          -o APT::FTPArchive::Release::Origin=XMRF \
-          -o APT::FTPArchive::Release::Label=XMRF \
-          -o APT::FTPArchive::Release::Suite=stable \
-          -o APT::FTPArchive::Release::Codename=stable \
-          -o APT::FTPArchive::Release::Architectures="all $ARCHES" \
-          -o APT::FTPArchive::Release::Components=main \
-          release . > Release
-
-        printf '%s\n' "$GPG_PASSPHRASE" |
-          gpg --batch --yes --pinentry-mode loopback \
-            --passphrase-fd 0 \
-            --clearsign -o InRelease Release
-
-        printf '%s\n' "$GPG_PASSPHRASE" |
-          gpg --batch --yes --pinentry-mode loopback \
-            --passphrase-fd 0 \
-            --armor --detach-sign -o Release.gpg Release
-
-        # Verify signatures
-        gpg --batch --verify InRelease
-        gpg --batch --verify Release.gpg Release
-
-        popd
-
-        echo "APT repository signatures verified successfully."
-
-    - name: Smoke test...
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        # Test APT on Debian 13
-        docker run --rm \
-          -v "$PWD/site:/repo:ro" \
-          debian:13 sh -ec '
-            cp /repo/xmrf-signing.asc /usr/share/keyrings/xmrf.asc
-
-            echo "deb [signed-by=/usr/share/keyrings/xmrf.asc] file:/repo/deb stable main" \
-              > /etc/apt/sources.list.d/xmrf.list
-
-            apt-get update
-            apt-get install -y xmrf
-            xmrf -h
-          '
-
-        # Test DNF on Fedora 43
-        docker run --rm \
-          -v "$PWD/site:/repo:ro" \
-          fedora:43 sh -ec '
-            cat > /etc/yum.repos.d/xmrf.repo <<EOF
-        [xmrf]
-        name=XMRF
-        baseurl=file:///repo/rpm
-        enabled=1
-        gpgcheck=1
-        gpgkey=file:///repo/xmrf-signing.asc
-        EOF
-
-            dnf install -y xmrf
-            rpm -V xmrf
-            xmrf -h
-          '
-
-    - name: Install public assets...
-      run: |
-        cp public/install/install-*.sh site/
         cp public/pages/index.html site/index.html
         touch site/.nojekyll
-
-    - name: List assests ...
+        deployment_id="$GITHUB_RUN_ID.$GITHUB_RUN_ATTEMPT"
+        printf '%s\n' "$deployment_id" > site/build-id.txt
+        printf 'deployment_id=%s\n' "$deployment_id" >> "$GITHUB_OUTPUT"
+    - name: Archive signed site
       run: |
-        tree -n --charset=ascii site/
-
-    - name: Configure GitHub Pages...
-      uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-
-    # Archive directly so a composite action cannot introduce an unpinned
-    # nested upload action. Pages expects a single artifact.tar inside the ZIP.
-    - name: Archive Pages artifact
-      run: |
-        tar --dereference --hard-dereference \
-          --directory site \
-          --exclude=.git --exclude=.github \
-          -cf "$RUNNER_TEMP/artifact.tar" .
-
+        # Avoid composite actions with nested action references. Pages expects
+        # one artifact.tar; dereference repo links and preserve .nojekyll.
+        tar --dereference --hard-dereference --directory site \
+          --exclude=.git --exclude=.github -cf "$RUNNER_TEMP/artifact.tar" .
     - name: Upload Pages artifact
       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: github-pages
         path: ${{ runner.temp }}/artifact.tar
-        retention-days: 1
+        retention-days: 3
         if-no-files-found: error
 
-    - name: Deploy GitHub Pages...
+  test:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        manager: [apt, dnf, apk, pacman]
+    name: Verify signed ${{ matrix.manager }} repository
+    steps:
+    - name: Checkout tests
+      uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      with:
+        persist-credentials: false
+    - name: Download signed site
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      with:
+        name: github-pages
+        path: artifact
+    - name: Prepare authentic and tampered mirrors
+      run: |
+        mkdir site
+        tar -xf artifact/artifact.tar -C site
+        python3 .github/scripts/repository-fixtures.py site bad-site
+    - name: Verify installation and reject unauthenticated metadata
+      env:
+        PACKAGE_MANAGER: ${{ matrix.manager }}
+      run: bash .github/scripts/run-repository-test.sh "$PACKAGE_MANAGER" local
+
+  deploy:
+    needs: [build, test]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - name: Configure Pages
+      uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+    - name: Deploy verified artifact
       id: deployment
       uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
-    - name: Live test...
-      shell: bash
+  live:
+    needs: [build, deploy]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        manager: [apt, dnf, apk, pacman]
+    name: Test deployed ${{ matrix.manager }} installer
+    steps:
+    - name: Checkout tests
+      uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      with:
+        persist-credentials: false
+    - name: Wait for deployment and install from HTTPS
+      env:
+        PACKAGE_MANAGER: ${{ matrix.manager }}
+        XMRF_REPO_URL: ${{ needs.deploy.outputs.page_url }}
+        DEPLOYMENT_ID: ${{ needs.build.outputs.deployment_id }}
       run: |
-        set -euo pipefail
-
-        rm -rf site/
-        sleep 10
-
-        # Test APT on Debian 13
-        docker run --rm \
-          -v "$PWD/site:/repo:ro" \
-          debian:13 sh -ec '
-            apt-get update
-            apt-get install -y ca-certificates curl
-
-            curl -fsSL https://xmrf.taiz.me/install-apt.sh | bash
-
-            xmrf -h
-          '
-
-        # Test DNF on Fedora 43
-        docker run --rm \
-          -v "$PWD/site:/repo:ro" \
-          fedora:43 sh -ec '
-            dnf install -y curl ca-certificates
-
-            curl -fsSL https://xmrf.taiz.me/install-dnf.sh | bash
-
-            rpm -V xmrf
-            xmrf -h
-          '
+        export XMRF_REPO_URL="${XMRF_REPO_URL%/}"
+        bash .github/scripts/run-repository-test.sh "$PACKAGE_MANAGER" live
