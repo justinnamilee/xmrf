@@ -38,7 +38,7 @@ jobs:
         persist-credentials: false
     - name: Check download selection and shell scripts
       run: |
-        python3 -m unittest discover -s .github/scripts/tests -v
+        prove -v .github/scripts/tests/*.t
         bash -n .github/scripts/build-repositories.sh .github/scripts/run-repository-test.sh
         sh -n public/install/install.sh
         sh -n .github/scripts/test-repository.sh
@@ -67,7 +67,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
         REPO_SIZE: ${{ vars.REPO_SIZE }}
-      run: python3 .github/scripts/repository_assets.py site
+      run: perl .github/scripts/repository-assets.pl site
     - name: Sign packages and repository indexes
       env:
         GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
@@ -124,7 +124,7 @@ jobs:
       run: |
         mkdir site
         tar -xf artifact/artifact.tar -C site
-        python3 .github/scripts/repository-fixtures.py site bad-site
+        perl .github/scripts/repository-fixtures.pl site bad-site
     - name: Verify installation and reject unauthenticated metadata
       env:
         PACKAGE_MANAGER: ${{ matrix.manager }}

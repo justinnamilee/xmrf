@@ -47,8 +47,5 @@ testing/
 /dist/
 /packages/
 
-# Python repository tooling
-__pycache__/
-
 # Local Alpine private signing key
 /xmrf-alpine.rsa

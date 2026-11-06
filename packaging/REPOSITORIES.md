@@ -117,7 +117,7 @@ publishing; there is no insecure HTTP testing option.
 
 ## Workflow gates and validation
 
-1. **Build:** after Python/shell checks, download release assets,
+1. **Build:** after Perl/shell checks, download release assets,
    import and validate keys, sign packages/indexes, and archive one immutable
    Pages artifact. The RSA container sees only its RSA key; the Arch indexing
    container receives no private keys.
@@ -143,11 +143,13 @@ native tooling packages still receive signed upstream updates.
 Local checks, without signing keys or Docker:
 
 ```sh
-python3 -m unittest discover -s .github/scripts/tests -v
+prove -v .github/scripts/tests/*.t
 actionlint
 shellcheck public/install/install.sh .github/scripts/build-repositories.sh \
   .github/scripts/run-repository-test.sh .github/scripts/test-repository.sh
 ```
 
-The full signing/installation tests require the configured secrets and a Docker
-runner; they never use production private keys in unit tests.
+The helpers and unit tests use only core Perl modules; no CPAN installation is
+needed for repository publishing. The full signing/installation tests require
+the configured secrets and a Docker runner; they never use production private
+keys in unit tests.
