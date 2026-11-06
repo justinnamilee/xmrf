@@ -42,3 +42,7 @@ inc/
 
 # Local
 testing/
+# Release staging
+/.packaging/
+/dist/
+/packages/

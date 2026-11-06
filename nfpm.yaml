@@ -1,0 +1,53 @@
+name: xmrf
+arch: all
+platform: linux
+version: ${XMRF_VERSION}
+prerelease: ${XMRF_PRERELEASE}
+release: "1"
+# nFPM 2.48.0 drops Arch prereleases from .PKGINFO without an explicit epoch.
+# Zero preserves normal version ordering in every package manager.
+epoch: "0"
+section: utils
+priority: optional
+maintainer: Justin Lee <justin.nami.lee@gmail.com>
+description: Regex-map Rename File
+homepage: https://github.com/justinnamilee/xmrf
+license: GPL-3.0-or-later
+archlinux:
+  packager: Justin Lee <justin.nami.lee@gmail.com>
+
+contents:
+  - src: bin/xmrf
+    dst: /usr/bin/xmrf
+    file_info:
+      mode: 0755
+  - src: lib/xmrf/app.pm
+    dst: /usr/share/xmrf/lib/xmrf/app.pm
+    file_info:
+      mode: 0644
+  - src: .packaging/xmrf.1.gz
+    dst: /usr/share/man/man1/xmrf.1.gz
+    file_info:
+      mode: 0644
+  - src: packaging/copyright
+    dst: /usr/share/doc/xmrf/copyright
+    file_info:
+      mode: 0644
+  - src: LICENSE
+    dst: /usr/share/licenses/xmrf/LICENSE
+    file_info:
+      mode: 0644
+
+overrides:
+  deb:
+    depends:
+      - perl (>= 5.28)
+  rpm:
+    depends:
+      - perl >= 5.28
+  apk:
+    depends:
+      - perl>=5.28
+  archlinux:
+    depends:
+      - perl>=5.28
