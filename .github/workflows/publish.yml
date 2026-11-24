@@ -23,7 +23,7 @@ jobs:
 
     steps:
     - name: Checkout...
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Install dependencies...
       run: |
@@ -222,16 +222,16 @@ jobs:
         tree -n --charset=ascii site/
 
     - name: Configure GitHub Pages...
-      uses: actions/configure-pages@v5
+      uses: actions/configure-pages@v6
 
     - name: Upload Pages artifact...
-      uses: actions/upload-pages-artifact@v4
+      uses: actions/upload-pages-artifact@v5
       with:
         path: site
 
     - name: Deploy GitHub Pages...
       id: deployment
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5
 
     - name: Live test...
       shell: bash
